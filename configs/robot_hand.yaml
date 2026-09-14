@@ -1,0 +1,108 @@
+# v0.3 文献驱动工程参数。
+# 重要：关节活动范围与几何尺寸仍是工程近似值，不是 CasiaHand 官方 CAD/标定参数。
+# 结构层面参考 Yan et al. (2025): 15 DoF / 7 actuators；拇指全驱动，四根非拇指单腱欠驱动。
+version: v0.3.4
+joint_order:
+  - thumb_mcp
+  - thumb_pip
+  - thumb_dip
+  - index_mcp
+  - index_pip
+  - index_dip
+  - middle_mcp
+  - middle_pip
+  - middle_dip
+  - ring_mcp
+  - ring_pip
+  - ring_dip
+  - little_mcp
+  - little_pip
+  - little_dip
+
+# 为兼容 v0.2/手套通道名继续保留 thumb_mcp/pip/dip；
+# 在 CasiaHand 解剖命名中，它们分别对应 CMC/MCP/IP。
+anatomical_aliases:
+  thumb_mcp: thumb_cmc
+  thumb_pip: thumb_mcp
+  thumb_dip: thumb_ip
+
+joint_ranges_deg:
+  thumb_mcp: [-20, 60]
+  thumb_pip: [0, 65]
+  thumb_dip: [0, 75]
+  index_mcp: [0, 85]
+  index_pip: [0, 95]
+  index_dip: [0, 70]
+  middle_mcp: [0, 85]
+  middle_pip: [0, 95]
+  middle_dip: [0, 70]
+  ring_mcp: [0, 85]
+  ring_pip: [0, 95]
+  ring_dip: [0, 70]
+  little_mcp: [0, 90]
+  little_pip: [0, 95]
+  little_dip: [0, 70]
+
+finger_lengths_m:
+  thumb: [0.032, 0.024, 0.018]
+  index: [0.042, 0.026, 0.019]
+  middle: [0.047, 0.028, 0.020]
+  ring: [0.044, 0.026, 0.019]
+  little: [0.035, 0.021, 0.016]
+base_offsets_m:
+  thumb: [-0.054, -0.072, -0.004]
+  index: [-0.019, 0.000, 0.0]
+  middle: [0.000, 0.004, 0.0]
+  ring: [0.019, 0.000, 0.0]
+  little: [0.035, -0.007, 0.0]
+base_yaw_deg:
+  thumb: -62
+  index: 0
+  middle: 0
+  ring: 2
+  little: 6
+
+# v0.3.2: 三维手指基座姿态 [roll_x, pitch_y, yaw_z]，单位 deg。
+# 拇指侧置并向掌侧倾斜，保持 3-DoF 工程近似。
+base_euler_deg:
+  thumb: [-27.5, 0.0, -62.0]
+  index: [0.0, 0.0, 0.0]
+  middle: [0.0, 0.0, 0.0]
+  ring: [0.0, 0.0, 2.0]
+  little: [0.0, 0.0, 6.0]
+
+architecture:
+  nominal_dof: 15
+  effective_actuators: 7
+  thumb_fully_actuated: true
+  non_thumb_underactuated: true
+  actuator_order:
+    - thumb_mcp
+    - thumb_pip
+    - thumb_dip
+    - index_flexor
+    - middle_flexor
+    - ring_flexor
+    - little_flexor
+
+# 单腱驱动三关节的工程化协同系数。
+# 这些系数用于“目标腱位移”投影，不是论文给出的真实滑轮半径/腱路参数。
+# 保留为可配置项，待实验室真实机械参数到位后替换。
+coupling:
+  index:  {pip_over_mcp: 0.78, dip_over_mcp: 0.56}
+  middle: {pip_over_mcp: 0.80, dip_over_mcp: 0.58}
+  ring:   {pip_over_mcp: 0.82, dip_over_mcp: 0.60}
+  little: {pip_over_mcp: 0.84, dip_over_mcp: 0.62}
+
+# Yan et al. (2025) 给出的非拇指扭簧刚度：
+# MCP 24.106 mNm/rad，PIP/DIP 12.857 mNm/rad。
+non_thumb_spring_stiffness_Nm_rad:
+  mcp: 0.024106
+  pip: 0.012857
+  dip: 0.012857
+
+# 文献强调拇指、指尖和掌部是稳定抓取的重要接触区域。
+contact_sections:
+  - thumb
+  - fingers
+  - palm

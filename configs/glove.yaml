@@ -1,0 +1,21 @@
+sampling_hz: 60
+raw_min_default: 500.0
+raw_max_default: 3500.0
+calibration_epsilon: 1.0
+moving_average_window: 5
+channels:
+  - thumb_mcp
+  - thumb_pip
+  - thumb_dip
+  - index_mcp
+  - index_pip
+  - index_dip
+  - middle_mcp
+  - middle_pip
+  - middle_dip
+  - ring_mcp
+  - ring_pip
+  - ring_dip
+  - little_mcp
+  - little_pip
+  - little_dip

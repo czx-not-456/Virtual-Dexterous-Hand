@@ -1,0 +1,167 @@
+<mujoco model="humanoid_virtual_dexterous_hand_v034_object_aware">
+  <compiler angle="radian" autolimits="true" />
+  <option timestep="0.003" gravity="0 0 -9.81" integrator="implicitfast" />
+  <statistic center="0 -0.005 0.17" extent="0.42" />
+  <visual>
+    <headlight ambient="0.30 0.30 0.30" diffuse="0.72 0.72 0.72" specular="0.18 0.18 0.18" />
+    <rgba haze="0.10 0.14 0.18 1" />
+  </visual>
+  <asset>
+    <texture name="floor_tex" type="2d" builtin="checker" rgb1="0.16 0.18 0.21" rgb2="0.22 0.25 0.29" width="512" height="512" />
+    <material name="floor_mat" texture="floor_tex" texrepeat="6 6" reflectance="0.06" />
+    <material name="palm_mat" rgba="0.18 0.32 0.56 1" />
+    <material name="finger_mat" rgba="0.66 0.73 0.82 1" />
+    <material name="joint_mat" rgba="0.28 0.40 0.55 1" />
+    <material name="thumb_mat" rgba="0.58 0.69 0.82 1" />
+    <material name="object_mat" rgba="0.92 0.48 0.16 1" />
+    <material name="table_mat" rgba="0.30 0.32 0.35 1" />
+    <material name="pad_mat" rgba="0.24 0.34 0.44 1" />
+  </asset>
+  <default>
+    <joint damping="0.35" armature="0.003" />
+    <geom friction="1.1 0.08 0.01" density="650" contype="1" conaffinity="1" condim="4" />
+    <position kp="45" kv="2.4" />
+  </default>
+  <worldbody>
+    <light name="key_light" pos="0 -0.20 0.72" dir="0 0 -1" diffuse="0.85 0.85 0.85" />
+    <light name="fill_light" pos="0.30 0.18 0.42" dir="-0.5 -0.2 -1" diffuse="0.38 0.42 0.48" />
+    <camera name="overview" mode="targetbody" target="palm" pos="0.30 -0.38 0.38" />
+    <camera name="closeup" mode="targetbody" target="palm" pos="0.19 -0.24 0.30" />
+    <camera name="side" mode="targetbody" target="palm" pos="0.34 0.02 0.27" />
+    <geom name="floor" type="plane" size="0.60 0.60 0.02" material="floor_mat" />
+    <body name="task_table" pos="0 0.015 0.035">
+      <geom type="box" size="0.24 0.20 0.035" material="table_mat" contype="1" conaffinity="1" />
+    </body>
+    <body name="grasp_object" pos="-0.015 0.015 0.120">
+      <freejoint name="grasp_object_free" />
+      <geom name="task_object_geom" type="cylinder" size="0.037 0.050" material="object_mat" density="320" friction="1.35 0.12 0.01" />
+      <site name="object_center" type="sphere" size="0.004" rgba="1 1 1 0.9" />
+    </body>
+    <body name="visual_guides" pos="0 0 0">
+      <site name="pinch_focus" type="sphere" pos="-0.037 0.003 0.184" size="0.010" rgba="0.20 0.90 0.45 0.22" />
+    </body>
+    <body name="palm" pos="0 0 0.240">
+      <geom name="palm_core" type="box" pos="0 -0.052 0" size="0.050 0.052 0.013" material="palm_mat" contype="1" conaffinity="1" friction="1.25 0.10 0.01" />
+      <geom name="palm_heel" type="ellipsoid" pos="0 -0.101 0" size="0.046 0.022 0.015" material="palm_mat" contype="1" conaffinity="1" friction="1.25 0.10 0.01" />
+      <geom name="thenar" type="ellipsoid" pos="-0.043 -0.067 -0.003" size="0.024 0.036 0.016" material="thumb_mat" contype="1" conaffinity="1" friction="1.25 0.10 0.01" />
+      <geom name="hypothenar" type="ellipsoid" pos="0.031 -0.058 -0.002" size="0.017 0.031 0.014" material="finger_mat" contype="1" conaffinity="1" friction="1.25 0.10 0.01" />
+      <geom name="wrist_base" type="box" pos="0 -0.132 0" size="0.043 0.030 0.018" material="joint_mat" contype="0" conaffinity="0" />
+      <body name="thumb1" pos="-0.054 -0.072 -0.004" euler="-0.48 0 -1.08">
+        <joint name="thumb_mcp" type="hinge" axis="1 0 0" range="-0.349066 1.047198" />
+        <geom type="sphere" pos="0 0 0" size="0.0100" material="joint_mat" />
+        <geom type="capsule" fromto="0 0 0 0 0.032 0" size="0.0090" material="thumb_mat" />
+        <body name="thumb2" pos="0 0.032 0">
+          <joint name="thumb_pip" type="hinge" axis="1 0 0" range="0 1.134464" />
+          <geom type="sphere" size="0.0088" material="joint_mat" />
+          <geom type="capsule" fromto="0 0 0 0 0.024 0" size="0.0080" material="thumb_mat" />
+          <body name="thumb3" pos="0 0.024 0">
+            <joint name="thumb_dip" type="hinge" axis="1 0 0" range="0 1.308997" />
+            <geom type="sphere" size="0.0078" material="joint_mat" />
+            <geom type="capsule" fromto="0 0 0 0 0.018 0" size="0.0072" material="thumb_mat" />
+            <site name="thumb_tip" type="sphere" pos="0 0.018 0" size="0.0085" rgba="0.95 0.18 0.20 1" />
+            <geom name="thumb_pad" type="sphere" pos="0 0.018 0" size="0.0085" material="pad_mat" friction="1.45 0.14 0.01" solref="0.012 1" solimp="0.90 0.95 0.002" />
+          </body>
+        </body>
+      </body>
+      <body name="index1" pos="-0.019 0 0">
+        <joint name="index_mcp" type="hinge" axis="-1 0 0" range="0 1.483530" stiffness="0.024106" springref="0" />
+        <geom type="sphere" size="0.0095" material="joint_mat" />
+        <geom type="capsule" fromto="0 0 0 0 0.042 0" size="0.0086" material="finger_mat" />
+        <body name="index2" pos="0 0.042 0">
+          <joint name="index_pip" type="hinge" axis="-1 0 0" range="0 1.658063" stiffness="0.012857" springref="0" />
+          <geom type="sphere" size="0.0083" material="joint_mat" />
+          <geom type="capsule" fromto="0 0 0 0 0.026 0" size="0.0075" material="finger_mat" />
+          <body name="index3" pos="0 0.026 0">
+            <joint name="index_dip" type="hinge" axis="-1 0 0" range="0 1.221730" stiffness="0.012857" springref="0" />
+            <geom type="sphere" size="0.0074" material="joint_mat" />
+            <geom type="capsule" fromto="0 0 0 0 0.019 0" size="0.0067" material="finger_mat" />
+            <site name="index_tip" type="sphere" pos="0 0.019 0" size="0.0080" rgba="1.00 0.72 0.12 1" />
+            <geom name="index_pad" type="sphere" pos="0 0.019 0" size="0.0080" material="pad_mat" friction="1.45 0.14 0.01" solref="0.012 1" solimp="0.90 0.95 0.002" />
+          </body>
+        </body>
+      </body>
+      <body name="middle1" pos="0 0.004 0">
+        <joint name="middle_mcp" type="hinge" axis="-1 0 0" range="0 1.483530" stiffness="0.024106" springref="0" />
+        <geom type="sphere" size="0.0097" material="joint_mat" />
+        <geom type="capsule" fromto="0 0 0 0 0.047 0" size="0.0088" material="finger_mat" />
+        <body name="middle2" pos="0 0.047 0">
+          <joint name="middle_pip" type="hinge" axis="-1 0 0" range="0 1.658063" stiffness="0.012857" springref="0" />
+          <geom type="sphere" size="0.0084" material="joint_mat" />
+          <geom type="capsule" fromto="0 0 0 0 0.028 0" size="0.0076" material="finger_mat" />
+          <body name="middle3" pos="0 0.028 0">
+            <joint name="middle_dip" type="hinge" axis="-1 0 0" range="0 1.221730" stiffness="0.012857" springref="0" />
+            <geom type="sphere" size="0.0075" material="joint_mat" />
+            <geom type="capsule" fromto="0 0 0 0 0.020 0" size="0.0068" material="finger_mat" />
+            <site name="middle_tip" type="sphere" pos="0 0.020 0" size="0.0078" rgba="0.20 0.76 0.95 1" />
+            <geom name="middle_pad" type="sphere" pos="0 0.020 0" size="0.0078" material="pad_mat" friction="1.45 0.14 0.01" solref="0.012 1" solimp="0.90 0.95 0.002" />
+          </body>
+        </body>
+      </body>
+      <body name="ring1" pos="0.019 0 0" euler="0 0 0.034907">
+        <joint name="ring_mcp" type="hinge" axis="-1 0 0" range="0 1.483530" stiffness="0.024106" springref="0" />
+        <geom type="sphere" size="0.0093" material="joint_mat" />
+        <geom type="capsule" fromto="0 0 0 0 0.044 0" size="0.0083" material="finger_mat" />
+        <body name="ring2" pos="0 0.044 0">
+          <joint name="ring_pip" type="hinge" axis="-1 0 0" range="0 1.658063" stiffness="0.012857" springref="0" />
+          <geom type="sphere" size="0.0080" material="joint_mat" />
+          <geom type="capsule" fromto="0 0 0 0 0.026 0" size="0.0072" material="finger_mat" />
+          <body name="ring3" pos="0 0.026 0">
+            <joint name="ring_dip" type="hinge" axis="-1 0 0" range="0 1.221730" stiffness="0.012857" springref="0" />
+            <geom type="sphere" size="0.0071" material="joint_mat" />
+            <geom type="capsule" fromto="0 0 0 0 0.019 0" size="0.0064" material="finger_mat" />
+            <site name="ring_tip" type="sphere" pos="0 0.019 0" size="0.0075" rgba="0.20 0.76 0.95 1" />
+            <geom name="ring_pad" type="sphere" pos="0 0.019 0" size="0.0075" material="pad_mat" friction="1.45 0.14 0.01" solref="0.012 1" solimp="0.90 0.95 0.002" />
+          </body>
+        </body>
+      </body>
+      <body name="little1" pos="0.035 -0.007 0" euler="0 0 0.104720">
+        <joint name="little_mcp" type="hinge" axis="-1 0 0" range="0 1.570796" stiffness="0.024106" springref="0" />
+        <geom type="sphere" size="0.0087" material="joint_mat" />
+        <geom type="capsule" fromto="0 0 0 0 0.035 0" size="0.0078" material="finger_mat" />
+        <body name="little2" pos="0 0.035 0">
+          <joint name="little_pip" type="hinge" axis="-1 0 0" range="0 1.658063" stiffness="0.012857" springref="0" />
+          <geom type="sphere" size="0.0075" material="joint_mat" />
+          <geom type="capsule" fromto="0 0 0 0 0.021 0" size="0.0067" material="finger_mat" />
+          <body name="little3" pos="0 0.021 0">
+            <joint name="little_dip" type="hinge" axis="-1 0 0" range="0 1.221730" stiffness="0.012857" springref="0" />
+            <geom type="sphere" size="0.0067" material="joint_mat" />
+            <geom type="capsule" fromto="0 0 0 0 0.016 0" size="0.0060" material="finger_mat" />
+            <site name="little_tip" type="sphere" pos="0 0.016 0" size="0.0070" rgba="0.20 0.76 0.95 1" />
+            <geom name="little_pad" type="sphere" pos="0 0.016 0" size="0.0070" material="pad_mat" friction="1.45 0.14 0.01" solref="0.012 1" solimp="0.90 0.95 0.002" />
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <tendon>
+    <fixed name="index_flexor_tendon" limited="false">
+      <joint joint="index_mcp" coef="1.0" />
+      <joint joint="index_pip" coef="0.78" />
+      <joint joint="index_dip" coef="0.56" />
+    </fixed>
+    <fixed name="middle_flexor_tendon" limited="false">
+      <joint joint="middle_mcp" coef="1.0" />
+      <joint joint="middle_pip" coef="0.8" />
+      <joint joint="middle_dip" coef="0.58" />
+    </fixed>
+    <fixed name="ring_flexor_tendon" limited="false">
+      <joint joint="ring_mcp" coef="1.0" />
+      <joint joint="ring_pip" coef="0.82" />
+      <joint joint="ring_dip" coef="0.6" />
+    </fixed>
+    <fixed name="little_flexor_tendon" limited="false">
+      <joint joint="little_mcp" coef="1.0" />
+      <joint joint="little_pip" coef="0.84" />
+      <joint joint="little_dip" coef="0.62" />
+    </fixed>
+  </tendon>
+  <actuator>
+    <position name="act_thumb_mcp" joint="thumb_mcp" ctrlrange="-0.349066 1.047198" kp="45" kv="2.4" />
+    <position name="act_thumb_pip" joint="thumb_pip" ctrlrange="0.000000 1.134464" kp="45" kv="2.4" />
+    <position name="act_thumb_dip" joint="thumb_dip" ctrlrange="0.000000 1.308997" kp="45" kv="2.4" />
+    <position name="act_index_flexor" tendon="index_flexor_tendon" ctrlrange="0 3.460988" kp="22" kv="1.6" />
+    <position name="act_middle_flexor" tendon="middle_flexor_tendon" ctrlrange="0 3.518584" kp="22" kv="1.6" />
+    <position name="act_ring_flexor" tendon="ring_flexor_tendon" ctrlrange="0 3.576180" kp="22" kv="1.6" />
+    <position name="act_little_flexor" tendon="little_flexor_tendon" ctrlrange="0 3.721042" kp="22" kv="1.6" />
+  </actuator>
+</mujoco>

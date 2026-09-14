@@ -1,0 +1,103 @@
+intent:
+  pinch_enter_m: 0.06
+  pinch_exit_m: 0.072
+  wrap_enter: 0.68
+  wrap_exit: 0.58
+  dwell_frames: 4
+  sequence_window_frames: 7
+optimizer:
+  maxiter: 28
+  ftol: 1.0e-06
+  weights:
+    NEUTRAL:
+      pos: 0.35
+      vector: 0.65
+      topo: 1.2
+      smooth: 0.24
+      coupling: 0.18
+      collision: 0.45
+    PINCH:
+      pos: 18.0
+      vector: 5.5
+      topo: 0.3
+      smooth: 0.08
+      coupling: 0.05
+      collision: 1.1
+    WRAP:
+      pos: 1.25
+      vector: 1.5
+      topo: 1.7
+      smooth: 0.2
+      coupling: 0.8
+      collision: 0.7
+  collision:
+    adjacent_tip_min_m: 0.01
+    non_target_thumb_tip_min_m: 0.014
+    penalty_gain: 1.0
+  vector_pairs:
+  - - thumb
+    - index
+  - - thumb
+    - middle
+  - - index
+    - middle
+  - - middle
+    - ring
+  - - ring
+    - little
+output_filter:
+  alpha: 0.45
+  max_velocity_deg_s: 360
+contact_assist:
+  enabled: true
+  release_rate_deg_s: 220
+  pinch:
+    active_intent: PINCH
+    close_rate_deg_s: 110
+    max_extra_deg:
+      thumb_mcp: 6
+      thumb_pip: 8
+      thumb_dip: 6
+      index_mcp: 36
+      index_pip: 34
+      index_dip: 24
+  wrap:
+    active_intent: WRAP
+    close_rate_deg_s: 85
+    max_extra_deg:
+      thumb_mcp: 14
+      thumb_pip: 20
+      thumb_dip: 14
+      index_mcp: 18
+      index_pip: 24
+      index_dip: 16
+      middle_mcp: 18
+      middle_pip: 24
+      middle_dip: 16
+      ring_mcp: 20
+      ring_pip: 26
+      ring_dip: 18
+      little_mcp: 22
+      little_pip: 28
+      little_dip: 20
+
+task_space_servo:
+  enabled: true
+  gain: 0.72
+  damping: 0.018
+  blend: 0.86
+  max_joint_step_deg: 4.5
+  stop_error_m: 0.0045
+  pinch:
+    active_intent: PINCH
+    clearance_m: 0.0075
+    vertical_margin_m: 0.010
+  wrap:
+    active_intent: WRAP
+    clearance_m: 0.0075
+    vertical_margin_m: 0.012
+  sphere:
+    active_intent: WRAP
+    clearance_m: 0.0075
+    vertical_margin_m: 0.010
+

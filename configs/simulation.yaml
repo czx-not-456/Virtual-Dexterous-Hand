@@ -1,0 +1,66 @@
+mujoco:
+  model_path: models/dexterous_hand/humanoid_hand_v031.xml
+  default_camera: overview
+  task_object_body: grasp_object
+  default_task: wrap
+  auto_reset_object: true
+  hold_task_object_when_inactive: true
+  object_workspace_radius_m: 0.28
+  object_min_z_m: 0.045
+  camera_presets:
+    overview:
+      lookat:
+      - 0.0
+      - -0.015
+      - 0.19
+      distance: 0.52
+      azimuth: 140.0
+      elevation: -24.0
+    closeup:
+      lookat:
+      - -0.018
+      - 0.005
+      - 0.19
+      distance: 0.34
+      azimuth: 140.0
+      elevation: -20.0
+    side:
+      lookat:
+      - 0.0
+      - 0.0
+      - 0.185
+      distance: 0.44
+      azimuth: 90.0
+      elevation: -12.0
+  task_objects:
+    wrap:
+      type: cylinder
+      size:
+      - 0.035
+      - 0.065
+      pos:
+      - -0.005
+      - -0.02
+      - 0.135
+      mass_density: 320
+    pinch:
+      type: box
+      size:
+      - 0.006
+      - 0.006
+      - 0.056
+      pos:
+      - -0.014
+      - -0.044
+      - 0.126
+      mass_density: 260
+    sphere:
+      type: sphere
+      size:
+      - 0.038
+      pos:
+      - -0.008
+      - 0.018
+      - 0.108
+      mass_density: 300
+  stability_orientation_deg: 3.0
