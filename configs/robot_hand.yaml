@@ -1,7 +1,7 @@
 # v0.3 文献驱动工程参数。
 # 重要：关节活动范围与几何尺寸仍是工程近似值，不是 CasiaHand 官方 CAD/标定参数。
 # 结构层面参考 Yan et al. (2025): 15 DoF / 7 actuators；拇指全驱动，四根非拇指单腱欠驱动。
-version: v0.3.4
+version: v0.4.4
 joint_order:
   - thumb_mcp
   - thumb_pip

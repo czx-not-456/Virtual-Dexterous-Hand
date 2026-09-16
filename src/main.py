@@ -2,16 +2,20 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+import json
 import math
+from pathlib import Path
 import time
 import numpy as np
 
 from src.common import ROOT, load_yaml
 from src.evaluation.logger import CSVRunLogger
 from src.evaluation.metrics import joint_rmse, velocity_rms
+from src.evaluation.task_evaluator import TaskEpisodeEvaluator
 from src.features.feature_extractor import FeatureExtractor
 from src.features.intent_recognition import IntentRecognizer
 from src.glove.calibration import AdaptiveCalibrator
+from src.glove.dataset_driver import CSVGloveDatasetDriver
 from src.glove.mock_driver import MockGloveDriver
 from src.hand_model.human_hand import HumanHandModel
 from src.hand_model.robot_hand import RobotHandModel
@@ -43,6 +47,7 @@ CONTACT_COLUMNS = [
     "stable_orientation",
     "pinch_contact_proxy",
     "wrap_contact_proxy",
+    "task_contact_proxy",
     "stable_contact_proxy",
     "object_displacement_m",
 ]
@@ -56,9 +61,15 @@ SERVO_COLUMNS = [
     "servo_corrected_digits",
 ]
 
+EVALUATION_COLUMNS = [
+    "task_active",
+    "task_success",
+    "task_success_streak_frames",
+]
+
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description="Virtual dexterous hand v0.3.4 - object-aware task-space servo prototype")
+    p = argparse.ArgumentParser(description="Virtual dexterous hand v0.4 - synthetic dataset + benchmarkable MuJoCo pipeline")
     p.add_argument("--sim", choices=["auto", "none", "mujoco"], default="auto")
     p.add_argument("--render", action="store_true")
     p.add_argument(
@@ -72,14 +83,24 @@ def build_parser() -> argparse.ArgumentParser:
         "--camera",
         choices=["overview", "closeup", "side", "free"],
         default=None,
-        help="MuJoCo 自由相机初始视角预设；启动后仍可鼠标拖动；不填写时读取 configs/simulation.yaml",
+        help="MuJoCo 自由相机初始视角预设",
     )
     p.add_argument(
         "--task",
-        choices=["wrap", "pinch", "sphere"],
         default=None,
-        help="测试物体：wrap=圆柱包络，pinch=薄块捏合，sphere=球体形状适应",
+        help="测试物体名称；见 configs/simulation.yaml -> task_objects，例如 wrap/pinch/sphere/card/bottle/box",
     )
+    p.add_argument("--input", choices=["mock", "dataset"], default="dataset", help="模拟输入来源")
+    p.add_argument(
+        "--dataset",
+        type=Path,
+        default=ROOT / "datasets" / "synthetic_glove_v1.csv",
+        help="CSV 模拟数据集路径",
+    )
+    p.add_argument("--dataset-trial", type=int, default=0, help="使用数据集中的某个 trial_id")
+    p.add_argument("--seed", type=int, default=7, help="procedural mock 模式随机种子")
+    p.add_argument("--output-dir", type=Path, default=ROOT / "outputs")
+    p.add_argument("--run-name", default=None, help="固定输出文件名前缀，便于批量实验")
     return p
 
 
@@ -106,9 +127,37 @@ def _empty_contact_metrics() -> dict[str, float | int | bool]:
         "stable_orientation": True,
         "pinch_contact_proxy": False,
         "wrap_contact_proxy": False,
+        "task_contact_proxy": False,
         "stable_contact_proxy": False,
         "object_displacement_m": 0.0,
     }
+
+
+def _make_driver(args: argparse.Namespace, glove_cfg: dict):
+    channels = list(glove_cfg["channels"])
+    hz = float(glove_cfg["sampling_hz"])
+    if args.input == "dataset":
+        driver = CSVGloveDatasetDriver(
+            args.dataset,
+            channels,
+            sampling_hz=hz,
+            trial_id=args.dataset_trial,
+            loop=True,
+        )
+        print(
+            f"[INFO] 输入=synthetic dataset: {args.dataset} "
+            f"trial={args.dataset_trial} available={driver.available_trials}"
+        )
+        return driver
+    driver = MockGloveDriver(
+        channels=channels,
+        sampling_hz=hz,
+        raw_min=float(glove_cfg["raw_min_default"]),
+        raw_max=float(glove_cfg["raw_max_default"]),
+        seed=int(args.seed),
+    )
+    print(f"[INFO] 输入=procedural mock seed={args.seed}")
+    return driver
 
 
 def main() -> None:
@@ -120,12 +169,15 @@ def main() -> None:
     hz = float(glove_cfg["sampling_hz"])
     dt = 1.0 / hz
 
-    driver = MockGloveDriver(
-        channels=channels,
-        sampling_hz=hz,
-        raw_min=float(glove_cfg["raw_min_default"]),
-        raw_max=float(glove_cfg["raw_max_default"]),
-    )
+    task_name = args.task or str(sim_cfg.get("default_task", "wrap"))
+    task_catalog = dict(sim_cfg.get("task_objects", {}))
+    if task_name not in task_catalog:
+        raise SystemExit(f"未知 task={task_name!r}；可用：{', '.join(sorted(task_catalog))}")
+    task_spec = dict(task_catalog[task_name])
+    task_mode = str(task_spec.get("interaction", task_name))
+    active_intent = str(task_spec.get("active_intent", "PINCH" if task_mode == "pinch" else "WRAP"))
+
+    driver = _make_driver(args, glove_cfg)
     calibrator = AdaptiveCalibrator(channels, epsilon=float(glove_cfg["calibration_epsilon"]))
     calibrator.fit(driver.calibration_samples())
     input_filter = MovingAverageFilter(channels, int(glove_cfg["moving_average_window"]))
@@ -155,18 +207,15 @@ def main() -> None:
     if args.sim == "auto":
         try:
             import mujoco  # noqa: F401
-
             use_mujoco = True
         except ImportError:
             use_mujoco = False
             print("[INFO] 未检测到 MuJoCo，自动使用纯算法模式。")
 
-    task_name = args.task or str(sim_cfg.get("default_task", "wrap"))
     if use_mujoco:
         from src.simulation.mujoco_env import MujocoSimulator
 
         camera = args.camera or str(sim_cfg["default_camera"])
-        task_spec = dict(sim_cfg.get("task_objects", {}).get(task_name, {}))
         simulator = MujocoSimulator(
             robot,
             model_path=str(sim_cfg["model_path"]),
@@ -180,9 +229,18 @@ def main() -> None:
             object_min_z_m=float(sim_cfg["object_min_z_m"]),
             stability_orientation_deg=float(sim_cfg.get("stability_orientation_deg", 3.0)),
             camera_presets=dict(sim_cfg.get("camera_presets", {})),
+            control_dt_s=dt,
         )
         if args.render:
-            print(f"[INFO] MuJoCo v0.3.4 Viewer 已启动；自由相机初始预设={camera}；任务={task_name}；任务空间伺服=ON")
+            print(
+                f"[INFO] MuJoCo Viewer 已启动；camera={camera}；task={task_name} "
+                f"mode={task_mode}；任务空间伺服={'ON' if task_servo.enabled else 'OFF'}"
+            )
+        print(
+            f"[INFO] Physics sync: control_dt={dt*1000:.2f}ms; "
+            f"mujoco_dt={simulator.physics_dt_s*1000:.2f}ms; "
+            f"avg_substeps={dt/simulator.physics_dt_s:.2f}"
+        )
 
     print(
         f"[INFO] Robot architecture: nominal DoF={robot.nominal_dof}, "
@@ -190,11 +248,28 @@ def main() -> None:
     )
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_path = ROOT / "outputs" / f"run_{stamp}.csv"
+    run_name = args.run_name or f"run_{stamp}_{task_name}"
+    output_dir = Path(args.output_dir)
+    if not output_dir.is_absolute():
+        output_dir = (ROOT / output_dir).resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    log_path = output_dir / f"{run_name}.csv"
+    summary_path = output_dir / f"{run_name}_summary.json"
     logger = CSVRunLogger(
         log_path,
         robot.joint_order,
-        extra_columns=CONTACT_COLUMNS + SERVO_COLUMNS,
+        extra_columns=CONTACT_COLUMNS + SERVO_COLUMNS + EVALUATION_COLUMNS,
+    )
+
+    eval_cfg = dict(sim_cfg.get("evaluation", {}))
+    evaluator = TaskEpisodeEvaluator(
+        task_name=task_name,
+        sampling_hz=hz,
+        min_success_streak_frames=int(eval_cfg.get("min_success_streak_frames", 12)),
+        # Precision PINCH is successful when thumb+index fingertip contact is
+        # sustained.  Orientation stability remains visible via stable_ratio.
+        # WRAP continues to require stable contact for success.
+        success_mode="contact" if task_mode == "pinch" else "stable",
     )
 
     q_prev_opt = None
@@ -216,10 +291,9 @@ def main() -> None:
             q_h = human.angles_from_normalized(norm)
             features = extractor.extract(q_h)
             intent = recognizer.update(features)
+            task_active = intent.value == active_intent
 
             if simulator is not None:
-                active_intent = "PINCH" if task_name == "pinch" else "WRAP"
-                task_active = intent.value == active_intent
                 rising = simulator.set_task_active(
                     task_active,
                     hold_when_inactive=bool(sim_cfg.get("hold_task_object_when_inactive", True)),
@@ -248,13 +322,15 @@ def main() -> None:
                         q_target,
                         simulator=simulator,
                         task_name=task_name,
+                        task_mode=task_mode,
                         intent_value=intent.value,
                         contact=last_contact,
                     )
                 else:
+                    assist_mode = "wrap" if task_mode in {"wrap", "sphere"} else task_mode
                     q_target = contact_assist.apply(
                         q_target,
-                        task_name=task_name,
+                        task_name=assist_mode,
                         intent_value=intent.value,
                         contact=last_contact,
                     )
@@ -262,7 +338,21 @@ def main() -> None:
             q_filtered = lp.apply(q_target)
             q_out = rate_limit(q_filtered, q_prev_out, vmax, dt)
             if simulator is not None:
-                q_actual = simulator.step(q_out)
+                # PINCH approach fixture: keep the free calibration block upright
+                # until BOTH fingertip pads have contacted it.  A single early
+                # contact can otherwise knock the tall block down and make the
+                # second fingertip chase a moving target.  As soon as bilateral
+                # fingertip contact was observed on the previous frame, release
+                # the object; success must then persist under free-body physics.
+                hold_pinch_object = bool(
+                    task_mode == "pinch"
+                    and task_active
+                    and not (
+                        bool(last_contact.get("thumb_tip_contact", False))
+                        and bool(last_contact.get("index_tip_contact", False))
+                    )
+                )
+                q_actual = simulator.step(q_out, hold_object=hold_pinch_object)
                 contact = simulator.contact_metrics()
                 last_contact = contact
             else:
@@ -273,6 +363,17 @@ def main() -> None:
             rmse = joint_rmse(q_actual, result.q_base)
             vel = velocity_rms(q_actual, q_prev_out, dt)
             q_prev_out = q_actual.copy()
+            servo_dict = servo_diag.as_dict()
+            eval_state = evaluator.update(
+                frame=frame,
+                task_active=task_active,
+                contact=contact,
+                latency_ms=latency_ms,
+                optimizer_ms=optimizer_ms,
+                joint_rmse_rad=rmse,
+                velocity_rms_rad_s=vel,
+                servo_mean_error_m=float(servo_dict["servo_mean_error_m"]),
+            )
 
             logger.write(
                 [
@@ -287,17 +388,26 @@ def main() -> None:
                     rmse,
                     vel,
                     *[contact[name] for name in CONTACT_COLUMNS],
-                    *[servo_diag.as_dict()[name] for name in SERVO_COLUMNS],
+                    *[servo_dict[name] for name in SERVO_COLUMNS],
+                    *[eval_state[name] for name in EVALUATION_COLUMNS],
                     *q_actual.tolist(),
                 ]
             )
 
-            if intent != last_intent:
+            # Print intent transitions plus periodic active-task diagnostics.
+            # The thumb/index pad flags are essential for PINCH debugging: raw
+            # contact_count alone cannot tell a phalanx hit from a true pad hit.
+            report_active = bool(task_active and frame % 30 == 0)
+            if intent != last_intent or report_active:
                 extra = ""
                 if simulator is not None:
                     extra = (
                         f" contacts={contact['contact_count']} sections={contact['contact_sections']} "
                         f"tip_ratio={float(contact['tip_contact_ratio']):.2f}"
+                        f" Ttip={int(bool(contact['thumb_tip_contact']))}"
+                        f" Itip={int(bool(contact['index_tip_contact']))}"
+                        f" Terr={float(servo_dict['servo_thumb_error_m'])*1000:.1f}mm"
+                        f" Ierr={float(servo_dict['servo_index_error_m'])*1000:.1f}mm"
                     )
                 print(
                     f"frame={frame:04d} intent={intent.value:<7} "
@@ -318,7 +428,30 @@ def main() -> None:
         if simulator is not None:
             simulator.close()
 
-    print(f"[DONE] 输出日志：{log_path}")
+        summary = evaluator.summary()
+        summary.update(
+            {
+                "version": "v0.4.6-pinch-success",
+                "input_source": args.input,
+                "dataset": str(args.dataset) if args.input == "dataset" else None,
+                "dataset_trial": int(args.dataset_trial) if args.input == "dataset" else None,
+                "mock_seed": int(args.seed) if args.input == "mock" else None,
+                "simulation": "mujoco" if simulator is not None else "none",
+                "task_mode": task_mode,
+                "active_intent": active_intent,
+                "log_csv": str(log_path),
+            }
+        )
+        summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"[DONE] CSV:     {log_path}")
+        print(f"[DONE] Summary: {summary_path}")
+        if simulator is not None:
+            print(
+                f"[RESULT] task={task_name} success_proxy={summary['success_proxy']} "
+                f"contact_ratio={summary['contact_frame_ratio']:.1%} "
+                f"stable_ratio={summary['stable_frame_ratio']:.1%} "
+                f"p95_latency={summary['p95_pipeline_latency_ms']:.2f}ms"
+            )
 
 
 if __name__ == "__main__":

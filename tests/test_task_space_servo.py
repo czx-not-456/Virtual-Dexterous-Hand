@@ -88,3 +88,40 @@ def test_task_space_servo_holds_digit_after_contact():
     )
     thumb_idx = [idx["thumb_mcp"], idx["thumb_pip"], idx["thumb_dip"]]
     assert np.allclose(out[thumb_idx], sim.q[thumb_idx])
+
+
+def test_pinch_non_tip_contact_does_not_freeze_digit():
+    robot = RobotHandModel()
+    cfg = load_yaml("configs/algorithm.yaml")["task_space_servo"]
+    servo = ObjectAwareTaskServo(robot, cfg)
+    sim = FakeSimulator(robot)
+    q = np.zeros(len(robot.joint_order), dtype=float)
+    contact = _contact()
+    contact["thumb_contact"] = True
+    contact["thumb_tip_contact"] = False
+    out, diag = servo.apply(
+        q, simulator=sim, task_name="pinch", intent_value="PINCH", contact=contact
+    )
+    idx = {name: i for i, name in enumerate(robot.joint_order)}
+    thumb_idx = [idx["thumb_mcp"], idx["thumb_pip"], idx["thumb_dip"]]
+    assert diag.active
+    assert np.linalg.norm(out[thumb_idx]) > 0
+
+
+def test_pinch_tip_contact_still_freezes_digit():
+    robot = RobotHandModel()
+    cfg = load_yaml("configs/algorithm.yaml")["task_space_servo"]
+    servo = ObjectAwareTaskServo(robot, cfg)
+    sim = FakeSimulator(robot)
+    idx = {name: i for i, name in enumerate(robot.joint_order)}
+    sim.q[idx["thumb_mcp"]] = -0.12
+    sim.q[idx["thumb_pip"]] = 0.15
+    sim.q[idx["thumb_dip"]] = 0.08
+    q = np.zeros(len(robot.joint_order), dtype=float)
+    contact = _contact()
+    contact["thumb_tip_contact"] = True
+    out, _ = servo.apply(
+        q, simulator=sim, task_name="pinch", intent_value="PINCH", contact=contact
+    )
+    thumb_idx = [idx["thumb_mcp"], idx["thumb_pip"], idx["thumb_dip"]]
+    assert np.allclose(out[thumb_idx], sim.q[thumb_idx])

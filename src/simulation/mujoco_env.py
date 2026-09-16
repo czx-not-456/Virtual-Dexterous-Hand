@@ -33,6 +33,7 @@ class MujocoSimulator:
         object_min_z_m: float = 0.045,
         stability_orientation_deg: float = 3.0,
         camera_presets: dict | None = None,
+        control_dt_s: float | None = None,
     ) -> None:
         try:
             import mujoco
@@ -46,6 +47,7 @@ class MujocoSimulator:
         self.camera_name = camera
         self.task_name = str(task_name)
         self.task_spec = dict(task_spec or {})
+        self.task_mode = str(self.task_spec.get("interaction", task_name))
         self.auto_reset_object = bool(auto_reset_object)
         self._task_active = False
         self.object_workspace_radius_m = float(object_workspace_radius_m)
@@ -53,6 +55,14 @@ class MujocoSimulator:
         self.stability_orientation_deg = float(stability_orientation_deg)
         self.camera_presets = dict(camera_presets or {})
         self._contact_streak_frames = 0
+        # The glove/control loop runs at 60 Hz, while the MJCF physics timestep is
+        # 3 ms. Older versions advanced MuJoCo only once per control frame, so
+        # 16.67 ms of control time advanced only 3 ms of physics. That made the
+        # index finger lag badly during the short PINCH window. We keep an exact
+        # time accumulator and execute 5/6 substeps per control tick on average.
+        self.control_dt_s = float(control_dt_s) if control_dt_s is not None else None
+        self._physics_time_accumulator_s = 0.0
+        self.last_physics_substeps = 0
 
         path = (ROOT / model_path).resolve()
         if not path.is_file():
@@ -65,6 +75,13 @@ class MujocoSimulator:
             xml_text = self._configure_task_xml(xml_text, task_object_body, task_spec)
         self.model = mujoco.MjModel.from_xml_string(xml_text)
         self.data = mujoco.MjData(self.model)
+        self.physics_dt_s = float(self.model.opt.timestep)
+        if self.control_dt_s is None:
+            self.control_dt_s = self.physics_dt_s
+        if self.control_dt_s <= 0.0:
+            raise ValueError("control_dt_s must be positive")
+        if self.physics_dt_s <= 0.0:
+            raise ValueError("MuJoCo timestep must be positive")
 
         self.act_ids: list[int] = []
         for actuator in robot.actuator_order:
@@ -197,12 +214,64 @@ class MujocoSimulator:
         if pos[2] < self.object_min_z_m or xy_offset > self.object_workspace_radius_m:
             self.reset_task_object()
 
-    def step(self, target_q: np.ndarray) -> np.ndarray:
+    def _hold_task_object_pose(self, *, forward: bool = False) -> None:
+        """Keep the free task object at its reproducible initial pose.
+
+        PINCH uses this only during the approach phase.  It prevents one digit
+        from knocking the tall calibration block over before the opposite pad
+        arrives.  Once both fingertip pads touch, the caller releases the object
+        again, so the stability metric still has to survive free-body physics.
+        """
+        if self._object_qpos_adr is None or self._object_qpos0 is None:
+            return
+        qadr = self._object_qpos_adr
+        self.data.qpos[qadr : qadr + 7] = self._object_qpos0
+        if self._object_dof_adr is not None:
+            dadr = self._object_dof_adr
+            self.data.qvel[dadr : dadr + 6] = 0.0
+        if forward:
+            self.mujoco.mj_forward(self.model, self.data)
+
+    def step(self, target_q: np.ndarray, *, hold_object: bool = False) -> np.ndarray:
         target_q = np.asarray(target_q, dtype=float)
         controls = self.robot.actuator_targets_from_joint_targets(target_q)
         for aid, u in zip(self.act_ids, controls):
             self.data.ctrl[aid] = float(u)
-        self.mujoco.mj_step(self.model, self.data)
+
+        # Advance approximately one control period of physical time. For the
+        # default 60 Hz controller and 3 ms MJCF timestep this alternates between
+        # 5 and 6 physics steps (average 5.56), instead of the single 3 ms step
+        # used in v0.4.2. The accumulator avoids long-term clock drift.
+        #
+        # During PINCH approach, ``hold_object`` makes the free object behave as a
+        # temporary fixture: each substep starts from the same initial object pose.
+        # This removes the common failure mode where the first fingertip contact
+        # topples the block before the second fingertip arrives.
+        if hold_object:
+            self._hold_task_object_pose()
+        self._physics_time_accumulator_s += float(self.control_dt_s)
+        substeps = 0
+        max_substeps = 64  # defensive guard for accidental configuration errors
+        while (
+            self._physics_time_accumulator_s + 1e-12 >= self.physics_dt_s
+            and substeps < max_substeps
+        ):
+            self.mujoco.mj_step(self.model, self.data)
+            if hold_object:
+                self._hold_task_object_pose()
+            self._physics_time_accumulator_s -= self.physics_dt_s
+            substeps += 1
+        self.last_physics_substeps = substeps
+
+        # Recompute derived poses/contact pairs for the held pose so the contact
+        # metrics and Viewer correspond to the same object state.
+        if hold_object:
+            self._hold_task_object_pose(forward=True)
+
+        if substeps >= max_substeps and self._physics_time_accumulator_s >= self.physics_dt_s:
+            # Do not allow an invalid control period to create an unbounded loop.
+            self._physics_time_accumulator_s = 0.0
+
         self._maybe_reset_task_object()
         if self.viewer is not None:
             self.viewer.sync()
@@ -300,7 +369,7 @@ class MujocoSimulator:
             "thumb" in digit_contacts
             and any(f in digit_contacts for f in ("index", "middle", "ring", "little"))
         )
-        task_proxy = pinch_proxy if self.task_name == "pinch" else wrap_proxy
+        task_proxy = pinch_proxy if self.task_mode == "pinch" else wrap_proxy
         stable_contact_proxy = bool(task_proxy and stable_orientation)
 
         return {
@@ -325,6 +394,7 @@ class MujocoSimulator:
             "stable_orientation": bool(stable_orientation),
             "pinch_contact_proxy": pinch_proxy,
             "wrap_contact_proxy": wrap_proxy,
+            "task_contact_proxy": bool(task_proxy),
             "stable_contact_proxy": stable_contact_proxy,
             "object_displacement_m": float(self.object_displacement_m()),
         }
@@ -406,10 +476,11 @@ class MujocoSimulator:
         clearance_m: float,
         vertical_margin_m: float,
     ) -> np.ndarray:
-        """根据当前物体位姿生成一个指尖球心目标点。
+        """Generate a reachable fingertip-center target on the current object surface.
 
-        clearance_m 是指尖球心相对物体表面的外侧距离，近似补偿 fingertip pad
-        半径；目标会随物体姿态实时更新，因此即使物体产生轻微位移也能继续追踪。
+        ``task_name`` is the interaction mode (``pinch``/``wrap``/``sphere``), not
+        necessarily the catalog name. This lets multiple standard objects reuse the
+        same control law. The target follows the current free object's pose.
         """
         center, R = self.task_object_pose()
         tip = self.fingertip_position(finger)
@@ -418,17 +489,25 @@ class MujocoSimulator:
         kind = str(spec.get("type", "cylinder"))
         size = [float(x) for x in spec.get("size", [])]
         c = float(clearance_m)
-        margin = float(vertical_margin_m)
+        margin = max(0.0, float(vertical_margin_m))
+        mode = str(spec.get("interaction", task_name))
 
-        if task_name == "pinch" and kind == "box" and len(size) >= 3:
+        if mode == "pinch" and kind == "box" and len(size) >= 3:
             hx, hy, hz = size[:3]
-            # 当前手模型中拇指位于物体 -Y 侧，食指从 +Y 侧闭合。
+            # Thumb approaches from -Y, index from +Y. Preserve the current X as
+            # much as possible instead of forcing both tips to the box centerline;
+            # this is important because this hand has no ab/adduction DoF.
             side = -1.0 if finger == "thumb" else 1.0
-            z = float(np.clip(local_tip[2], -hz + margin, hz - margin))
-            local_target = np.array([0.0, side * (hy + c), z], dtype=float)
+            x_margin = min(margin, max(0.0, hx * 0.35))
+            z_margin = min(margin, max(0.0, hz * 0.35))
+            x_lo, x_hi = -hx + x_margin, hx - x_margin
+            z_lo, z_hi = -hz + z_margin, hz - z_margin
+            x = float(np.clip(local_tip[0], min(x_lo, x_hi), max(x_lo, x_hi)))
+            z = float(np.clip(local_tip[2], min(z_lo, z_hi), max(z_lo, z_hi)))
+            local_target = np.array([x, side * (hy + c), z], dtype=float)
             return center + R @ local_target
 
-        if task_name in {"wrap", "sphere"}:
+        if mode in {"wrap", "sphere"}:
             if kind == "sphere" and len(size) >= 1:
                 radius = size[0]
                 v = local_tip.copy()
@@ -454,11 +533,31 @@ class MujocoSimulator:
                     radial = default_dir.get(finger, np.array([0.0, 1.0]))
                     n = float(np.linalg.norm(radial))
                 xy = radial / n * (radius + c)
-                z = float(np.clip(local_tip[2], -half_h + margin, half_h - margin))
+                z_margin = min(margin, max(0.0, half_h * 0.35))
+                z = float(np.clip(local_tip[2], -half_h + z_margin, half_h - z_margin))
                 local_target = np.array([xy[0], xy[1], z], dtype=float)
                 return center + R @ local_target
 
-        # 未知任务的保守回退：直接返回当前指尖，不施加额外运动。
+            if kind == "box" and len(size) >= 3:
+                half = np.asarray(size[:3], dtype=float)
+                # Closest point on the box; then move outward by fingertip-center
+                # clearance. This supports box/cuboid envelope-grasp benchmarks.
+                surface = np.clip(local_tip, -half, half)
+                outside = local_tip - surface
+                n = float(np.linalg.norm(outside))
+                if n < 1e-9:
+                    # If numerically inside, choose the nearest face.
+                    face_gap = half - np.abs(local_tip)
+                    axis = int(np.argmin(face_gap))
+                    normal = np.zeros(3, dtype=float)
+                    normal[axis] = 1.0 if local_tip[axis] >= 0.0 else -1.0
+                    surface[axis] = normal[axis] * half[axis]
+                else:
+                    normal = outside / n
+                local_target = surface + c * normal
+                return center + R @ local_target
+
+        # Unknown task/geometry: do not inject an unsafe correction.
         return tip.copy()
 
     def close(self) -> None:

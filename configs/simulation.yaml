@@ -7,60 +7,85 @@ mujoco:
   hold_task_object_when_inactive: true
   object_workspace_radius_m: 0.28
   object_min_z_m: 0.045
+  stability_orientation_deg: 3.0
+  evaluation:
+    min_success_streak_frames: 12
   camera_presets:
     overview:
-      lookat:
-      - 0.0
-      - -0.015
-      - 0.19
+      lookat: [0.0, -0.015, 0.19]
       distance: 0.52
       azimuth: 140.0
       elevation: -24.0
     closeup:
-      lookat:
-      - -0.018
-      - 0.005
-      - 0.19
+      lookat: [-0.018, 0.005, 0.19]
       distance: 0.34
       azimuth: 140.0
       elevation: -20.0
     side:
-      lookat:
-      - 0.0
-      - 0.0
-      - 0.185
+      lookat: [0.0, 0.0, 0.185]
       distance: 0.44
       azimuth: 90.0
       elevation: -12.0
+
+  # Standardized simulated objects. All positions keep the object near the fixed
+  # hand workspace and above the current table top (z=0.070 m).
   task_objects:
     wrap:
+      label: cylinder
+      interaction: wrap
+      active_intent: WRAP
       type: cylinder
-      size:
-      - 0.035
-      - 0.065
-      pos:
-      - -0.005
-      - -0.02
-      - 0.135
+      size: [0.035, 0.065]
+      pos: [-0.005, -0.020, 0.135]
       mass_density: 320
     pinch:
+      label: thin_block
+      interaction: pinch
+      active_intent: PINCH
       type: box
-      size:
-      - 0.006
-      - 0.006
-      - 0.056
-      pos:
-      - -0.014
-      - -0.044
-      - 0.126
-      mass_density: 260
+      # v0.4.4 calibration block. MuJoCo box size is HALF-size.
+      # The index/thumb precision-pinch centerline for this hand is around
+      # z=0.190-0.193 m. The old block top was only z=0.182 m, so both pads
+      # could pass just above the top edge even when Y alignment was correct.
+      # Keep the bottom on the z=0.070 m table while raising the top to 0.202 m.
+      # v0.4.6 reachability fix. The old 132 mm block ended at z=0.202 m.
+      # The underactuated index's closest useful pinch pose is around
+      # (y,z)=(-0.0217, 0.2094) m, so its 8 mm pad could never intersect the
+      # old box (minimum center-to-box distance was about 10.3 mm).
+      # Raise only the top face while keeping the bottom on the z=0.070 m table.
+      # MuJoCo box size is HALF-size: actual size = 90 x 30 x 140 mm.
+      size: [0.045, 0.015, 0.070]
+      pos: [-0.014, -0.044, 0.140]
+      mass_density: 360
     sphere:
+      label: sphere
+      interaction: sphere
+      active_intent: WRAP
       type: sphere
-      size:
-      - 0.038
-      pos:
-      - -0.008
-      - 0.018
-      - 0.108
+      size: [0.038]
+      pos: [-0.008, 0.018, 0.108]
       mass_density: 300
-  stability_orientation_deg: 3.0
+    card:
+      label: card
+      interaction: pinch
+      active_intent: PINCH
+      type: box
+      size: [0.020, 0.003, 0.056]
+      pos: [-0.014, -0.044, 0.126]
+      mass_density: 180
+    bottle:
+      label: bottle_like_cylinder
+      interaction: wrap
+      active_intent: WRAP
+      type: cylinder
+      size: [0.026, 0.070]
+      pos: [-0.005, -0.020, 0.140]
+      mass_density: 260
+    box:
+      label: rectangular_box
+      interaction: wrap
+      active_intent: WRAP
+      type: box
+      size: [0.032, 0.032, 0.060]
+      pos: [-0.005, -0.020, 0.130]
+      mass_density: 240

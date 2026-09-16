@@ -27,6 +27,8 @@ def main() -> None:
     drift = [_float(r, "orientation_drift_deg") for r in rows]
     tip = [_float(r, "tip_contact_ratio") for r in rows]
     stable = [str(r.get("stable_contact_proxy", "False")).lower() in {"true", "1"} for r in rows]
+    task_success = [str(r.get("task_success", "False")).lower() in {"true", "1"} for r in rows]
+    task_active = [str(r.get("task_active", "False")).lower() in {"true", "1"} for r in rows]
     contacts = [_float(r, "contact_count") for r in rows]
 
     intents = {}
@@ -40,6 +42,12 @@ def main() -> None:
     print(f"mean tip contact ratio:{mean(tip):.3f}")
     print(f"contact frames:        {sum(c > 0 for c in contacts)}")
     print(f"stable-contact proxy:  {sum(stable)} frames")
+    if any(task_active):
+        active_n = sum(task_active)
+        active_stable = sum(s and a for s, a in zip(stable, task_active))
+        print(f"task active frames:     {active_n}")
+        print(f"task stable ratio:      {active_stable / active_n:.1%}")
+        print(f"task success reached:   {any(task_success)}")
     print("intent frames:", intents)
 
 

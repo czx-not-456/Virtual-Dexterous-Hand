@@ -1,3 +1,92 @@
+# v0.4.0：模拟数据集 + 标准物体评测 + 自动结果汇总
+
+> **v0.4.5 PINCH note:** the calibration block is 90×30×132 mm and is temporarily held upright during the PINCH approach. It is released immediately after bilateral thumb/index fingertip contact is observed, so subsequent stability is evaluated with the object free.
+
+> **v0.4.2 combined release:** this package includes both the validated WRAP contact tuning and the PINCH fingertip-contact fix. See `CHANGELOG_v0.4.2.md`.
+
+本版本继续采用**模拟数据**，不依赖真实数据手套。核心目标是把现有“能做捏合/抓握”的演示工程推进为可重复、可量化、可批量验证的大创实验系统。
+
+新增内容：
+
+- `datasets/synthetic_glove_v1.csv`：8 组可复现模拟数据试验，每组 600 帧；
+- `CSVGloveDatasetDriver`：像真实手套一样逐帧回放 CSV；
+- 标准物体任务：`pinch / wrap / sphere / card / bottle / box`；
+- PINCH 可达性优化：任务空间目标不再强制指尖对准盒体中心线，并增加拇指/食指预定位先验；
+- 通用 box / cylinder / sphere 表面目标生成；
+- 任务级量化评估：接触率、稳定接触率、首次接触时间、连续稳定帧数、P95 延迟、关节 RMSE、指尖接触率、物体姿态漂移等；
+- 每次运行自动生成 `CSV + summary.json`；
+- `experiments/benchmark_synthetic.py`：批量跑多个物体、多组模拟数据，并生成 CSV、Markdown 报告和 HTML 看板。
+
+> 当前模型手掌基座固定，因此 `success_proxy` 定义为“连续稳定接触代理”，**不等同于抓起并搬运成功率**。若后续加入手腕/机械臂自由度，再增加 lift / transport 指标。
+
+## 推荐运行流程
+
+安装依赖：
+
+```powershell
+cd D:\Vhand\Virtual-Dexterous-Hand-main
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+先跑自动测试：
+
+```powershell
+pytest -rA
+```
+
+用第 0 组模拟数据跑 PINCH：
+
+```powershell
+python -m src.main --sim mujoco --render --realtime --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task pinch --steps 600 --camera closeup
+```
+
+跑 WRAP：
+
+```powershell
+python -m src.main --sim mujoco --render --realtime --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task wrap --steps 600
+```
+
+其他物体：
+
+```powershell
+python -m src.main --sim mujoco --render --realtime --task sphere --steps 600
+python -m src.main --sim mujoco --render --realtime --task card --steps 600 --camera closeup
+python -m src.main --sim mujoco --render --realtime --task bottle --steps 600
+python -m src.main --sim mujoco --render --realtime --task box --steps 600
+```
+
+每次运行后 `outputs/` 会出现：
+
+```text
+run_YYYYMMDD_HHMMSS_<task>.csv
+run_YYYYMMDD_HHMMSS_<task>_summary.json
+```
+
+批量评测 6 类物体 × 5 组模拟数据：
+
+```powershell
+python experiments\benchmark_synthetic.py --trials 5 --steps 600
+```
+
+输出目录：
+
+```text
+outputs/benchmark/
+├── benchmark_runs.csv
+├── benchmark_summary.csv
+├── BENCHMARK_REPORT.md
+└── benchmark_dashboard.html
+```
+
+重新生成模拟数据集：
+
+```powershell
+python scripts\generate_synthetic_dataset.py --trials 8 --frames 600 --seed 42
+```
+
+---
+
 
 ## v0.3.4：基于物体位姿的任务空间接触伺服
 

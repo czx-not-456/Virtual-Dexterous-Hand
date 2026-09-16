@@ -87,22 +87,30 @@ class ObjectAwareTaskServo:
         # 预留状态接口；当前 servo 无积分状态。
         return None
 
-    def _task_cfg(self, task_name: str) -> dict | None:
-        cfg = self.cfg.get(task_name)
+    def _task_cfg(self, task_mode: str) -> dict | None:
+        cfg = self.cfg.get(task_mode)
         return dict(cfg) if isinstance(cfg, dict) else None
 
-    def _active_fingers(self, task_name: str) -> tuple[str, ...]:
-        if task_name == "pinch":
+    def _active_fingers(self, task_mode: str) -> tuple[str, ...]:
+        if task_mode == "pinch":
             return ("thumb", "index")
-        if task_name in {"wrap", "sphere"}:
+        if task_mode in {"wrap", "sphere"}:
             return ("thumb", "index", "middle", "ring", "little")
         return ()
 
-    def _finger_contacted(self, finger: str, contact: dict) -> bool:
-        # 指尖接触优先；任一该手指接触也作为安全停止条件。
-        return bool(contact.get(self.TIP_CONTACT_KEYS[finger], False)) or bool(
-            contact.get(self.CONTACT_KEYS[finger], False)
-        )
+    def _finger_contacted(self, finger: str, contact: dict, *, stop_on: str = "any") -> bool:
+        """Return whether the servo should freeze this digit.
+
+        For precision pinch we deliberately support ``stop_on=tip``. In the
+        old controller, a proximal/distal phalanx touching the thin block
+        froze the whole digit before the fingertip pad reached the object,
+        which made ``pinch_contact_proxy`` stay false even though MuJoCo
+        reported digit contact. WRAP keeps the conservative ``any`` policy.
+        """
+        tip = bool(contact.get(self.TIP_CONTACT_KEYS[finger], False))
+        if str(stop_on).lower() == "tip":
+            return tip
+        return tip or bool(contact.get(self.CONTACT_KEYS[finger], False))
 
     def _thumb_delta(self, J: np.ndarray, error: np.ndarray) -> np.ndarray:
         """3x3 DLS：dq = J^T (J J^T + lambda^2 I)^-1 e。"""
@@ -137,6 +145,7 @@ class ObjectAwareTaskServo:
         task_name: str,
         intent_value: str,
         contact: dict,
+        task_mode: str | None = None,
     ) -> tuple[np.ndarray, ServoDiagnostics]:
         q_target = np.asarray(q_target, dtype=float)
         diag = ServoDiagnostics()
@@ -144,7 +153,8 @@ class ObjectAwareTaskServo:
         if not self.enabled:
             return q_target.copy(), diag
 
-        task_cfg = self._task_cfg(task_name)
+        mode = str(task_mode or task_name)
+        task_cfg = self._task_cfg(mode)
         if task_cfg is None:
             return q_target.copy(), diag
 
@@ -152,14 +162,23 @@ class ObjectAwareTaskServo:
         if str(intent_value) != active_intent:
             return q_target.copy(), diag
 
-        clearance = float(task_cfg.get("clearance_m", 0.0070))
+        # ``target_offset_m`` is signed: positive stays outside the surface,
+        # negative creates a virtual target slightly inside the object. The
+        # latter is useful for contact tasks because collision prevents actual
+        # penetration while the servo continues to close until the pad touches.
+        clearance = float(task_cfg.get("target_offset_m", task_cfg.get("clearance_m", 0.0070)))
         vertical_margin = float(task_cfg.get("vertical_margin_m", 0.010))
+        stop_on_contact = str(task_cfg.get("stop_on_contact", "any")).lower()
+        command_blend = float(np.clip(task_cfg.get("command_blend", self.blend), 0.0, 1.0))
         q_actual = np.asarray(simulator.joint_positions(), dtype=float)
         q_cmd = q_target.copy()
         errors: list[float] = []
         diag.active = True
 
-        for finger in self._active_fingers(task_name):
+        posture_prior = dict(task_cfg.get("posture_prior_deg", {}))
+        posture_blend = float(task_cfg.get("posture_prior_blend", 0.0))
+
+        for finger in self._active_fingers(mode):
             joints = self.FINGER_JOINTS[finger]
             indices = np.array([self.idx[j] for j in joints], dtype=int)
 
@@ -167,7 +186,7 @@ class ObjectAwareTaskServo:
             target = np.asarray(
                 simulator.task_contact_target(
                     finger,
-                    task_name,
+                    mode,
                     clearance_m=clearance,
                     vertical_margin_m=vertical_margin,
                 ),
@@ -182,13 +201,26 @@ class ObjectAwareTaskServo:
             elif finger == "index":
                 diag.index_error_m = err
 
-            if self._finger_contacted(finger, contact):
-                # 接触后保持实际姿态，避免上游 target 把手指重新拉离物体。
+            if self._finger_contacted(finger, contact, stop_on=stop_on_contact):
+                # Pinch can require fingertip-only stopping; WRAP defaults to
+                # any digit contact for conservative anti-penetration behavior.
                 q_cmd[indices] = q_actual[indices]
                 continue
 
+            q_nominal = q_target[indices].copy()
+            if posture_prior and posture_blend > 0.0:
+                prior = q_nominal.copy()
+                has_prior = False
+                for k, joint in enumerate(joints):
+                    if joint in posture_prior:
+                        prior[k] = math.radians(float(posture_prior[joint]))
+                        has_prior = True
+                if has_prior:
+                    b = float(np.clip(posture_blend, 0.0, 1.0))
+                    q_nominal = (1.0 - b) * q_nominal + b * prior
+
             if err <= self.stop_error_m:
-                q_cmd[indices] = self.blend * q_actual[indices] + (1.0 - self.blend) * q_target[indices]
+                q_cmd[indices] = command_blend * q_actual[indices] + (1.0 - command_blend) * q_nominal
                 continue
 
             J = simulator.fingertip_jacobian(finger, joints)
@@ -198,7 +230,7 @@ class ObjectAwareTaskServo:
                 dq = self._underactuated_delta(finger, J, error)
 
             desired = q_actual[indices] + dq
-            q_cmd[indices] = self.blend * desired + (1.0 - self.blend) * q_target[indices]
+            q_cmd[indices] = command_blend * desired + (1.0 - command_blend) * q_nominal
             diag.corrected_digits += 1
 
         q_cmd = np.clip(q_cmd, self.robot.ranges[:, 0], self.robot.ranges[:, 1])
