@@ -511,11 +511,44 @@ class MujocoSimulator:
             if kind == "sphere" and len(size) >= 1:
                 radius = size[0]
                 v = local_tip.copy()
+                target_radius = radius + c
+                if finger != "thumb":
+                    # A non-thumb digit has only one effective tendon direction.
+                    # Select the sphere point reached by that local tangent instead
+                    # of the Euclidean-nearest point, which can lie outside the
+                    # digit's one-dimensional reachable manifold.
+                    joints = (f"{finger}_mcp", f"{finger}_pip", f"{finger}_dip")
+                    J = self.fingertip_jacobian(finger, joints)
+                    coupling = self.robot.coupling[finger]
+                    tendon = np.array(
+                        [1.0, float(coupling["pip_over_mcp"]), float(coupling["dip_over_mcp"])],
+                        dtype=float,
+                    )
+                    tangent = R.T @ (J @ tendon)
+                    tangent_norm2 = float(tangent @ tangent)
+                    if tangent_norm2 > 1e-12:
+                        # Intersect p+t*d with the clearance sphere. If the line
+                        # misses it, use the sphere point nearest to the line.
+                        b = float(v @ tangent)
+                        discriminant = b * b - tangent_norm2 * (
+                            float(v @ v) - target_radius * target_radius
+                        )
+                        if discriminant >= 0.0:
+                            root = math.sqrt(discriminant)
+                            candidates = [(-b - root) / tangent_norm2, (-b + root) / tangent_norm2]
+                            t = min(candidates, key=abs)
+                            local_target = v + t * tangent
+                            return center + R @ local_target
+                        closest = v - (b / tangent_norm2) * tangent
+                        closest_norm = float(np.linalg.norm(closest))
+                        if closest_norm > 1e-9:
+                            local_target = closest / closest_norm * target_radius
+                            return center + R @ local_target
                 n = float(np.linalg.norm(v))
                 if n < 1e-9:
                     v = np.array([0.0, 1.0, 0.0])
                     n = 1.0
-                local_target = v / n * (radius + c)
+                local_target = v / n * target_radius
                 return center + R @ local_target
 
             if kind == "cylinder" and len(size) >= 2:

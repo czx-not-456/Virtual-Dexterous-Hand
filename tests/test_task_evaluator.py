@@ -20,11 +20,15 @@ def test_task_evaluator_requires_consecutive_stable_frames():
             joint_rmse_rad=0.1,
             velocity_rms_rad_s=0.2,
         )
-    assert state["task_success"] is True
+    assert state["contact_success_proxy"] is True
+    assert state["stable_success_proxy"] is True
     summary = ev.summary()
-    assert summary["success_proxy"] is True
-    assert summary["max_success_streak_frames"] == 3
-    assert summary["first_success_latency_ms"] == 100.0
+    assert summary["contact_success_proxy"] is True
+    assert summary["stable_success_proxy"] is True
+    assert summary["max_contact_success_streak_frames"] == 3
+    assert summary["max_stable_success_streak_frames"] == 3
+    assert summary["first_contact_success_latency_ms"] == 100.0
+    assert summary["first_stable_success_latency_ms"] == 100.0
 
 
 def test_task_evaluator_ignores_inactive_frames_for_contact_ratio():
@@ -51,10 +55,8 @@ def test_task_evaluator_ignores_inactive_frames_for_contact_ratio():
     assert ev.summary()["contact_frame_ratio"] == 1.0
 
 
-def test_pinch_contact_mode_uses_bilateral_contact_for_success_but_keeps_stability_metric():
-    ev = TaskEpisodeEvaluator(
-        "pinch", sampling_hz=60, min_success_streak_frames=3, success_mode="contact"
-    )
+def test_contact_and_stable_success_are_independent():
+    ev = TaskEpisodeEvaluator("pinch", sampling_hz=60, min_success_streak_frames=3)
     for frame in range(3):
         state = ev.update(
             frame=frame,
@@ -71,9 +73,12 @@ def test_pinch_contact_mode_uses_bilateral_contact_for_success_but_keeps_stabili
             joint_rmse_rad=0,
             velocity_rms_rad_s=0,
         )
-    assert state["task_success"] is True
+    assert state["contact_success_proxy"] is True
+    assert state["stable_success_proxy"] is False
     summary = ev.summary()
-    assert summary["success_proxy"] is True
+    assert summary["contact_success_proxy"] is True
+    assert summary["stable_success_proxy"] is False
     assert summary["contact_frames"] == 3
     assert summary["stable_frames"] == 0
-    assert summary["success_mode"] == "contact"
+    assert summary["max_contact_success_streak_frames"] == 3
+    assert summary["max_stable_success_streak_frames"] == 0

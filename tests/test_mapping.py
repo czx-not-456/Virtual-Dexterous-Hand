@@ -32,7 +32,7 @@ def test_dynamic_pinch_does_not_worsen_pinch_task_error():
 
 
 def test_dynamic_wrap_reduces_coupling_penalty():
-    from src.retargeting.constraints import coupling_error
+    from src.retargeting.constraints import coupling_error, vector_shape_error
     human = HumanHandModel()
     robot = RobotHandModel()
     solver = IntentDrivenRetargeter(human, robot, load_yaml("configs/algorithm.yaml")["optimizer"])
@@ -41,3 +41,13 @@ def test_dynamic_wrap_reduces_coupling_penalty():
     static = solver.solve(qh, f.fingertip_positions, Intent.WRAP, dynamic=False)
     dynamic = solver.solve(qh, f.fingertip_positions, Intent.WRAP, dynamic=True)
     assert coupling_error(dynamic.q_target, robot) <= coupling_error(static.q_target, robot) + 1e-8
+    static_vec = vector_shape_error(
+        robot.fingertips(static.q_target), f.fingertip_positions,
+        solver.task_scale, solver.vector_pairs,
+    )
+    dynamic_vec = vector_shape_error(
+        robot.fingertips(dynamic.q_target), f.fingertip_positions,
+        solver.task_scale, solver.vector_pairs,
+    )
+    # Known multi-objective tradeoff is about 8.47%; prevent silent worsening.
+    assert dynamic_vec <= static_vec * 1.10

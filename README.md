@@ -1,423 +1,280 @@
-# v0.4.0：模拟数据集 + 标准物体评测 + 自动结果汇总
+# Virtual-Dexterous-Hand v0.4.6
 
-> **v0.4.5 PINCH note:** the calibration block is 90×30×132 mm and is temporarily held upright during the PINCH approach. It is released immediately after bilateral thumb/index fingertip contact is observed, so subsequent stability is evaluated with the object free.
+基于模拟数据手套、意图驱动重定向和 MuJoCo 的虚拟灵巧手实验系统。
 
-> **v0.4.2 combined release:** this package includes both the validated WRAP contact tuning and the PINCH fingertip-contact fix. See `CHANGELOG_v0.4.2.md`.
+当前版本提供：
 
-本版本继续采用**模拟数据**，不依赖真实数据手套。核心目标是把现有“能做捏合/抓握”的演示工程推进为可重复、可量化、可批量验证的大创实验系统。
+- 15 DoF / 7 actuator 欠驱动手模型；
+- OPEN、NEUTRAL、PINCH、WRAP 意图识别；
+- 数据集回放和程序化 Mock 输入；
+- pinch、wrap、sphere、card、bottle、box 六类标准任务；
+- 基于物体位姿、指尖 Jacobian 和欠驱动可达方向的任务空间伺服；
+- 每帧 CSV、任务 summary JSON、批量 CSV、Markdown 报告和 HTML 看板；
+- 明确分离的接触成功代理与稳定成功代理。
 
-新增内容：
+项目使用工程化近似手模型，不是 CasiaHand 官方 CAD 数字孪生。当前手掌基座固定，因此所有成功指标都是接触代理，不代表完成抓起、搬运或放置。
 
-- `datasets/synthetic_glove_v1.csv`：8 组可复现模拟数据试验，每组 600 帧；
-- `CSVGloveDatasetDriver`：像真实手套一样逐帧回放 CSV；
-- 标准物体任务：`pinch / wrap / sphere / card / bottle / box`；
-- PINCH 可达性优化：任务空间目标不再强制指尖对准盒体中心线，并增加拇指/食指预定位先验；
-- 通用 box / cylinder / sphere 表面目标生成；
-- 任务级量化评估：接触率、稳定接触率、首次接触时间、连续稳定帧数、P95 延迟、关节 RMSE、指尖接触率、物体姿态漂移等；
-- 每次运行自动生成 `CSV + summary.json`；
-- `experiments/benchmark_synthetic.py`：批量跑多个物体、多组模拟数据，并生成 CSV、Markdown 报告和 HTML 看板。
+## 1. Windows 新电脑从零部署
 
-> 当前模型手掌基座固定，因此 `success_proxy` 定义为“连续稳定接触代理”，**不等同于抓起并搬运成功率**。若后续加入手腕/机械臂自由度，再增加 lift / transport 指标。
+### 1.1 前置条件
 
-## 推荐运行流程
+- Windows 10 或 Windows 11，64 位；
+- 推荐 Python 3.11；
+- 支持范围为 Python 3.10–3.12；
+- 建议使用 PowerShell 5.1 或 PowerShell 7；
+- MuJoCo 由 Python 包安装，不需要另外下载可执行程序。
 
-安装依赖：
+确认 Python：
 
-```powershell
-cd D:\Vhand\Virtual-Dexterous-Hand-main
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
+    py -3.11 --version
 
-先跑自动测试：
+如果命令不存在，请先从 Python 官方安装 Python 3.11，并在安装器中启用 Python Launcher。
 
-```powershell
-pytest -rA
-```
+### 1.2 进入项目并创建虚拟环境
 
-用第 0 组模拟数据跑 PINCH：
+    cd "你的路径\Virtual-Dexterous-Hand-v0"
+    py -3.11 -m venv .venv
 
-```powershell
-python -m src.main --sim mujoco --render --realtime --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task pinch --steps 600 --camera closeup
-```
+PowerShell 当前进程若禁止脚本，可临时放开：
 
-跑 WRAP：
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
-```powershell
-python -m src.main --sim mujoco --render --realtime --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task wrap --steps 600
-```
+激活环境：
 
-其他物体：
+    .\.venv\Scripts\Activate.ps1
 
-```powershell
-python -m src.main --sim mujoco --render --realtime --task sphere --steps 600
-python -m src.main --sim mujoco --render --realtime --task card --steps 600 --camera closeup
-python -m src.main --sim mujoco --render --realtime --task bottle --steps 600
-python -m src.main --sim mujoco --render --realtime --task box --steps 600
-```
+升级 pip 并安装依赖：
 
-每次运行后 `outputs/` 会出现：
+    python -m pip install --upgrade pip
+    python -m pip install -r requirements.txt
+    python -m pip check
 
-```text
-run_YYYYMMDD_HHMMSS_<task>.csv
-run_YYYYMMDD_HHMMSS_<task>_summary.json
-```
+requirements.txt 包含 NumPy、SciPy、PyYAML、MuJoCo 和 pytest。
 
-批量评测 6 类物体 × 5 组模拟数据：
+### 1.3 PowerShell UTF-8 设置
 
-```powershell
-python experiments\benchmark_synthetic.py --trials 5 --steps 600
-```
+主程序和 benchmark 已主动以 UTF-8 输出。为保证 PowerShell 5.1 的重定向、管道和第三方命令也统一使用 UTF-8，建议在当前终端执行：
 
-输出目录：
+    $env:PYTHONUTF8 = "1"
+    [Console]::InputEncoding = [System.Text.UTF8Encoding]::new()
+    [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+    $OutputEncoding = [Console]::OutputEncoding
 
-```text
-outputs/benchmark/
-├── benchmark_runs.csv
-├── benchmark_summary.csv
-├── BENCHMARK_REPORT.md
-└── benchmark_dashboard.html
-```
+这些设置只影响当前 PowerShell 窗口。
 
-重新生成模拟数据集：
+## 2. 快速验证安装
 
-```powershell
-python scripts\generate_synthetic_dataset.py --trials 8 --frames 600 --seed 42
-```
+运行完整测试：
 
----
+    python -m pytest -rA
 
+当前版本包含纯算法、配置、MuJoCo schema、可达性以及六任务 canonical trial 集成测试。安装了 MuJoCo 的标准环境应执行全部测试，不应跳过物理运行测试。
 
-## v0.3.4：基于物体位姿的任务空间接触伺服
+当前仓库在 Python 3.11.9、MuJoCo 3.13.0 环境的基准结果为 58 passed。
 
-在 v0.3.3 的真实运行数据中，PINCH 仍为 0% 接触，WRAP 虽出现少量接触但圆柱会在正式 WRAP 前被推倒。v0.3.4 因此新增：
+检查依赖：
 
-- Object-aware task-space servo：使用 MuJoCo 指尖 Jacobian 把目标指尖导向当前物体表面；
-- PINCH：拇指 3 DoF + 食指单腱有效方向闭环；
-- WRAP：拇指与四根非拇指分别朝圆柱当前表面收敛；
-- Task gating：非目标意图期间保持物体标准初态，进入目标意图时复位后释放；
-- CSV 记录任务空间误差，便于下一轮基于数据调参。
+    python -m pip check
 
-详见 `CHANGELOG_v0.3.4.md` 与 `CONTACT_VALIDATION_v0.3.4.md`。
+运行映射对照：
 
+    python experiments\compare_mapping.py
 
-## v0.3.2 接触闭环辅助
+WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射同时显著降低欠驱动 coupling penalty。测试设置了退化上限，防止该指标继续静默恶化。
 
-v0.3.2 新增任务级接触闭环辅助：PINCH 时仅对拇指/食指追加小幅闭合，WRAP 时对五指分别追加闭合；某根手指与任务物体接触后会停止继续增加该手指的额外闭合量。接触统计现在区分手-物接触与物体-环境接触，并记录逐指/逐指腹接触状态。详见 `CONTACT_VALIDATION.md`。
+## 3. 数据集
 
-# 基于数据手套的手部动作采集与虚拟灵巧手交互系统（v0.3）
+默认数据集：
 
-v0.3 在 v0.2 已经跑通的 **Mock 数据手套 → 姿态解算 → 意图识别 → 动态映射 → MuJoCo** 链路上，进一步把项目参考文献中与结构、映射和评测直接相关的信息落实到工程中。
+    datasets\synthetic_glove_v1.csv
 
-完整链路：
+数据集包含 8 个 trial，每个 trial 800 帧。完整周期为：
 
-> Mock 数据手套 → 自适应标定 → 滤波/归一化 → 姿态解算 → 短时序意图识别 → 文献驱动混合映射 → 15 DoF / 7 actuator 欠驱动 MuJoCo 手 → 手-物接触与稳定性评测 → CSV 记录
+- OPEN：80 帧；
+- NEUTRAL：80 帧；
+- PINCH：240 帧；
+- NEUTRAL：80 帧；
+- WRAP：240 帧；
+- OPEN：80 帧。
 
-> **重要定位**：v0.3 是“文献驱动的工程验证模型”，不是 CasiaHand 官方数字孪生。没有可靠来源支持的 CAD 尺寸、腱轮半径、摩擦参数、真实关节限位等仍采用项目可调近似值。
+重新生成：
 
-详细依据见：
+    python scripts\generate_synthetic_dataset.py --trials 8 --frames 800 --seed 42
 
-`LITERATURE_INFORMED_DESIGN.md`
+不要把帧数改为 600 后再用于标准 benchmark，因为那样不会覆盖完整 WRAP 阶段。
 
----
+## 4. 运行单个任务
 
-## 1. v0.3 相比 v0.2 的核心升级
+### 4.1 PINCH
 
-### 1.1 由 15 个独立驱动改为 15 DoF / 7 actuator
+无界面、完整 canonical trial：
 
-参考 CasiaHand 2025 论文的结构：
+    python -m src.main --sim mujoco --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task pinch --steps 800
 
-- 拇指 3 个关节独立驱动；
-- 食指/中指/无名指/小指分别由单根 flexor tendon 驱动 3 个关节；
-- 总计 15 DoF、7 个有效执行器。
+可视化并按 60 Hz 实时运行：
 
-对应文件：
+    python -m src.main --sim mujoco --render --realtime --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task pinch --steps 800 --camera closeup
 
-- `configs/robot_hand.yaml`
-- `src/hand_model/robot_hand.py`
-- `models/dexterous_hand/humanoid_hand_v03.xml`
+PINCH 方块实际尺寸为 90 × 30 × 140 mm。MuJoCo box 配置使用半尺寸 [0.045, 0.015, 0.070]，中心高度为 0.140 m，底面位于 0.070 m 桌面上。
 
-运行时会显示：
+### 4.2 WRAP
 
-```text
-Robot architecture: nominal DoF=15, effective actuators=7
-```
+无界面：
 
-### 1.2 非拇指加入论文给出的扭簧刚度
+    python -m src.main --sim mujoco --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task wrap --steps 800
 
-v0.3 MJCF 为非拇指写入：
+可视化：
 
-```text
-MCP: 0.024106 N·m/rad
-PIP: 0.012857 N·m/rad
-DIP: 0.012857 N·m/rad
-```
+    python -m src.main --sim mujoco --render --realtime --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task wrap --steps 800 --camera overview
 
-这对应 CasiaHand 论文中的 24.106 / 12.857 / 12.857 mNm/rad。
+### 4.3 其他标准物体
 
-其作用不是把三个关节锁死，而是让单腱驱动下的手指具有一定被动顺应趋势。
+    python -m src.main --sim mujoco --input dataset --dataset-trial 0 --task sphere --steps 800
+    python -m src.main --sim mujoco --input dataset --dataset-trial 0 --task card --steps 800
+    python -m src.main --sim mujoco --input dataset --dataset-trial 0 --task bottle --steps 800
+    python -m src.main --sim mujoco --input dataset --dataset-trial 0 --task box --steps 800
 
-### 1.3 映射算法从“位置+拓扑”扩展为混合目标
+card 是 6 mm 薄边、30 mm 夹持宽度、140 mm 高度的校准卡片。PINCH/card 接近阶段会临时固定物体：PINCH 首次建立双指接触后释放，薄 card 连续建立规定帧数的真实双指接触后释放。夹具期间可计入接触成功，但不会计入稳定成功。
 
-v0.3 目标函数包含：
+### 4.4 纯算法模式
 
-```text
-E_pos       关键末端位置
-E_vector    关键指尖相对向量/手形关系
-E_topo      拓扑/关节相似
-E_smooth    时间平滑
-E_coupling  欠驱协同软约束
-E_collision 简化自碰撞安全
-```
+不启动 MuJoCo：
 
-仍然使用 SLSQP，并由 `NEUTRAL / PINCH / WRAP` 动态调权。
+    python -m src.main --sim none --input dataset --dataset-trial 0 --task pinch --steps 800
 
-这比 v0.2 更接近参考文献中的“关节 + 笛卡尔/关键点 + 平滑 + 安全约束”混合映射思想。
+此模式用于检查数据、标定、意图、映射、日志链路；因为没有物理后端，接触指标应为零。
 
-### 1.4 意图识别加入短时序信息
+### 4.5 Viewer 操作
 
-2025 tele-grasping 工作强调使用人体运动序列识别抓取意图。v0.3 当前没有真实训练数据，因此**没有伪造 Bi-GRU 模型**，而是加入：
+可用相机预设：
 
-- `sequence_window_frames`；
-- pinch distance 短时序均值；
-- wrap score 短时序均值；
-- 原有迟滞阈值；
-- dwell frame。
+- overview；
+- closeup；
+- side；
+- free。
 
-这能减少单帧噪声误触发，同时保留以后替换成训练型时序模型的接口。
+示例：
 
-### 1.5 MuJoCo 加入真实可统计的接触区
+    python -m src.main --sim mujoco --render --realtime --task sphere --steps 800 --camera side
 
-v0.2 的掌面主要用于视觉展示；v0.3 将以下区域真正加入碰撞：
+预设仅设置自由相机初始位置，启动后仍可用 MuJoCo Viewer 鼠标旋转、平移和缩放。
 
-- thumb/thenar；
-- fingers；
-- palm；
-- 五个 fingertip pads。
+## 5. 六任务批量 benchmark
 
-因此现在不仅能“看动作”，还能记录手-物接触。
+运行所有六类任务、trial 0：
 
-### 1.6 新增文献对应的稳定性/接触指标
+    python experiments\benchmark_synthetic.py --trials 1
 
-每帧 CSV 新增：
+运行所有六类任务、前 5 个 trial：
 
-```text
-contact_count
-contact_sections
-thumb_contact
-finger_contact
-palm_contact
-tip_contact_ratio
-contact_streak_frames
-orientation_drift_deg
-stable_orientation
-stable_contact_proxy
-object_displacement_m
-```
+    python experiments\benchmark_synthetic.py --trials 5
 
-其中 `orientation_drift_deg` 默认采用 **3°** 作为稳定性阈值，与 CasiaHand 论文中的 spatial stability 判据一致。
+只运行 PINCH 和 WRAP：
 
-`stable_contact_proxy` 只是本项目仿真的代理指标，不等同于正式“抓起并搬运成功率”。
+    python experiments\benchmark_synthetic.py --trials 1 --tasks pinch wrap
 
-### 1.7 三类测试物体
+默认不需要传 --steps。脚本会读取每个所选 trial 的实际行数并完整运行。仅在明确需要截断诊断时才使用，例如：
 
-v0.3 支持：
+    python experiments\benchmark_synthetic.py --trials 1 --tasks pinch --steps 400
 
-```text
---task wrap    圆柱，观察包络抓握
---task pinch   薄块，观察拇指-食指精细捏合
---task sphere  球体，观察形状适应
-```
+批处理会分别统计：
 
-同一 MJCF 会在加载前由 Python 动态修改测试物体，不需要维护多份场景。
+- command_failures：子进程非零退出、summary 缺失或 summary 无效；
+- task_metric_failures：命令完成，但任务要求的接触或稳定指标未通过。
 
----
+command_failures 大于零时 benchmark 自身返回非零退出码。任务指标失败会进入报告，但不会被伪装成命令执行失败。
 
-## 2. 安装环境
+输出目录默认为：
 
-Windows 10/11，推荐 Python 3.10–3.12。
+    outputs\benchmark
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
+包含：
 
----
+- benchmark_runs.csv：每个 task/trial 的完整结果，含 returncode 和 error；
+- benchmark_summary.csv：按任务聚合的接触成功率、稳定成功率和任务通过率；
+- BENCHMARK_REPORT.md：可阅读报告；
+- benchmark_dashboard.html：HTML 看板；
+- 每次子运行的 CSV 和 summary JSON。
 
-## 3. 先跑测试
+## 6. 输出文件
 
-```powershell
-pytest -rA
-```
+单次运行默认写入 outputs：
 
-生成环境结果：
+    run_YYYYMMDD_HHMMSS_task.csv
+    run_YYYYMMDD_HHMMSS_task_summary.json
 
-```text
-15 passed, 1 skipped
-```
+可以指定目录和名称：
 
-跳过的是 MuJoCo runtime schema 测试，因为生成环境没有安装 MuJoCo。
+    python -m src.main --sim mujoco --task wrap --steps 800 --output-dir outputs\manual --run-name wrap_trial0
 
-你的电脑已经能打开 MuJoCo，因此本机正常应当进一步执行该测试；若全部成功，理论上会看到：
+逐帧 CSV 主要字段：
 
-```text
-16 passed
-```
+- intent：识别出的手势意图；
+- contact_count：手与任务物体的接触对数量；
+- environment_contact_count：物体与桌面/地面的接触数量；
+- thumb_contact 等：逐指任意部位接触；
+- thumb_tip_contact 等：逐指指腹接触；
+- task_contact_proxy：当前任务需要的瞬时接触；
+- stable_contact_proxy：任务接触且物体姿态漂移不超过阈值；
+- contact_success_proxy：任务接触连续达到配置帧数后锁存为真；
+- stable_success_proxy：稳定接触连续达到配置帧数后锁存为真；
+- contact_success_streak_frames：当前连续任务接触帧数；
+- stable_success_streak_frames：当前连续稳定接触帧数；
+- orientation_drift_deg：物体相对初始姿态漂移；
+- object_displacement_m：物体中心位移；
+- servo_mean_error_m：活动手指任务空间平均误差；
+- pipeline_latency_ms：单帧完整管线耗时。
 
----
+summary JSON 同时保留两套成功指标：
 
-## 4. 纯算法运行
+- contact_success_proxy：是否建立了规定时长的任务接触；
+- stable_success_proxy：是否建立了规定时长的自由体稳定接触；
+- required_success_metric：该任务规定使用 contact 还是 stable；
+- task_metric_pass：规定指标是否通过。
 
-```powershell
-python -m src.main --sim none --steps 900
-```
+PINCH 和 card 要求 contact；wrap、sphere、bottle、box 要求 stable。两套原始指标始终同时输出。
 
-Mock 手势仍循环：
+## 7. 结果分析
 
-```text
-OPEN → NEUTRAL → PINCH → NEUTRAL → WRAP → OPEN
-```
+分析单次 CSV：
 
-终端会显示意图切换以及 15 DoF / 7 actuator 架构信息。
+    python experiments\analyze_run.py outputs\run_你的时间戳_task.csv
 
----
+分析 PINCH/WRAP 接触区段：
 
-## 5. MuJoCo 推荐运行方式
+    python experiments\analyze_contacts.py outputs\run_你的时间戳_task.csv
 
-### 5.1 包络抓握场景
+映射对照：
 
-```powershell
-python -m src.main --sim mujoco --render --steps 0 --realtime --task wrap
-```
+    python experiments\compare_mapping.py
 
-重点观察：
+生成的 CSV 使用 UTF-8 BOM，便于 Windows Excel 正确识别中文和字段名；JSON、Markdown 与 HTML 使用 UTF-8。
 
-- 四根非拇指在单 flexor tendon + spring 下的协同弯曲；
-- thumb/fingers/palm 是否逐渐形成多区域接触；
-- 圆柱是否发生明显姿态滑移。
+## 8. 主要目录
 
-### 5.2 精细捏合场景
+    configs/       手套、人体手、机器人手、算法和仿真配置
+    datasets/      可复现模拟手套数据
+    experiments/   benchmark、映射对照和结果分析
+    models/        MuJoCo MJCF 手与任务场景
+    scripts/       数据生成和辅助运行脚本
+    src/           主程序、驱动、特征、映射、仿真和评测
+    tests/         单元、回归和六任务 MuJoCo 集成测试
+    outputs/       运行结果；默认被 Git 忽略
 
-```powershell
-python -m src.main --sim mujoco --render --steps 0 --realtime --task pinch --camera closeup
-```
+核心配置：
 
-重点观察：
+- configs/simulation.yaml：物体尺寸、位置、任务类型、相机和稳定阈值；
+- configs/algorithm.yaml：意图阈值、优化器权重、任务空间伺服和任务专属参数；
+- configs/robot_hand.yaml：15 DoF、7 actuator、关节范围和欠驱动耦合；
+- models/dexterous_hand/humanoid_hand_v031.xml：当前 MuJoCo 模型。
 
-- 拇指与食指是否对薄块形成接触；
-- 其余三指是否保持相对开放；
-- `tip_contact_ratio` 和接触连续性是否变化。
+## 9. 当前边界与已知问题
 
-### 5.3 球体适应场景
+- 当前使用模拟数据，不等于真实数据手套实验；
+- 手掌基座固定，没有手腕/机械臂抓起和搬运阶段；
+- 结构、摩擦、腱路和关节参数仍是工程近似；
+- PINCH/card 的接触成功可能包含接近夹具阶段，稳定成功只统计释放后的自由体帧；
+- WRAP vector MSE 相对静态映射约退化 8.47%，作为欠驱动 coupling 改善的已知多目标权衡保留；
+- 正式论文实验仍需要真实硬件、真实受试者/手套标定和标准物体重复试验。
 
-```powershell
-python -m src.main --sim mujoco --render --steps 0 --realtime --task sphere
-```
-
-用于观察欠驱手指面对曲面时的接触适应趋势。
-
-### 5.4 自由视角
-
-```powershell
-python -m src.main --sim mujoco --render --steps 0 --realtime --task wrap --camera free
-```
-
----
-
-## 6. 映射对照实验
-
-```powershell
-python experiments/compare_mapping.py
-```
-
-生成环境当前 Mock 参数下：
-
-```text
-PINCH position MSE improvement:        9.58%
-PINCH vector MSE improvement:         40.03%
-WRAP coupling penalty improvement:    83.64%
-WRAP vector MSE improvement:         -41.77%
-```
-
-WRAP 的 vector MSE 变差并不意味着算法失效：WRAP 模式显式提高了欠驱协同目标的权重，因此会牺牲部分“与人手相对向量完全一致”的目标。这正是多目标、意图驱动映射要研究的权衡。
-
-这些都是 Mock 工程验证结果，**不能直接作为论文最终实验数据**。
-
----
-
-## 7. 分析运行 CSV
-
-每次 `src.main` 会生成：
-
-```text
-outputs/run_YYYYMMDD_HHMMSS.csv
-```
-
-分析：
-
-```powershell
-python experiments/analyze_run.py outputs\run_你的时间戳.csv
-```
-
-可快速查看：
-
-- 平均端到端延迟；
-- 平均优化耗时；
-- 最大物体姿态漂移；
-- 平均指尖接触率；
-- 接触帧数；
-- stable-contact proxy 帧数；
-- 各意图持续帧数。
-
----
-
-## 8. 当前仍未完成的内容
-
-v0.3 **没有**宣称实现以下内容：
-
-- 实验室真实数据手套 SDK；
-- CasiaHand 官方 CAD/MJCF/URDF；
-- 精确腱轮半径与腱路几何；
-- 真实力传感器/触觉反馈；
-- Bi-GRU 意图识别；
-- CVAE 连续抓取生成；
-- 点云场景感知；
-- mesh-level grasp refinement；
-- NASA-TLX 用户实验。
-
-下一阶段最优先的是：
-
-1. 接入真实数据手套；
-2. 获取实验室目标灵巧手官方模型/机械参数；
-3. 用真实数据重新标定意图阈值与映射权重；
-4. 在 YCB/标准物体上正式进行精度、延迟、稳定性和抓取任务实验。
-
----
-
-## 9. 参考文献对应关系
-
-本版直接吸收的信息主要来自：
-
-1. Yan D, Wang P, Zhang T, et al. *CasiaHand: Design and Evaluation of a 15-DoF Tendon-Driven Anthropomorphic Robotic Hand*. IEEE Robotics and Automation Letters, 2025.
-2. Huang Y, Wang Z, Shen X, et al. *Human-Like Dexterous Manipulation for the Anthropomorphic Hand-Arm Robotic System via Teleoperation*. ICIRA 2023.
-3. Huang Y, Fan D, Yan D, et al. *Human-Robot Collaborative Tele-Grasping in Clutter With Five-Fingered Robotic Hands*. IEEE Robotics and Automation Letters, 2025.
-4. Li Y, Wang P, Li R, et al. *A Survey of Multifingered Robotic Manipulation: Biological Results, Structural Evolvements, and Learning Methods*. Frontiers in Neurorobotics, 2022.
-
-更详细的“文献结论 → 代码改动”对应表见 `LITERATURE_INFORMED_DESIGN.md`。
-
----
-
-## v0.3.2 可视化修复
-
-v0.3.2 解决了本机 MuJoCo 验证中暴露的两个问题：
-
-1. 手模型视觉上像有“六根手指”：已移除细长 forearm 几何，仅保留五个 digit root，并以宽矩形 wrist base 表示腕部。
-2. `overview / closeup / side` 视角无法自由拖动：现在这三个名称均为 **FREE camera 的初始视角预设**，启动后可继续用鼠标自由旋转、平移、缩放。
-
-详见 `CHANGELOG_v0.3.2.md` 与 `CAMERA_CONTROLS.md`。
-
-## v0.3.4：任务工作区校准
-
-v0.3.4 根据真实运行 CSV 校正了 PINCH 薄块与 WRAP 圆柱的位置/尺寸，并调整接触辅助策略。详见 `CHANGELOG_v0.3.4.md` 与 `CONTACT_VALIDATION_v0.3.4.md`。
+版本演进与设计依据见 CHANGELOG_v0.4.0.md 至 CHANGELOG_v0.4.6.md、LITERATURE_INFORMED_DESIGN.md 和各 VALIDATION 文档。

@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 import math
 from pathlib import Path
+import sys
 import time
 import numpy as np
 
@@ -63,8 +64,10 @@ SERVO_COLUMNS = [
 
 EVALUATION_COLUMNS = [
     "task_active",
-    "task_success",
-    "task_success_streak_frames",
+    "contact_success_proxy",
+    "stable_success_proxy",
+    "contact_success_streak_frames",
+    "stable_success_streak_frames",
 ]
 
 
@@ -161,6 +164,11 @@ def _make_driver(args: argparse.Namespace, glove_cfg: dict):
 
 
 def main() -> None:
+    # PowerShell 5.1 decodes redirected native output using the active code page.
+    # Emit UTF-8 consistently so captured Chinese paths/messages remain readable.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     args = build_parser().parse_args()
     glove_cfg = load_yaml("configs/glove.yaml")
     algo_cfg = load_yaml("configs/algorithm.yaml")
@@ -266,16 +274,13 @@ def main() -> None:
         task_name=task_name,
         sampling_hz=hz,
         min_success_streak_frames=int(eval_cfg.get("min_success_streak_frames", 12)),
-        # Precision PINCH is successful when thumb+index fingertip contact is
-        # sustained.  Orientation stability remains visible via stable_ratio.
-        # WRAP continues to require stable contact for success.
-        success_mode="contact" if task_mode == "pinch" else "stable",
     )
 
     q_prev_opt = None
     q_prev_out = None
     last_intent = None
     last_contact = _empty_contact_metrics()
+    approach_fixture_released = False
     frame = 0
 
     try:
@@ -300,6 +305,7 @@ def main() -> None:
                 )
                 if rising:
                     last_contact = _empty_contact_metrics()
+                    approach_fixture_released = False
                     contact_assist.reset()
                     task_servo.reset()
 
@@ -344,16 +350,25 @@ def main() -> None:
                 # second fingertip chase a moving target.  As soon as bilateral
                 # fingertip contact was observed on the previous frame, release
                 # the object; success must then persist under free-body physics.
+                bilateral_tip_contact = bool(
+                    last_contact.get("thumb_tip_contact", False)
+                    and last_contact.get("index_tip_contact", False)
+                )
+                if task_name == "pinch" and bilateral_tip_contact:
+                    approach_fixture_released = True
+                elif task_name == "card" and evaluator.contact_success:
+                    approach_fixture_released = True
                 hold_pinch_object = bool(
                     task_mode == "pinch"
                     and task_active
-                    and not (
-                        bool(last_contact.get("thumb_tip_contact", False))
-                        and bool(last_contact.get("index_tip_contact", False))
-                    )
+                    and not approach_fixture_released
                 )
                 q_actual = simulator.step(q_out, hold_object=hold_pinch_object)
                 contact = simulator.contact_metrics()
+                if hold_pinch_object:
+                    # Fixture-assisted frames prove physical contact acquisition,
+                    # but they must not count as free-body stability.
+                    contact["stable_contact_proxy"] = False
                 last_contact = contact
             else:
                 q_actual = q_out
@@ -429,9 +444,17 @@ def main() -> None:
             simulator.close()
 
         summary = evaluator.summary()
+        required_success_metric = "contact" if task_mode == "pinch" else "stable"
+        task_metric_pass = bool(
+            summary[
+                "contact_success_proxy"
+                if required_success_metric == "contact"
+                else "stable_success_proxy"
+            ]
+        )
         summary.update(
             {
-                "version": "v0.4.6-pinch-success",
+                "version": "v0.4.6",
                 "input_source": args.input,
                 "dataset": str(args.dataset) if args.input == "dataset" else None,
                 "dataset_trial": int(args.dataset_trial) if args.input == "dataset" else None,
@@ -439,6 +462,8 @@ def main() -> None:
                 "simulation": "mujoco" if simulator is not None else "none",
                 "task_mode": task_mode,
                 "active_intent": active_intent,
+                "required_success_metric": required_success_metric,
+                "task_metric_pass": task_metric_pass,
                 "log_csv": str(log_path),
             }
         )
@@ -447,7 +472,9 @@ def main() -> None:
         print(f"[DONE] Summary: {summary_path}")
         if simulator is not None:
             print(
-                f"[RESULT] task={task_name} success_proxy={summary['success_proxy']} "
+                f"[RESULT] task={task_name} "
+                f"contact_success={summary['contact_success_proxy']} "
+                f"stable_success={summary['stable_success_proxy']} "
                 f"contact_ratio={summary['contact_frame_ratio']:.1%} "
                 f"stable_ratio={summary['stable_frame_ratio']:.1%} "
                 f"p95_latency={summary['p95_pipeline_latency_ms']:.2f}ms"

@@ -87,8 +87,11 @@ class ObjectAwareTaskServo:
         # 预留状态接口；当前 servo 无积分状态。
         return None
 
-    def _task_cfg(self, task_mode: str) -> dict | None:
-        cfg = self.cfg.get(task_mode)
+    def _task_cfg(self, task_name: str, task_mode: str) -> dict | None:
+        """Prefer per-object tuning, then fall back to the shared interaction mode."""
+        cfg = self.cfg.get(task_name)
+        if not isinstance(cfg, dict):
+            cfg = self.cfg.get(task_mode)
         return dict(cfg) if isinstance(cfg, dict) else None
 
     def _active_fingers(self, task_mode: str) -> tuple[str, ...]:
@@ -108,7 +111,10 @@ class ObjectAwareTaskServo:
         reported digit contact. WRAP keeps the conservative ``any`` policy.
         """
         tip = bool(contact.get(self.TIP_CONTACT_KEYS[finger], False))
-        if str(stop_on).lower() == "tip":
+        policy = str(stop_on).lower()
+        if policy == "never":
+            return False
+        if policy == "tip":
             return tip
         return tip or bool(contact.get(self.CONTACT_KEYS[finger], False))
 
@@ -154,7 +160,7 @@ class ObjectAwareTaskServo:
             return q_target.copy(), diag
 
         mode = str(task_mode or task_name)
-        task_cfg = self._task_cfg(mode)
+        task_cfg = self._task_cfg(str(task_name), mode)
         if task_cfg is None:
             return q_target.copy(), diag
 
@@ -169,6 +175,8 @@ class ObjectAwareTaskServo:
         clearance = float(task_cfg.get("target_offset_m", task_cfg.get("clearance_m", 0.0070)))
         vertical_margin = float(task_cfg.get("vertical_margin_m", 0.010))
         stop_on_contact = str(task_cfg.get("stop_on_contact", "any")).lower()
+        if stop_on_contact not in {"any", "tip", "never"}:
+            raise ValueError(f"unknown stop_on_contact policy: {stop_on_contact}")
         command_blend = float(np.clip(task_cfg.get("command_blend", self.blend), 0.0, 1.0))
         q_actual = np.asarray(simulator.joint_positions(), dtype=float)
         q_cmd = q_target.copy()

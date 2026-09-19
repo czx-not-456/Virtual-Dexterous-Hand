@@ -125,3 +125,32 @@ def test_pinch_tip_contact_still_freezes_digit():
     )
     thumb_idx = [idx["thumb_mcp"], idx["thumb_pip"], idx["thumb_dip"]]
     assert np.allclose(out[thumb_idx], sim.q[thumb_idx])
+
+
+def test_task_specific_config_precedes_interaction_mode_fallback():
+    robot = RobotHandModel()
+    cfg = load_yaml("configs/algorithm.yaml")["task_space_servo"]
+    servo = ObjectAwareTaskServo(robot, cfg)
+    assert servo._task_cfg("card", "pinch")["target_offset_m"] == -0.002
+    assert servo._task_cfg("unknown_pinch_object", "pinch")["target_offset_m"] == 0.006
+
+
+def test_never_contact_policy_keeps_card_servo_active():
+    robot = RobotHandModel()
+    servo = ObjectAwareTaskServo(robot, load_yaml("configs/algorithm.yaml")["task_space_servo"])
+    sim = FakeSimulator(robot)
+    q = np.zeros(len(robot.joint_order), dtype=float)
+    contact = _contact()
+    contact["thumb_tip_contact"] = True
+    out, diag = servo.apply(
+        q,
+        simulator=sim,
+        task_name="card",
+        task_mode="pinch",
+        intent_value="PINCH",
+        contact=contact,
+    )
+    idx = {name: i for i, name in enumerate(robot.joint_order)}
+    thumb_idx = [idx["thumb_mcp"], idx["thumb_pip"], idx["thumb_dip"]]
+    assert diag.active
+    assert np.linalg.norm(out[thumb_idx]) > 0

@@ -90,11 +90,11 @@ task_space_servo:
   pinch:
     active_intent: PINCH
     # Fingertip-center target stays just outside the contacted face.
-    # index_pad radius is 8 mm and thumb_pad radius is 8.5 mm, so 7 mm
-    # leaves ~1-1.5 mm of compliant contact without the visible interpenetration
+    # index_pad radius is 8 mm and thumb_pad radius is 8.5 mm, so 6 mm
+    # leaves ~2-2.5 mm of compliant contact without the visible interpenetration
     # caused by the old negative offset.
-    target_offset_m: 0.0070
-    clearance_m: 0.0070  # legacy fallback; target_offset_m takes precedence
+    target_offset_m: 0.0060
+    clearance_m: 0.0060  # legacy fallback; target_offset_m takes precedence
     vertical_margin_m: 0.001
     stop_on_contact: tip
     command_blend: 0.90
@@ -105,6 +105,22 @@ task_space_servo:
       thumb_dip: 0
       # Reachability-aware index pre-shape. With the 1-tendon index, the
       # practical pinch-contact region is near PIP/DIP limits and MCP ~70 deg.
+      index_mcp: 70
+      index_pip: 95
+      index_dip: 70
+  card:
+    active_intent: PINCH
+    # A shallow virtual target maintains pressure after the thin free card is
+    # released; MuJoCo collision still prevents physical interpenetration.
+    target_offset_m: -0.0020
+    vertical_margin_m: 0.001
+    stop_on_contact: never
+    command_blend: 0.92
+    posture_prior_blend: 1.00
+    posture_prior_deg:
+      thumb_mcp: -20
+      thumb_pip: 0
+      thumb_dip: 0
       index_mcp: 70
       index_pip: 95
       index_dip: 70

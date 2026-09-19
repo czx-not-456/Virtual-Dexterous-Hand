@@ -11,26 +11,28 @@ import numpy as np
 class TaskEpisodeEvaluator:
     """Aggregate per-frame simulation metrics into a reproducible task summary.
 
-    Because the current hand base is fixed, this evaluator deliberately reports a
-    *stable-contact success proxy* rather than claiming full pick-and-place success.
-    A task is marked successful when ``stable_contact_proxy`` remains true for
-    ``min_success_streak_frames`` consecutive active frames.
+    Contact acquisition and stable contact are deliberately reported as separate
+    success proxies. Neither metric claims full pick-and-place success because the
+    current hand base is fixed and no lift/transport phase is evaluated.
     """
 
     task_name: str
     sampling_hz: float
     min_success_streak_frames: int = 12
-    success_mode: str = "stable"  # "stable" or "contact"
     total_frames: int = 0
     active_frames: int = 0
     contact_frames: int = 0
     stable_frames: int = 0
-    success_streak: int = 0
-    max_success_streak: int = 0
+    contact_success_streak: int = 0
+    stable_success_streak: int = 0
+    max_contact_success_streak: int = 0
+    max_stable_success_streak: int = 0
     first_active_frame: int | None = None
     first_contact_frame: int | None = None
-    first_success_frame: int | None = None
-    success: bool = False
+    first_contact_success_frame: int | None = None
+    first_stable_success_frame: int | None = None
+    contact_success: bool = False
+    stable_success: bool = False
     _latency_ms: list[float] = field(default_factory=list)
     _optimizer_ms: list[float] = field(default_factory=list)
     _rmse_rad: list[float] = field(default_factory=list)
@@ -59,12 +61,15 @@ class TaskEpisodeEvaluator:
         self._velocity_rad_s.append(float(velocity_rms_rad_s))
 
         if not task_active:
-            self.success_streak = 0
+            self.contact_success_streak = 0
+            self.stable_success_streak = 0
             return {
                 "task_active": False,
                 "task_contact_proxy": False,
-                "task_success": bool(self.success),
-                "task_success_streak_frames": 0,
+                "contact_success_proxy": bool(self.contact_success),
+                "stable_success_proxy": bool(self.stable_success),
+                "contact_success_streak_frames": 0,
+                "stable_success_streak_frames": 0,
             }
 
         self.active_frames += 1
@@ -80,20 +85,33 @@ class TaskEpisodeEvaluator:
         if stable:
             self.stable_frames += 1
 
-        # Success semantics are task-specific.  For precision PINCH, bilateral
-        # thumb/index fingertip contact is the primary completion condition;
-        # object orientation stability remains a separately reported metric.
-        # WRAP keeps the stricter stable-contact success definition.
-        success_signal = task_proxy if self.success_mode == "contact" else stable
-        if success_signal:
-            self.success_streak += 1
-            self.max_success_streak = max(self.max_success_streak, self.success_streak)
+        if task_proxy:
+            self.contact_success_streak += 1
+            self.max_contact_success_streak = max(
+                self.max_contact_success_streak, self.contact_success_streak
+            )
         else:
-            self.success_streak = 0
+            self.contact_success_streak = 0
+        if stable:
+            self.stable_success_streak += 1
+            self.max_stable_success_streak = max(
+                self.max_stable_success_streak, self.stable_success_streak
+            )
+        else:
+            self.stable_success_streak = 0
 
-        if not self.success and self.success_streak >= self.min_success_streak_frames:
-            self.success = True
-            self.first_success_frame = int(frame)
+        if (
+            not self.contact_success
+            and self.contact_success_streak >= self.min_success_streak_frames
+        ):
+            self.contact_success = True
+            self.first_contact_success_frame = int(frame)
+        if (
+            not self.stable_success
+            and self.stable_success_streak >= self.min_success_streak_frames
+        ):
+            self.stable_success = True
+            self.first_stable_success_frame = int(frame)
 
         self._tip_ratio.append(float(contact.get("tip_contact_ratio", 0.0) or 0.0))
         self._orientation_drift_deg.append(float(contact.get("orientation_drift_deg", 0.0) or 0.0))
@@ -104,8 +122,10 @@ class TaskEpisodeEvaluator:
         return {
             "task_active": True,
             "task_contact_proxy": task_proxy,
-            "task_success": bool(self.success),
-            "task_success_streak_frames": int(self.success_streak),
+            "contact_success_proxy": bool(self.contact_success),
+            "stable_success_proxy": bool(self.stable_success),
+            "contact_success_streak_frames": int(self.contact_success_streak),
+            "stable_success_streak_frames": int(self.stable_success_streak),
         }
 
     @staticmethod
@@ -125,28 +145,31 @@ class TaskEpisodeEvaluator:
         active = max(self.active_frames, 1)
         return {
             "task": self.task_name,
-            "success_proxy": bool(self.success),
-            "success_definition": (
-                (
-                    f"task_contact_proxy consecutive >= {self.min_success_streak_frames} frames; "
-                    "PINCH bilateral fingertip-contact success, while stability is reported separately"
-                )
-                if self.success_mode == "contact"
-                else (
-                    f"stable_contact_proxy consecutive >= {self.min_success_streak_frames} frames; "
-                    "fixed-base simulation, not full lift/transport success"
-                )
+            "contact_success_proxy": bool(self.contact_success),
+            "stable_success_proxy": bool(self.stable_success),
+            "contact_success_definition": (
+                f"task_contact_proxy consecutive >= {self.min_success_streak_frames} active frames; "
+                "may include configured approach-fixture frames"
             ),
-            "success_mode": self.success_mode,
+            "stable_success_definition": (
+                f"stable_contact_proxy consecutive >= {self.min_success_streak_frames} active frames; "
+                "fixed-base simulation, not full lift/transport success"
+            ),
             "total_frames": int(self.total_frames),
             "active_frames": int(self.active_frames),
             "contact_frames": int(self.contact_frames),
             "stable_frames": int(self.stable_frames),
             "contact_frame_ratio": float(self.contact_frames / active) if self.active_frames else 0.0,
             "stable_frame_ratio": float(self.stable_frames / active) if self.active_frames else 0.0,
-            "max_success_streak_frames": int(self.max_success_streak),
+            "max_contact_success_streak_frames": int(self.max_contact_success_streak),
+            "max_stable_success_streak_frames": int(self.max_stable_success_streak),
             "first_contact_latency_ms": self._frames_to_ms(self.first_active_frame, self.first_contact_frame),
-            "first_success_latency_ms": self._frames_to_ms(self.first_active_frame, self.first_success_frame),
+            "first_contact_success_latency_ms": self._frames_to_ms(
+                self.first_active_frame, self.first_contact_success_frame
+            ),
+            "first_stable_success_latency_ms": self._frames_to_ms(
+                self.first_active_frame, self.first_stable_success_frame
+            ),
             "mean_pipeline_latency_ms": self._avg(self._latency_ms),
             "p95_pipeline_latency_ms": self._p95(self._latency_ms),
             "mean_optimizer_ms": self._avg(self._optimizer_ms),

@@ -14,6 +14,39 @@ sys.path.insert(0, str(ROOT))
 from src.common import load_yaml
 
 
+def _configure_utf8_stdio() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
+def _trial_lengths(dataset: Path) -> dict[int, int]:
+    if not dataset.is_file():
+        raise FileNotFoundError(f"dataset not found: {dataset}")
+    counts: dict[int, int] = {}
+    with dataset.open("r", encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        if not reader.fieldnames or "trial_id" not in reader.fieldnames:
+            raise ValueError(f"dataset has no trial_id column: {dataset}")
+        for row in reader:
+            trial = int(row["trial_id"])
+            counts[trial] = counts.get(trial, 0) + 1
+    if not counts:
+        raise ValueError(f"dataset contains no rows: {dataset}")
+    return counts
+
+
+def _invalid_result(task: str, trial: int, returncode: int, error: str) -> dict:
+    return {
+        "task": task,
+        "trial": trial,
+        "run_ok": False,
+        "returncode": returncode,
+        "error": error,
+        "task_metric_pass": False,
+    }
+
+
 def _run_one(task: str, trial: int, steps: int, dataset: Path, out_dir: Path, sim: str) -> dict:
     name = f"bench_{task}_trial{trial:02d}"
     cmd = [
@@ -40,156 +73,219 @@ def _run_one(task: str, trial: int, steps: int, dataset: Path, out_dir: Path, si
     print("[RUN]", " ".join(cmd))
     proc = subprocess.run(cmd, cwd=ROOT)
     if proc.returncode != 0:
-        return {"task": task, "trial": trial, "run_ok": False, "returncode": proc.returncode}
+        return _invalid_result(task, trial, proc.returncode, "subcommand failed")
+
     summary_path = out_dir / f"{name}_summary.json"
     if not summary_path.is_file():
-        return {"task": task, "trial": trial, "run_ok": False, "returncode": 0, "error": "missing summary"}
-    row = json.loads(summary_path.read_text(encoding="utf-8"))
+        return _invalid_result(task, trial, 0, "missing summary")
+    try:
+        row = json.loads(summary_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        return _invalid_result(task, trial, 0, f"invalid summary: {exc}")
+
+    required = {
+        "task",
+        "contact_success_proxy",
+        "stable_success_proxy",
+        "task_metric_pass",
+        "contact_frame_ratio",
+        "stable_frame_ratio",
+        "active_frames",
+    }
+    missing = sorted(required.difference(row))
+    if missing:
+        return _invalid_result(task, trial, 0, f"summary missing fields: {missing}")
+    if row.get("task") != task or int(row.get("active_frames", 0)) <= 0:
+        return _invalid_result(task, trial, 0, "summary task mismatch or no active frames")
+
     row["trial"] = trial
+    row["steps"] = steps
     row["run_ok"] = True
     row["returncode"] = 0
+    row["error"] = ""
     return row
 
 
 def _write_csv(rows: list[dict], path: Path) -> None:
     keys = [
-        "task", "trial", "run_ok", "success_proxy", "active_frames",
-        "contact_frame_ratio", "stable_frame_ratio", "max_success_streak_frames",
-        "first_contact_latency_ms", "first_success_latency_ms",
-        "mean_pipeline_latency_ms", "p95_pipeline_latency_ms", "mean_optimizer_ms",
-        "mean_joint_rmse_rad", "mean_velocity_rms_rad_s", "mean_tip_contact_ratio",
-        "max_orientation_drift_deg", "max_object_displacement_m", "mean_servo_error_m",
+        "task", "trial", "steps", "run_ok", "returncode", "error",
+        "required_success_metric", "task_metric_pass",
+        "contact_success_proxy", "stable_success_proxy", "active_frames",
+        "contact_frame_ratio", "stable_frame_ratio",
+        "max_contact_success_streak_frames", "max_stable_success_streak_frames",
+        "first_contact_latency_ms", "first_contact_success_latency_ms",
+        "first_stable_success_latency_ms", "mean_pipeline_latency_ms",
+        "p95_pipeline_latency_ms", "mean_optimizer_ms", "mean_joint_rmse_rad",
+        "mean_velocity_rms_rad_s", "mean_tip_contact_ratio",
+        "max_orientation_drift_deg", "max_object_displacement_m",
+        "mean_servo_error_m",
     ]
     with path.open("w", encoding="utf-8-sig", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=keys, extrasaction="ignore")
-        w.writeheader()
-        for r in rows:
-            w.writerow(r)
-
+        writer = csv.DictWriter(f, fieldnames=keys, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def _write_aggregate_csv(rows: list[dict], path: Path) -> None:
     keys = [
-        "task", "trials", "success_rate", "mean_contact_ratio", "mean_stable_ratio",
+        "task", "trials", "task_pass_rate", "contact_success_rate",
+        "stable_success_rate", "mean_contact_ratio", "mean_stable_ratio",
         "mean_p95_latency_ms", "mean_joint_rmse_rad", "mean_tip_contact_ratio",
         "mean_max_orientation_drift_deg",
     ]
     with path.open("w", encoding="utf-8-sig", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=keys, extrasaction="ignore")
-        w.writeheader()
-        for r in rows:
-            w.writerow(r)
+        writer = csv.DictWriter(f, fieldnames=keys, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
 
 def _aggregate(rows: list[dict]) -> list[dict]:
     tasks = sorted({str(r["task"]) for r in rows if r.get("run_ok")})
     out = []
     for task in tasks:
-        rs = [r for r in rows if r.get("run_ok") and r.get("task") == task]
-        if not rs:
-            continue
-        successes = [bool(r.get("success_proxy", False)) for r in rs]
+        selected = [r for r in rows if r.get("run_ok") and r.get("task") == task]
         out.append(
             {
                 "task": task,
-                "trials": len(rs),
-                "success_rate": sum(successes) / len(rs),
-                "mean_contact_ratio": mean(float(r.get("contact_frame_ratio", 0.0)) for r in rs),
-                "mean_stable_ratio": mean(float(r.get("stable_frame_ratio", 0.0)) for r in rs),
-                "mean_p95_latency_ms": mean(float(r.get("p95_pipeline_latency_ms", 0.0)) for r in rs),
-                "mean_joint_rmse_rad": mean(float(r.get("mean_joint_rmse_rad", 0.0)) for r in rs),
-                "mean_tip_contact_ratio": mean(float(r.get("mean_tip_contact_ratio", 0.0)) for r in rs),
-                "mean_max_orientation_drift_deg": mean(float(r.get("max_orientation_drift_deg", 0.0)) for r in rs),
+                "trials": len(selected),
+                "task_pass_rate": mean(bool(r["task_metric_pass"]) for r in selected),
+                "contact_success_rate": mean(bool(r["contact_success_proxy"]) for r in selected),
+                "stable_success_rate": mean(bool(r["stable_success_proxy"]) for r in selected),
+                "mean_contact_ratio": mean(float(r["contact_frame_ratio"]) for r in selected),
+                "mean_stable_ratio": mean(float(r["stable_frame_ratio"]) for r in selected),
+                "mean_p95_latency_ms": mean(float(r["p95_pipeline_latency_ms"]) for r in selected),
+                "mean_joint_rmse_rad": mean(float(r["mean_joint_rmse_rad"]) for r in selected),
+                "mean_tip_contact_ratio": mean(float(r["mean_tip_contact_ratio"]) for r in selected),
+                "mean_max_orientation_drift_deg": mean(
+                    float(r["max_orientation_drift_deg"]) for r in selected
+                ),
             }
         )
     return out
 
 
-def _write_report(agg: list[dict], path: Path, dataset: Path, steps: int) -> None:
+def _write_report(
+    agg: list[dict], path: Path, dataset: Path, step_description: str,
+    command_failures: int, task_failures: int,
+) -> None:
     lines = [
         "# Synthetic MuJoCo Benchmark Report",
         "",
-        f"- Dataset: `{dataset}`",
-        f"- Frames per run: {steps}",
-        "- Success is a stable-contact proxy because the current hand base is fixed; it is not a lift/transport success metric.",
+        f"- Dataset: {dataset}",
+        f"- Frames per run: {step_description}",
+        f"- Command/summary failures: {command_failures}",
+        f"- Completed runs that failed their required task metric: {task_failures}",
+        "- Contact success and stable success are reported separately.",
+        "- These are fixed-base proxies, not lift/transport success metrics.",
         "",
-        "| Task | Trials | Success | Contact ratio | Stable ratio | P95 latency (ms) | Joint RMSE (rad) | Tip contact ratio | Max orientation drift (deg) |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| Task | Trials | Required pass | Contact success | Stable success | Contact ratio | Stable ratio | P95 latency (ms) | Joint RMSE (rad) | Tip ratio | Max drift (deg) |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    for r in agg:
+    for row in agg:
         lines.append(
-            f"| {r['task']} | {r['trials']} | {r['success_rate']:.1%} | "
-            f"{r['mean_contact_ratio']:.1%} | {r['mean_stable_ratio']:.1%} | "
-            f"{r['mean_p95_latency_ms']:.2f} | {r['mean_joint_rmse_rad']:.4f} | "
-            f"{r['mean_tip_contact_ratio']:.3f} | {r['mean_max_orientation_drift_deg']:.2f} |"
+            f"| {row['task']} | {row['trials']} | {row['task_pass_rate']:.1%} | "
+            f"{row['contact_success_rate']:.1%} | {row['stable_success_rate']:.1%} | "
+            f"{row['mean_contact_ratio']:.1%} | {row['mean_stable_ratio']:.1%} | "
+            f"{row['mean_p95_latency_ms']:.2f} | {row['mean_joint_rmse_rad']:.4f} | "
+            f"{row['mean_tip_contact_ratio']:.3f} | "
+            f"{row['mean_max_orientation_drift_deg']:.2f} |"
         )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def _write_html(agg: list[dict], path: Path) -> None:
-    cards = []
-    rows = []
-    for r in agg:
-        pct = max(0.0, min(100.0, 100.0 * float(r["success_rate"])))
-        cards.append(
-            f'''<div class="card"><h3>{r['task']}</h3><div class="big">{pct:.0f}%</div>
-            <div class="bar"><span style="width:{pct:.1f}%"></span></div>
-            <p>contact {100*r['mean_contact_ratio']:.1f}% · stable {100*r['mean_stable_ratio']:.1f}%</p></div>'''
+    table_rows = []
+    for row in agg:
+        table_rows.append(
+            f"<tr><td>{row['task']}</td><td>{row['trials']}</td>"
+            f"<td>{100 * row['task_pass_rate']:.1f}%</td>"
+            f"<td>{100 * row['contact_success_rate']:.1f}%</td>"
+            f"<td>{100 * row['stable_success_rate']:.1f}%</td>"
+            f"<td>{100 * row['mean_contact_ratio']:.1f}%</td>"
+            f"<td>{100 * row['mean_stable_ratio']:.1f}%</td>"
+            f"<td>{row['mean_p95_latency_ms']:.2f}</td></tr>"
         )
-        rows.append(
-            f"<tr><td>{r['task']}</td><td>{r['trials']}</td><td>{100*r['success_rate']:.1f}%</td>"
-            f"<td>{100*r['mean_contact_ratio']:.1f}%</td><td>{100*r['mean_stable_ratio']:.1f}%</td>"
-            f"<td>{r['mean_p95_latency_ms']:.2f}</td><td>{r['mean_joint_rmse_rad']:.4f}</td>"
-            f"<td>{r['mean_tip_contact_ratio']:.3f}</td><td>{r['mean_max_orientation_drift_deg']:.2f}</td></tr>"
-        )
-    html = f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>Virtual Dexterous Hand Benchmark</title>
-<style>
-body{{font-family:Arial,"Microsoft YaHei",sans-serif;background:#f5f6f8;color:#20242a;margin:0;padding:28px}}
-h1{{margin:0 0 6px}} .note{{color:#59636e;margin-bottom:24px}}
-.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:26px}}
-.card{{background:white;border-radius:12px;padding:18px;box-shadow:0 2px 12px #00000012}} .big{{font-size:34px;font-weight:700}}
-.bar{{height:8px;background:#e5e9ef;border-radius:9px;overflow:hidden}} .bar span{{display:block;height:100%;background:#3568c0}}
-table{{width:100%;border-collapse:collapse;background:white;box-shadow:0 2px 12px #00000012}} th,td{{padding:10px;border-bottom:1px solid #e6e8eb;text-align:right}} th:first-child,td:first-child{{text-align:left}}
-</style></head><body><h1>虚拟灵巧手模拟数据评测看板</h1>
-<div class="note">success = 连续稳定接触代理；当前固定手掌模型不宣称“抓起并搬运成功”。</div>
-<div class="grid">{''.join(cards)}</div>
-<table><thead><tr><th>Task</th><th>Trials</th><th>Success</th><th>Contact</th><th>Stable</th><th>P95 latency ms</th><th>Joint RMSE</th><th>Tip ratio</th><th>Orientation drift°</th></tr></thead><tbody>{''.join(rows)}</tbody></table>
-</body></html>'''
+    html = f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>Virtual Dexterous Hand Benchmark</title><style>
+body{{font-family:Arial,"Microsoft YaHei",sans-serif;background:#f5f6f8;color:#20242a;padding:28px}}
+table{{width:100%;border-collapse:collapse;background:white}}th,td{{padding:10px;border-bottom:1px solid #ddd;text-align:right}}
+th:first-child,td:first-child{{text-align:left}}</style></head><body>
+<h1>虚拟灵巧手模拟数据评测</h1>
+<p>接触成功与稳定成功分开报告；任务通过列使用任务配置声明的必需指标。</p>
+<table><thead><tr><th>Task</th><th>Trials</th><th>Required pass</th>
+<th>Contact success</th><th>Stable success</th><th>Contact ratio</th>
+<th>Stable ratio</th><th>P95 latency ms</th></tr></thead>
+<tbody>{''.join(table_rows)}</tbody></table></body></html>"""
     path.write_text(html, encoding="utf-8")
 
 
-def main() -> None:
-    p = argparse.ArgumentParser(description="Batch benchmark standardized MuJoCo grasp tasks with synthetic glove data")
-    p.add_argument("--dataset", type=Path, default=ROOT / "datasets" / "synthetic_glove_v1.csv")
-    p.add_argument("--trials", type=int, default=5)
-    p.add_argument("--steps", type=int, default=600)
-    p.add_argument("--tasks", nargs="*", default=None)
-    p.add_argument("--output-dir", type=Path, default=ROOT / "outputs" / "benchmark")
-    p.add_argument("--sim", choices=["mujoco", "none"], default="mujoco", help="none 仅用于检查批处理流程")
-    args = p.parse_args()
+def main() -> int:
+    _configure_utf8_stdio()
+    parser = argparse.ArgumentParser(
+        description="Batch benchmark standardized MuJoCo grasp tasks with synthetic glove data"
+    )
+    parser.add_argument("--dataset", type=Path, default=ROOT / "datasets" / "synthetic_glove_v1.csv")
+    parser.add_argument("--trials", type=int, default=5)
+    parser.add_argument(
+        "--steps", type=int, default=None,
+        help="frames per run; default reads and runs the complete selected trial",
+    )
+    parser.add_argument("--tasks", nargs="*", default=None)
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "outputs" / "benchmark")
+    parser.add_argument("--sim", choices=["mujoco", "none"], default="mujoco", help="none 仅用于检查批处理流程")
+    args = parser.parse_args()
+
+    if args.trials <= 0:
+        parser.error("--trials must be positive")
+    if args.steps is not None and args.steps <= 0:
+        parser.error("--steps must be positive when provided")
 
     cfg = load_yaml("configs/simulation.yaml")["mujoco"]
     all_tasks = list(cfg["task_objects"].keys())
     tasks = args.tasks or all_tasks
-    unknown = [t for t in tasks if t not in all_tasks]
+    unknown = [task for task in tasks if task not in all_tasks]
     if unknown:
-        raise SystemExit(f"unknown tasks={unknown}; available={all_tasks}")
+        parser.error(f"unknown tasks={unknown}; available={all_tasks}")
+
+    lengths = _trial_lengths(args.dataset)
+    trial_ids = sorted(lengths)[: args.trials]
+    if len(trial_ids) < args.trials:
+        parser.error(
+            f"requested {args.trials} trials, dataset only has {len(lengths)}: {sorted(lengths)}"
+        )
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     rows = []
     for task in tasks:
-        for trial in range(args.trials):
-            rows.append(_run_one(task, trial, args.steps, args.dataset, args.output_dir, args.sim))
+        for trial in trial_ids:
+            steps = int(args.steps) if args.steps is not None else lengths[trial]
+            rows.append(_run_one(task, trial, steps, args.dataset, args.output_dir, args.sim))
 
+    failures = [row for row in rows if not row.get("run_ok")]
+    task_failures = [
+        row for row in rows if row.get("run_ok") and not row.get("task_metric_pass")
+    ]
     _write_csv(rows, args.output_dir / "benchmark_runs.csv")
     agg = _aggregate(rows)
     _write_aggregate_csv(agg, args.output_dir / "benchmark_summary.csv")
-    _write_report(agg, args.output_dir / "BENCHMARK_REPORT.md", args.dataset, args.steps)
+    step_description = str(args.steps) if args.steps is not None else "complete selected trial"
+    _write_report(
+        agg,
+        args.output_dir / "BENCHMARK_REPORT.md",
+        args.dataset,
+        step_description,
+        len(failures),
+        len(task_failures),
+    )
     _write_html(agg, args.output_dir / "benchmark_dashboard.html")
-    failures = [r for r in rows if not r.get("run_ok")]
-    print(f"[DONE] benchmark runs={len(rows)}, command_failures={len(failures)}")
+    print(
+        f"[DONE] benchmark runs={len(rows)}, command_failures={len(failures)}, "
+        f"task_metric_failures={len(task_failures)}"
+    )
     print(f"[DONE] {args.output_dir / 'BENCHMARK_REPORT.md'}")
     print(f"[DONE] {args.output_dir / 'benchmark_dashboard.html'}")
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

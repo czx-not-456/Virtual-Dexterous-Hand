@@ -62,16 +62,21 @@ mujoco:
       interaction: sphere
       active_intent: WRAP
       type: sphere
-      size: [0.038]
-      pos: [-0.008, 0.018, 0.108]
+      # 130 mm sphere resting on the table. The former 76 mm sphere topped out
+      # at z=0.146 m, below the underactuated fingers' useful wrap workspace.
+      size: [0.065]
+      pos: [-0.005, -0.020, 0.135]
       mass_density: 300
     card:
       label: card
       interaction: pinch
       active_intent: PINCH
       type: box
-      size: [0.020, 0.003, 0.056]
-      pos: [-0.014, -0.044, 0.126]
+      # Thin calibration card, oriented so the 6 mm edge is along X and the
+      # thumb/index pinch its 30 mm width along Y. This respects the hand's lack
+      # of ab/adduction while preserving a genuinely thin card geometry.
+      size: [0.003, 0.015, 0.070]
+      pos: [-0.014, -0.044, 0.140]
       mass_density: 180
     bottle:
       label: bottle_like_cylinder
