@@ -277,4 +277,4 @@ PINCH 和 card 要求 contact；wrap、sphere、bottle、box 要求 stable。两
 - WRAP vector MSE 相对静态映射约退化 8.47%，作为欠驱动 coupling 改善的已知多目标权衡保留；
 - 正式论文实验仍需要真实硬件、真实受试者/手套标定和标准物体重复试验。
 
-版本演进与设计依据见 CHANGELOG_v0.4.0.md 至 CHANGELOG_v0.4.6.md、LITERATURE_INFORMED_DESIGN.md 和各 VALIDATION 文档。
+版本演进与设计依据见 CHANGELOG_v0.md、LITERATURE_INFORMED_DESIGN.md 和 VALIDATION.md。
