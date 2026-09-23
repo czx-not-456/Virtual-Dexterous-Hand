@@ -80,6 +80,13 @@ def test_v03_has_contact_pads_and_task_scene():
     assert {"palm_core", "palm_heel", "thenar", "hypothenar"}.issubset(geoms)
 
 
+def test_pinch_focus_site_is_retained_but_invisible():
+    _, _, root = _load_root()
+    site = next(s for s in root.findall(".//site") if s.attrib.get("name") == "pinch_focus")
+    assert site.attrib["pos"] == "-0.037 0.003 0.184"
+    assert float(site.attrib["rgba"].split()[3]) == 0.0
+
+
 def test_v031_has_exactly_five_digit_roots_and_no_forearm_digit():
     _, _, root = _load_root()
     palm = next(b for b in root.findall(".//body") if b.attrib.get("name") == "palm")

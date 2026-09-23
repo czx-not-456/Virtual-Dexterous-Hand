@@ -59,7 +59,7 @@
     <!-- 非碰撞视觉标记：提示捏合时重点观察拇指/食指指尖。 -->
     <body name="visual_guides" pos="0 0 0">
       <site name="pinch_focus" type="sphere" pos="-0.037 0.003 0.184" size="0.010"
-            rgba="0.20 0.90 0.45 0.22"/>
+            rgba="0.20 0.90 0.45 0"/>
     </body>
 
     <!--

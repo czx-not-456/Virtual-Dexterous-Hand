@@ -38,7 +38,7 @@
       <site name="object_center" type="sphere" size="0.004" rgba="1 1 1 0.9" />
     </body>
     <body name="visual_guides" pos="0 0 0">
-      <site name="pinch_focus" type="sphere" pos="-0.037 0.003 0.184" size="0.010" rgba="0.20 0.90 0.45 0.22" />
+      <site name="pinch_focus" type="sphere" pos="-0.037 0.003 0.184" size="0.010" rgba="0.20 0.90 0.45 0" />
     </body>
     <body name="palm" pos="0 0 0.240">
       <geom name="palm_core" type="box" pos="0 -0.052 0" size="0.050 0.052 0.013" material="palm_mat" contype="1" conaffinity="1" friction="1.25 0.10 0.01" />
