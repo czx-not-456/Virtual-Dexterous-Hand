@@ -5,21 +5,13 @@ from src.hand_model.robot_hand import RobotHandModel
 
 
 def coupling_error(q: np.ndarray, robot: RobotHandModel) -> float:
-    """名义协同误差。
-
-    对真实欠驱动手而言，单腱 + 弹簧允许接触后产生被动顺应；因此本项只作为
-    运动学映射的软约束，不把三关节锁成刚性固定比例。
-    """
+    """Optional configured CH-M6 synergy penalty; zero until hardware is confirmed."""
     idx = {name: i for i, name in enumerate(robot.joint_order)}
     err = 0.0
-    for finger, cfg in robot.coupling.items():
-        mcp = q[idx[f"{finger}_mcp"]]
-        pip = q[idx[f"{finger}_pip"]]
-        dip = q[idx[f"{finger}_dip"]]
-        err += float((pip - cfg["pip_over_mcp"] * mcp) ** 2)
-        err += float((dip - cfg["dip_over_mcp"] * mcp) ** 2)
+    for cfg in robot.synergies.values():
+        target, source = str(cfg["target"]), str(cfg["source"])
+        err += float((q[idx[target]] - float(cfg["ratio"]) * q[idx[source]]) ** 2)
     return err
-
 
 def fingertip_collision_penalty(
     q: np.ndarray,

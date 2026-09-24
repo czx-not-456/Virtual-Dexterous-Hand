@@ -7,22 +7,23 @@ import numpy as np
 
 from src.common import ROOT
 from src.hand_model.robot_hand import RobotHandModel
+from src.simulation.ch_m6_adapter import build_ch_m6_scene
 
 
 class MujocoSimulator:
-    """MuJoCo 驱动层（v0.3.2 五指 + 接触闭环辅助版）。
+    """CH-M6 MuJoCo driver with runtime scene/contact adaptation.
 
     核心变化：
-    - 15 DoF / 7 actuator 控制接口：拇指 3 个独立执行器 + 四根非拇指 flexor；
-    - 非拇指由 MJCF tendon + joint spring 形成欠驱动近似；
-    - 支持 wrap/pinch/sphere 三种任务物体；
+    - CH-M6 原生 11 DoF / 11 position actuator 控制接口；
+    - 15 维标准人手姿态由配置映射为 11 维 CH-M6 目标；
+    - 支持 neutral / PINCH / WRAP 三种标准场景；
     - 记录 thumb/fingers/palm 接触区、指尖接触率、物体姿态漂移等指标。
     """
 
     def __init__(
         self,
         robot: RobotHandModel,
-        model_path: str = "models/dexterous_hand/humanoid_hand_v03.xml",
+        model_path: str = "CH-M6/CH-M6_L.xml",
         render: bool = False,
         camera: str = "overview",
         task_object_body: str = "grasp_object",
@@ -33,6 +34,7 @@ class MujocoSimulator:
         object_min_z_m: float = 0.045,
         stability_orientation_deg: float = 3.0,
         camera_presets: dict | None = None,
+        scene_config: dict | None = None,
         control_dt_s: float | None = None,
     ) -> None:
         try:
@@ -68,13 +70,23 @@ class MujocoSimulator:
         if not path.is_file():
             raise FileNotFoundError(f"MuJoCo 模型文件不存在：{path}")
 
-        # v0.3 始终由 Python 读取 XML：既兼容中文路径，也允许在加载前按 task_spec
-        # 轻量修改测试物体类型、尺寸和位置，不需要复制三份场景文件。
-        xml_text = path.read_text(encoding="utf-8")
+        scene_cfg = {
+            "physics_timestep_s": 0.002,
+            "palm_pos_m": [0.0, 0.0, 0.240],
+            "palm_quat_wxyz": [0.0, 0.0, 1.0, 0.0],
+            "table": {"pos": [0.0, 0.10, 0.035], "size": [0.24, 0.20, 0.035]},
+            "task_object_body": task_object_body,
+        }
+        scene_cfg.update(dict(scene_config or {}))
+        scene_cfg["task_object_body"] = task_object_body
+        # Project-level adapter reads the teacher-provided XML/STL as immutable assets.
+        # Scene entities and contact proxies exist only in this in-memory XML.
+        xml_text, assets = build_ch_m6_scene(path, robot, scene_cfg)
         if task_spec:
             xml_text = self._configure_task_xml(xml_text, task_object_body, task_spec)
-        self.model = mujoco.MjModel.from_xml_string(xml_text)
+        self.model = mujoco.MjModel.from_xml_string(xml_text, assets=assets)
         self.data = mujoco.MjData(self.model)
+        mujoco.mj_forward(self.model, self.data)
         self.physics_dt_s = float(self.model.opt.timestep)
         if self.control_dt_s is None:
             self.control_dt_s = self.physics_dt_s
@@ -85,9 +97,9 @@ class MujocoSimulator:
 
         self.act_ids: list[int] = []
         for actuator in robot.actuator_order:
-            aid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, f"act_{actuator}")
+            aid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator)
             if aid < 0:
-                raise RuntimeError(f"Missing actuator act_{actuator} in MJCF")
+                raise RuntimeError(f"Missing CH-M6 actuator {actuator} in MJCF")
             self.act_ids.append(aid)
         if len(self.act_ids) != robot.effective_actuators:
             raise RuntimeError(
@@ -322,17 +334,10 @@ class MujocoSimulator:
                 self.model, self.mujoco.mjtObj.mjOBJ_BODY, bid
             ) or ""
 
-            digit = None
-            for name in ("thumb", "index", "middle", "ring", "little"):
-                if bname.startswith(name):
-                    digit = name
-                    break
+            digit = self.robot.finger_for_body(bname)
 
-            is_thenar = gname == "thenar"
-            is_palm = (
-                bname == "palm"
-                and gname in {"palm_core", "palm_heel", "hypothenar"}
-            )
+            is_thenar = False
+            is_palm = bname == str(self.robot.simulation_names["palm_body"])
 
             if digit is not None or is_thenar or is_palm:
                 hand_contact_count += 1
@@ -349,7 +354,7 @@ class MujocoSimulator:
             elif is_palm:
                 sections.add("palm")
 
-            if gname.endswith("_pad"):
+            if gname in set(self.robot.simulation_names["fingertip_geoms"].values()):
                 pad_contacts.add(gname)
 
         if hand_contact_count > 0:
@@ -361,7 +366,7 @@ class MujocoSimulator:
         stable_orientation = orient_deg <= self.stability_orientation_deg
 
         tip_flags = {
-            finger: f"{finger}_pad" in pad_contacts
+            finger: self.robot.tip_geom_name(finger) in pad_contacts
             for finger in ("thumb", "index", "middle", "ring", "little")
         }
         pinch_proxy = bool(tip_flags["thumb"] and tip_flags["index"])
@@ -443,7 +448,7 @@ class MujocoSimulator:
 
     def fingertip_position(self, finger: str) -> np.ndarray:
         sid = self.mujoco.mj_name2id(
-            self.model, self.mujoco.mjtObj.mjOBJ_SITE, f"{finger}_tip"
+            self.model, self.mujoco.mjtObj.mjOBJ_SITE, self.robot.tip_site_name(finger)
         )
         if sid < 0:
             raise RuntimeError(f"Missing fingertip site: {finger}_tip")
@@ -451,7 +456,7 @@ class MujocoSimulator:
 
     def fingertip_jacobian(self, finger: str, joint_names: tuple[str, ...]) -> np.ndarray:
         sid = self.mujoco.mj_name2id(
-            self.model, self.mujoco.mjtObj.mjOBJ_SITE, f"{finger}_tip"
+            self.model, self.mujoco.mjtObj.mjOBJ_SITE, self.robot.tip_site_name(finger)
         )
         if sid < 0:
             raise RuntimeError(f"Missing fingertip site: {finger}_tip")
@@ -493,57 +498,18 @@ class MujocoSimulator:
         mode = str(spec.get("interaction", task_name))
 
         if mode == "pinch" and kind == "box" and len(size) >= 3:
-            hx, hy, hz = size[:3]
-            # Thumb approaches from -Y, index from +Y. Preserve the current X as
-            # much as possible instead of forcing both tips to the box centerline;
-            # this is important because this hand has no ab/adduction DoF.
-            side = -1.0 if finger == "thumb" else 1.0
-            x_margin = min(margin, max(0.0, hx * 0.35))
-            z_margin = min(margin, max(0.0, hz * 0.35))
-            x_lo, x_hi = -hx + x_margin, hx - x_margin
-            z_lo, z_hi = -hz + z_margin, hz - z_margin
-            x = float(np.clip(local_tip[0], min(x_lo, x_hi), max(x_lo, x_hi)))
-            z = float(np.clip(local_tip[2], min(z_lo, z_hi), max(z_lo, z_hi)))
-            local_target = np.array([x, side * (hy + c), z], dtype=float)
+            half = np.asarray(size[:3], dtype=float)
+            face = dict(spec.get("contact_faces", {}).get(finger, {}))
+            axis = int(face.get("axis", 0))
+            sign = float(face.get("sign", 1.0 if local_tip[axis] >= 0 else -1.0))
+            local_target = np.clip(local_tip, -half + margin, half - margin)
+            local_target[axis] = sign * (half[axis] + c)
             return center + R @ local_target
-
         if mode in {"wrap", "sphere"}:
             if kind == "sphere" and len(size) >= 1:
                 radius = size[0]
                 v = local_tip.copy()
                 target_radius = radius + c
-                if finger != "thumb":
-                    # A non-thumb digit has only one effective tendon direction.
-                    # Select the sphere point reached by that local tangent instead
-                    # of the Euclidean-nearest point, which can lie outside the
-                    # digit's one-dimensional reachable manifold.
-                    joints = (f"{finger}_mcp", f"{finger}_pip", f"{finger}_dip")
-                    J = self.fingertip_jacobian(finger, joints)
-                    coupling = self.robot.coupling[finger]
-                    tendon = np.array(
-                        [1.0, float(coupling["pip_over_mcp"]), float(coupling["dip_over_mcp"])],
-                        dtype=float,
-                    )
-                    tangent = R.T @ (J @ tendon)
-                    tangent_norm2 = float(tangent @ tangent)
-                    if tangent_norm2 > 1e-12:
-                        # Intersect p+t*d with the clearance sphere. If the line
-                        # misses it, use the sphere point nearest to the line.
-                        b = float(v @ tangent)
-                        discriminant = b * b - tangent_norm2 * (
-                            float(v @ v) - target_radius * target_radius
-                        )
-                        if discriminant >= 0.0:
-                            root = math.sqrt(discriminant)
-                            candidates = [(-b - root) / tangent_norm2, (-b + root) / tangent_norm2]
-                            t = min(candidates, key=abs)
-                            local_target = v + t * tangent
-                            return center + R @ local_target
-                        closest = v - (b / tangent_norm2) * tangent
-                        closest_norm = float(np.linalg.norm(closest))
-                        if closest_norm > 1e-9:
-                            local_target = closest / closest_norm * target_radius
-                            return center + R @ local_target
                 n = float(np.linalg.norm(v))
                 if n < 1e-9:
                     v = np.array([0.0, 1.0, 0.0])

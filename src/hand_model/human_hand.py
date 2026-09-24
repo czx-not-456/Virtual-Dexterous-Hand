@@ -5,7 +5,7 @@ import numpy as np
 
 from src.common import load_yaml
 from src.processing.normalization import normalized_to_angle
-from .kinematics import HandKinematics
+from .kinematics import HumanHandKinematics
 
 
 class HumanHandModel:
@@ -16,7 +16,7 @@ class HumanHandModel:
             [math.radians(float(cfg["joint_ranges_deg"][j][0])), math.radians(float(cfg["joint_ranges_deg"][j][1]))]
             for j in self.joint_order
         ])
-        self.kin = HandKinematics(
+        self.kin = HumanHandKinematics(
             cfg["finger_lengths_m"], cfg["base_offsets_m"], cfg["base_yaw_deg"], self.joint_order
         )
 

@@ -237,6 +237,7 @@ def main() -> None:
             object_min_z_m=float(sim_cfg["object_min_z_m"]),
             stability_orientation_deg=float(sim_cfg.get("stability_orientation_deg", 3.0)),
             camera_presets=dict(sim_cfg.get("camera_presets", {})),
+            scene_config=sim_cfg,
             control_dt_s=dt,
         )
         if args.render:
@@ -356,8 +357,6 @@ def main() -> None:
                 )
                 if task_name == "pinch" and bilateral_tip_contact:
                     approach_fixture_released = True
-                elif task_name == "card" and evaluator.contact_success:
-                    approach_fixture_released = True
                 hold_pinch_object = bool(
                     task_mode == "pinch"
                     and task_active
@@ -444,22 +443,19 @@ def main() -> None:
             simulator.close()
 
         summary = evaluator.summary()
-        required_success_metric = "contact" if task_mode == "pinch" else "stable"
-        task_metric_pass = bool(
-            summary[
-                "contact_success_proxy"
-                if required_success_metric == "contact"
-                else "stable_success_proxy"
-            ]
-        )
+        required_success_metric = str(task_spec.get("required_success_metric", "contact" if task_mode == "pinch" else "stable"))
+        task_metric_pass = True if required_success_metric == "none" else bool(summary["contact_success_proxy" if required_success_metric == "contact" else "stable_success_proxy"])
         summary.update(
             {
-                "version": "v0.4.6",
+                "version": "ch-m6-adapter-v1",
                 "input_source": args.input,
                 "dataset": str(args.dataset) if args.input == "dataset" else None,
                 "dataset_trial": int(args.dataset_trial) if args.input == "dataset" else None,
                 "mock_seed": int(args.seed) if args.input == "mock" else None,
                 "simulation": "mujoco" if simulator is not None else "none",
+                "robot_model": "CH-M6_L",
+                "robot_dof": robot.nominal_dof,
+                "robot_actuators": robot.effective_actuators,
                 "task_mode": task_mode,
                 "active_intent": active_intent,
                 "required_success_metric": required_success_metric,

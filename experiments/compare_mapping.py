@@ -55,9 +55,9 @@ def main() -> None:
 
     p = metrics["PINCH"]
     w = metrics["WRAP"]
-    print("Intent-aware hybrid mapping comparison (v0.3 mock data)")
+    print("Intent-aware CH-M6 15-to-11 mapping comparison")
     print("- PINCH: prioritizes thumb-index endpoint/vector alignment while preserving collision safety.")
-    print("- WRAP: prioritizes under-actuated multi-finger coordination and whole-hand shape.")
+    print("- WRAP: prioritizes CH-M6 multi-finger coordination and whole-hand shape.")
     print()
     print(
         f"PINCH position MSE: static={p['s_pos']:.8f}, dynamic={p['d_pos']:.8f}, "
@@ -68,7 +68,7 @@ def main() -> None:
         f"improvement={pct_improvement(p['s_vec'], p['d_vec']):.2f}%"
     )
     print(
-        f"WRAP coupling penalty: static={w['s_cpl']:.8f}, dynamic={w['d_cpl']:.8f}, "
+        f"WRAP configured synergy penalty: static={w['s_cpl']:.8f}, dynamic={w['d_cpl']:.8f}, "
         f"improvement={pct_improvement(w['s_cpl'], w['d_cpl']):.2f}%"
     )
     print(

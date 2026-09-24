@@ -1,3 +1,4 @@
+# TODO(指导老师): servo 增益、姿态先验和闭合速率均为仿真初值，需结合实物标定。
 intent:
   pinch_enter_m: 0.06
   pinch_exit_m: 0.072
@@ -9,126 +10,41 @@ optimizer:
   maxiter: 28
   ftol: 1.0e-06
   weights:
-    NEUTRAL:
-      pos: 0.35
-      vector: 0.65
-      topo: 1.2
-      smooth: 0.24
-      coupling: 0.18
-      collision: 0.45
-    PINCH:
-      pos: 18.0
-      vector: 5.5
-      topo: 0.3
-      smooth: 0.08
-      coupling: 0.05
-      collision: 1.1
-    WRAP:
-      pos: 1.25
-      vector: 1.5
-      topo: 1.7
-      smooth: 0.2
-      coupling: 0.8
-      collision: 0.7
-  collision:
-    adjacent_tip_min_m: 0.01
-    non_target_thumb_tip_min_m: 0.014
-    penalty_gain: 1.0
-  vector_pairs:
-  - - thumb
-    - index
-  - - thumb
-    - middle
-  - - index
-    - middle
-  - - middle
-    - ring
-  - - ring
-    - little
-output_filter:
-  alpha: 0.45
-  max_velocity_deg_s: 360
+    NEUTRAL: {pos: 0.35, vector: 0.65, topo: 1.2, smooth: 0.24, coupling: 0.0, collision: 0.45}
+    PINCH: {pos: 18.0, vector: 5.5, topo: 0.3, smooth: 0.08, coupling: 0.0, collision: 1.1}
+    WRAP: {pos: 1.25, vector: 1.5, topo: 1.7, smooth: 0.2, coupling: 0.0, collision: 0.7}
+  collision: {adjacent_tip_min_m: 0.010, non_target_thumb_tip_min_m: 0.014, penalty_gain: 1.0}
+  vector_pairs: [[thumb,index],[thumb,middle],[index,middle],[middle,ring],[ring,little]]
+output_filter: {alpha: 0.45, max_velocity_deg_s: 360}
 contact_assist:
   enabled: true
   release_rate_deg_s: 220
   pinch:
     active_intent: PINCH
-    close_rate_deg_s: 110
-    max_extra_deg:
-      thumb_mcp: 6
-      thumb_pip: 8
-      thumb_dip: 6
-      index_mcp: 36
-      index_pip: 34
-      index_dip: 24
+    close_rate_deg_s: 100
+    max_extra_deg: {th_cmc_joint: 10, th_mcp_joint: 8, th_ip_joint: 8, ff_mcp_joint: 22, ff_dip_joint: 22}
   wrap:
     active_intent: WRAP
     close_rate_deg_s: 85
-    max_extra_deg:
-      thumb_mcp: 14
-      thumb_pip: 20
-      thumb_dip: 14
-      index_mcp: 18
-      index_pip: 24
-      index_dip: 16
-      middle_mcp: 18
-      middle_pip: 24
-      middle_dip: 16
-      ring_mcp: 20
-      ring_pip: 26
-      ring_dip: 18
-      little_mcp: 22
-      little_pip: 28
-      little_dip: 20
+    max_extra_deg: {th_cmc_joint: 15, th_mcp_joint: 12, th_ip_joint: 12, ff_mcp_joint: 20, ff_dip_joint: 22, mf_mcp_joint: 20, mf_dip_joint: 22, rf_mcp_joint: 20, rf_dip_joint: 22, lf_mcp_joint: 20, lf_dip_joint: 22}
 task_space_servo:
   enabled: true
-  gain: 0.88
+  gain: 0.80
   damping: 0.018
-  blend: 0.96
-  max_joint_step_deg: 6.5
-  stop_error_m: 0.0008
+  blend: 0.92
+  max_joint_step_deg: 6.0
+  stop_error_m: 0.001
   pinch:
     active_intent: PINCH
-    # Fingertip-center target stays just outside the contacted face.
-    # index_pad radius is 8 mm and thumb_pad radius is 8.5 mm, so 6 mm
-    # leaves ~2-2.5 mm of compliant contact without the visible interpenetration
-    # caused by the old negative offset.
-    target_offset_m: 0.0060
-    clearance_m: 0.0060  # legacy fallback; target_offset_m takes precedence
-    vertical_margin_m: 0.001
+    target_offset_m: 0.0045
+    vertical_margin_m: 0.003
     stop_on_contact: tip
-    command_blend: 0.90
-    posture_prior_blend: 1.00
-    posture_prior_deg:
-      thumb_mcp: -20
-      thumb_pip: 0
-      thumb_dip: 0
-      # Reachability-aware index pre-shape. With the 1-tendon index, the
-      # practical pinch-contact region is near PIP/DIP limits and MCP ~70 deg.
-      index_mcp: 70
-      index_pip: 95
-      index_dip: 70
-  card:
-    active_intent: PINCH
-    # A shallow virtual target maintains pressure after the thin free card is
-    # released; MuJoCo collision still prevents physical interpenetration.
-    target_offset_m: -0.0020
-    vertical_margin_m: 0.001
-    stop_on_contact: never
     command_blend: 0.92
-    posture_prior_blend: 1.00
-    posture_prior_deg:
-      thumb_mcp: -20
-      thumb_pip: 0
-      thumb_dip: 0
-      index_mcp: 70
-      index_pip: 95
-      index_dip: 70
+    posture_prior_blend: 0.75
+    posture_prior_deg: {th_cmc_joint: 50, th_mcp_joint: 18, th_ip_joint: 28, ff_mcp_joint: 45, ff_dip_joint: 44}
   wrap:
     active_intent: WRAP
-    clearance_m: 0.0055
-    vertical_margin_m: 0.012
-  sphere:
-    active_intent: WRAP
-    clearance_m: 0.0055
-    vertical_margin_m: 0.01
+    clearance_m: 0.0045
+    vertical_margin_m: 0.008
+    stop_on_contact: any
+    command_blend: 0.90

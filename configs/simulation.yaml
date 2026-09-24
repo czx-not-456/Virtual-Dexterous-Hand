@@ -1,96 +1,55 @@
 mujoco:
-  model_path: models/dexterous_hand/humanoid_hand_v031.xml
-  default_camera: overview
+  model_path: CH-M6/CH-M6_L.xml
+  robot_model: CH-M6_L
   task_object_body: grasp_object
+  default_camera: overview
   default_task: wrap
+  physics_timestep_s: 0.002
+  palm_pos_m: [0.0, 0.0, 0.240]
+  palm_quat_wxyz: [0.0, 0.0, 1.0, 0.0]
+  table:
+    pos: [0.0, 0.10, 0.035]
+    size: [0.24, 0.20, 0.035]
   auto_reset_object: true
   hold_task_object_when_inactive: true
-  object_workspace_radius_m: 0.28
-  object_min_z_m: 0.045
-  stability_orientation_deg: 3.0
+  object_workspace_radius_m: 0.30
+  object_min_z_m: 0.040
+  stability_orientation_deg: 5.0
   evaluation:
     min_success_streak_frames: 12
   camera_presets:
-    overview:
-      lookat: [0.0, -0.015, 0.19]
-      distance: 0.52
-      azimuth: 140.0
-      elevation: -24.0
-    closeup:
-      lookat: [-0.018, 0.005, 0.19]
-      distance: 0.34
-      azimuth: 140.0
-      elevation: -20.0
-    side:
-      lookat: [0.0, 0.0, 0.185]
-      distance: 0.44
-      azimuth: 90.0
-      elevation: -12.0
-
-  # Standardized simulated objects. All positions keep the object near the fixed
-  # hand workspace and above the current table top (z=0.070 m).
+    overview: {lookat: [0.0, 0.09, 0.16], distance: 0.48, azimuth: 135.0, elevation: -22.0}
+    closeup: {lookat: [0.02, 0.10, 0.18], distance: 0.30, azimuth: 135.0, elevation: -18.0}
+    side: {lookat: [0.0, 0.10, 0.17], distance: 0.40, azimuth: 90.0, elevation: -10.0}
+  # TODO(指导老师): 任务物体尺寸/位姿、摩擦和密度需按最终实验夹具复测。
   task_objects:
+    neutral:
+      label: neutral_reference
+      interaction: neutral
+      active_intent: NEUTRAL
+      required_success_metric: none
+      type: sphere
+      size: [0.025]
+      pos: [0.15, 0.10, 0.095]
+      mass_density: 250
+    pinch:
+      label: precision_block
+      interaction: pinch
+      active_intent: PINCH
+      required_success_metric: contact
+      type: box
+      size: [0.008, 0.025, 0.060]
+      pos: [0.042, 0.110, 0.130]
+      mass_density: 360
+      contact_faces:
+        thumb: {axis: 0, sign: 1}
+        index: {axis: 0, sign: -1}
     wrap:
-      label: cylinder
+      label: wrap_cylinder
       interaction: wrap
       active_intent: WRAP
+      required_success_metric: stable
       type: cylinder
       size: [0.035, 0.065]
-      pos: [-0.005, -0.020, 0.135]
+      pos: [0.000, 0.100, 0.135]
       mass_density: 320
-    pinch:
-      label: thin_block
-      interaction: pinch
-      active_intent: PINCH
-      type: box
-      # v0.4.4 calibration block. MuJoCo box size is HALF-size.
-      # The index/thumb precision-pinch centerline for this hand is around
-      # z=0.190-0.193 m. The old block top was only z=0.182 m, so both pads
-      # could pass just above the top edge even when Y alignment was correct.
-      # Keep the bottom on the z=0.070 m table while raising the top to 0.202 m.
-      # v0.4.6 reachability fix. The old 132 mm block ended at z=0.202 m.
-      # The underactuated index's closest useful pinch pose is around
-      # (y,z)=(-0.0217, 0.2094) m, so its 8 mm pad could never intersect the
-      # old box (minimum center-to-box distance was about 10.3 mm).
-      # Raise only the top face while keeping the bottom on the z=0.070 m table.
-      # MuJoCo box size is HALF-size: actual size = 90 x 30 x 140 mm.
-      size: [0.045, 0.015, 0.070]
-      pos: [-0.014, -0.044, 0.140]
-      mass_density: 360
-    sphere:
-      label: sphere
-      interaction: sphere
-      active_intent: WRAP
-      type: sphere
-      # 130 mm sphere resting on the table. The former 76 mm sphere topped out
-      # at z=0.146 m, below the underactuated fingers' useful wrap workspace.
-      size: [0.065]
-      pos: [-0.005, -0.020, 0.135]
-      mass_density: 300
-    card:
-      label: card
-      interaction: pinch
-      active_intent: PINCH
-      type: box
-      # Thin calibration card, oriented so the 6 mm edge is along X and the
-      # thumb/index pinch its 30 mm width along Y. This respects the hand's lack
-      # of ab/adduction while preserving a genuinely thin card geometry.
-      size: [0.003, 0.015, 0.070]
-      pos: [-0.014, -0.044, 0.140]
-      mass_density: 180
-    bottle:
-      label: bottle_like_cylinder
-      interaction: wrap
-      active_intent: WRAP
-      type: cylinder
-      size: [0.026, 0.070]
-      pos: [-0.005, -0.020, 0.140]
-      mass_density: 260
-    box:
-      label: rectangular_box
-      interaction: wrap
-      active_intent: WRAP
-      type: box
-      size: [0.032, 0.032, 0.060]
-      pos: [-0.005, -0.020, 0.130]
-      mass_density: 240

@@ -1,23 +1,14 @@
-from pathlib import Path
-
 import pytest
+from src.common import load_yaml
+from src.hand_model.robot_hand import RobotHandModel
+from src.simulation.mujoco_env import MujocoSimulator
+mujoco=pytest.importorskip("mujoco")
 
-from src.common import ROOT, load_yaml
-
-
-mujoco = pytest.importorskip("mujoco", reason="MuJoCo runtime is optional in CI/generation environment")
-
-
-def test_v03_mujoco_schema_loads_and_named_entities_exist():
-    cfg = load_yaml("configs/simulation.yaml")["mujoco"]
-    path = Path(ROOT / cfg["model_path"])
-    model = mujoco.MjModel.from_xml_string(path.read_text(encoding="utf-8"))
-
-    assert model.nu == 7
-    assert model.nv >= 21  # 15 hand hinge DoF + free object 6 DoF
-    for name in ("overview", "closeup", "side"):
-        assert mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, name) >= 0
-    assert mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "grasp_object") >= 0
-    assert mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "palm") >= 0
-    for name in ("index_flexor_tendon", "middle_flexor_tendon", "ring_flexor_tendon", "little_flexor_tendon"):
-        assert mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_TENDON, name) >= 0
+def test_ch_m6_runtime_loads_assets_scene_and_named_entities():
+    c=load_yaml("configs/simulation.yaml")["mujoco"]; r=RobotHandModel(); s=MujocoSimulator(r,model_path=c["model_path"],task_object_body=c["task_object_body"],task_name="neutral",task_spec=c["task_objects"]["neutral"],scene_config=c)
+    try:
+        assert s.model.nu==11; assert s.model.nq==18; assert s.model.nv==17
+        for n in r.joint_order: assert mujoco.mj_name2id(s.model,mujoco.mjtObj.mjOBJ_JOINT,n)>=0
+        for f in r.finger_joints: assert mujoco.mj_name2id(s.model,mujoco.mjtObj.mjOBJ_SITE,r.tip_site_name(f))>=0
+        assert mujoco.mj_name2id(s.model,mujoco.mjtObj.mjOBJ_BODY,c["task_object_body"])>=0
+    finally: s.close()

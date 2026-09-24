@@ -1,18 +1,18 @@
-# Virtual-Dexterous-Hand v0.4.6
+# Virtual-Dexterous-Hand CH-M6
 
 基于模拟数据手套、意图驱动重定向和 MuJoCo 的虚拟灵巧手实验系统。
 
 当前版本提供：
 
-- 15 DoF / 7 actuator 欠驱动手模型；
+- 指导老师提供的 CH-M6_L 模型（11 DoF / 11 position actuator）；
 - OPEN、NEUTRAL、PINCH、WRAP 意图识别；
 - 数据集回放和程序化 Mock 输入；
-- pinch、wrap、sphere、card、bottle、box 六类标准任务；
+- neutral、PINCH、WRAP 三类标准场景；
 - 基于物体位姿、指尖 Jacobian 和欠驱动可达方向的任务空间伺服；
 - 每帧 CSV、任务 summary JSON、批量 CSV、Markdown 报告和 HTML 看板；
 - 明确分离的接触成功代理与稳定成功代理。
 
-项目使用工程化近似手模型，不是 CasiaHand 官方 CAD 数字孪生。当前手掌基座固定，因此所有成功指标都是接触代理，不代表完成抓起、搬运或放置。
+项目统一使用 `CH-M6/` 中指导老师提供的只读第三方模型；site、接触代理和任务场景均在运行时注入，不修改原始 XML/STL。当前手掌基座固定，因此所有成功指标都是接触代理，不代表完成抓起、搬运或放置。
 
 ## 1. Windows 新电脑从零部署
 
@@ -68,7 +68,7 @@ requirements.txt 包含 NumPy、SciPy、PyYAML、MuJoCo 和 pytest。
 
     python -m pytest -rA
 
-当前版本包含纯算法、配置、MuJoCo schema、可达性以及六任务 canonical trial 集成测试。安装了 MuJoCo 的标准环境应执行全部测试，不应跳过物理运行测试。
+当前版本包含纯算法、配置、MuJoCo schema、可达性以及 neutral/PINCH/WRAP canonical trial 集成测试。安装了 MuJoCo 的标准环境应执行全部测试，不应跳过物理运行测试。
 
 当前仓库在 Python 3.11.9、MuJoCo 3.13.0 环境的基准结果为 58 passed。
 
@@ -115,7 +115,7 @@ WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射�
 
     python -m src.main --sim mujoco --render --realtime --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task pinch --steps 800 --camera closeup
 
-PINCH 方块实际尺寸为 90 × 30 × 140 mm。MuJoCo box 配置使用半尺寸 [0.045, 0.015, 0.070]，中心高度为 0.140 m，底面位于 0.070 m 桌面上。
+CH-M6 PINCH 方块沿 X 轴由拇指/食指对向夹持，实际尺寸为 16 × 50 × 120 mm，底面位于 0.070 m 桌面上。
 
 ### 4.2 WRAP
 
@@ -129,12 +129,7 @@ PINCH 方块实际尺寸为 90 × 30 × 140 mm。MuJoCo box 配置使用半尺�
 
 ### 4.3 其他标准物体
 
-    python -m src.main --sim mujoco --input dataset --dataset-trial 0 --task sphere --steps 800
-    python -m src.main --sim mujoco --input dataset --dataset-trial 0 --task card --steps 800
-    python -m src.main --sim mujoco --input dataset --dataset-trial 0 --task bottle --steps 800
-    python -m src.main --sim mujoco --input dataset --dataset-trial 0 --task box --steps 800
 
-card 是 6 mm 薄边、30 mm 夹持宽度、140 mm 高度的校准卡片。PINCH/card 接近阶段会临时固定物体：PINCH 首次建立双指接触后释放，薄 card 连续建立规定帧数的真实双指接触后释放。夹具期间可计入接触成功，但不会计入稳定成功。
 
 ### 4.4 纯算法模式
 
@@ -155,11 +150,10 @@ card 是 6 mm 薄边、30 mm 夹持宽度、140 mm 高度的校准卡片。PINCH
 
 示例：
 
-    python -m src.main --sim mujoco --render --realtime --task sphere --steps 800 --camera side
 
 预设仅设置自由相机初始位置，启动后仍可用 MuJoCo Viewer 鼠标旋转、平移和缩放。
 
-## 5. 六任务批量 benchmark
+## 5. 三场景批量 benchmark
 
 运行所有六类任务、trial 0：
 
@@ -232,7 +226,7 @@ summary JSON 同时保留两套成功指标：
 - required_success_metric：该任务规定使用 contact 还是 stable；
 - task_metric_pass：规定指标是否通过。
 
-PINCH 和 card 要求 contact；wrap、sphere、bottle、box 要求 stable。两套原始指标始终同时输出。
+neutral 要求流程无错误；PINCH 要求 contact；WRAP 要求 stable。接触与稳定两套原始指标始终同时输出。
 
 ## 7. 结果分析
 
@@ -258,22 +252,22 @@ PINCH 和 card 要求 contact；wrap、sphere、bottle、box 要求 stable。两
     models/        MuJoCo MJCF 手与任务场景
     scripts/       数据生成和辅助运行脚本
     src/           主程序、驱动、特征、映射、仿真和评测
-    tests/         单元、回归和六任务 MuJoCo 集成测试
+    tests/         单元、回归和三场景 MuJoCo 集成测试
     outputs/       运行结果；默认被 Git 忽略
 
 核心配置：
 
 - configs/simulation.yaml：物体尺寸、位置、任务类型、相机和稳定阈值；
 - configs/algorithm.yaml：意图阈值、优化器权重、任务空间伺服和任务专属参数；
-- configs/robot_hand.yaml：15 DoF、7 actuator、关节范围和欠驱动耦合；
-- models/dexterous_hand/humanoid_hand_v031.xml：当前 MuJoCo 模型。
+- configs/robot_hand.yaml：CH-M6 11 DoF、15→11 映射、运动学链和可配置待确认参数；
+- CH-M6/CH-M6_L.xml：指导老师原始只读模型；`src/simulation/ch_m6_adapter.py`：项目侧运行时适配。
 
 ## 9. 当前边界与已知问题
 
 - 当前使用模拟数据，不等于真实数据手套实验；
 - 手掌基座固定，没有手腕/机械臂抓起和搬运阶段；
 - 结构、摩擦、腱路和关节参数仍是工程近似；
-- PINCH/card 的接触成功可能包含接近夹具阶段，稳定成功只统计释放后的自由体帧；
+- PINCH 的接触成功可能包含接近夹具阶段，稳定成功只统计释放后的自由体帧；
 - WRAP vector MSE 相对静态映射约退化 8.47%，作为欠驱动 coupling 改善的已知多目标权衡保留；
 - 正式论文实验仍需要真实硬件、真实受试者/手套标定和标准物体重复试验。
 

@@ -1,108 +1,88 @@
-# v0.3 文献驱动工程参数。
-# 重要：关节活动范围与几何尺寸仍是工程近似值，不是 CasiaHand 官方 CAD/标定参数。
-# 结构层面参考 Yan et al. (2025): 15 DoF / 7 actuators；拇指全驱动，四根非拇指单腱欠驱动。
-version: v0.4.4
-joint_order:
-  - thumb_mcp
-  - thumb_pip
-  - thumb_dip
-  - index_mcp
-  - index_pip
-  - index_dip
-  - middle_mcp
-  - middle_pip
-  - middle_dip
-  - ring_mcp
-  - ring_pip
-  - ring_dip
-  - little_mcp
-  - little_pip
-  - little_dip
-
-# 为兼容 v0.2/手套通道名继续保留 thumb_mcp/pip/dip；
-# 在 CasiaHand 解剖命名中，它们分别对应 CMC/MCP/IP。
-anatomical_aliases:
-  thumb_mcp: thumb_cmc
-  thumb_pip: thumb_mcp
-  thumb_dip: thumb_ip
-
+# CH-M6 左手的软件适配配置。第三方原始资源位于 CH-M6/，运行时只读。
+version: ch-m6-adapter-v1
+source_model_path: CH-M6/CH-M6_L.xml
+joint_order: [th_cmc_joint, th_mcp_joint, th_ip_joint, ff_mcp_joint, ff_dip_joint, mf_mcp_joint, mf_dip_joint, rf_mcp_joint, rf_dip_joint, lf_mcp_joint, lf_dip_joint]
 joint_ranges_deg:
-  thumb_mcp: [-20, 60]
-  thumb_pip: [0, 65]
-  thumb_dip: [0, 75]
-  index_mcp: [0, 85]
-  index_pip: [0, 95]
-  index_dip: [0, 70]
-  middle_mcp: [0, 85]
-  middle_pip: [0, 95]
-  middle_dip: [0, 70]
-  ring_mcp: [0, 85]
-  ring_pip: [0, 95]
-  ring_dip: [0, 70]
-  little_mcp: [0, 90]
-  little_pip: [0, 95]
-  little_dip: [0, 70]
-
-finger_lengths_m:
-  thumb: [0.032, 0.024, 0.018]
-  index: [0.042, 0.026, 0.019]
-  middle: [0.047, 0.028, 0.020]
-  ring: [0.044, 0.026, 0.019]
-  little: [0.035, 0.021, 0.016]
-base_offsets_m:
-  thumb: [-0.054, -0.072, -0.004]
-  index: [-0.019, 0.000, 0.0]
-  middle: [0.000, 0.004, 0.0]
-  ring: [0.019, 0.000, 0.0]
-  little: [0.035, -0.007, 0.0]
-base_yaw_deg:
-  thumb: -62
-  index: 0
-  middle: 0
-  ring: 2
-  little: 6
-
-# v0.3.2: 三维手指基座姿态 [roll_x, pitch_y, yaw_z]，单位 deg。
-# 拇指侧置并向掌侧倾斜，保持 3-DoF 工程近似。
-base_euler_deg:
-  thumb: [-27.5, 0.0, -62.0]
-  index: [0.0, 0.0, 0.0]
-  middle: [0.0, 0.0, 0.0]
-  ring: [0.0, 0.0, 2.0]
-  little: [0.0, 0.0, 6.0]
-
+  th_cmc_joint: [0.0, 99.981]
+  th_mcp_joint: [0.0, 35.523]
+  th_ip_joint: [0.0, 55.004]
+  ff_mcp_joint: [0.0, 89.954]
+  ff_dip_joint: [0.0, 86.517]
+  mf_mcp_joint: [0.0, 89.954]
+  mf_dip_joint: [0.0, 88.236]
+  rf_mcp_joint: [0.0, 89.954]
+  rf_dip_joint: [0.0, 86.517]
+  lf_mcp_joint: [0.0, 89.954]
+  lf_dip_joint: [0.0, 88.236]
+# TODO(指导老师): 确认实物控制接口是否与 XML 一致为 11 个独立位置执行器。
 architecture:
-  nominal_dof: 15
-  effective_actuators: 7
-  thumb_fully_actuated: true
-  non_thumb_underactuated: true
-  actuator_order:
-    - thumb_mcp
-    - thumb_pip
-    - thumb_dip
-    - index_flexor
-    - middle_flexor
-    - ring_flexor
-    - little_flexor
-
-# 单腱驱动三关节的工程化协同系数。
-# 这些系数用于“目标腱位移”投影，不是论文给出的真实滑轮半径/腱路参数。
-# 保留为可配置项，待实验室真实机械参数到位后替换。
-coupling:
-  index:  {pip_over_mcp: 0.78, dip_over_mcp: 0.56}
-  middle: {pip_over_mcp: 0.80, dip_over_mcp: 0.58}
-  ring:   {pip_over_mcp: 0.82, dip_over_mcp: 0.60}
-  little: {pip_over_mcp: 0.84, dip_over_mcp: 0.62}
-
-# Yan et al. (2025) 给出的非拇指扭簧刚度：
-# MCP 24.106 mNm/rad，PIP/DIP 12.857 mNm/rad。
-non_thumb_spring_stiffness_Nm_rad:
-  mcp: 0.024106
-  pip: 0.012857
-  dip: 0.012857
-
-# 文献强调拇指、指尖和掌部是稳定抓取的重要接触区域。
-contact_sections:
-  - thumb
-  - fingers
-  - palm
+  nominal_dof: 11
+  effective_actuators: 11
+  actuator_order: [th_cmc_joint, th_mcp_joint, th_ip_joint, ff_mcp_joint, ff_dip_joint, mf_mcp_joint, mf_dip_joint, rf_mcp_joint, rf_dip_joint, lf_mcp_joint, lf_dip_joint]
+finger_joints:
+  thumb: [th_cmc_joint, th_mcp_joint, th_ip_joint]
+  index: [ff_mcp_joint, ff_dip_joint]
+  middle: [mf_mcp_joint, mf_dip_joint]
+  ring: [rf_mcp_joint, rf_dip_joint]
+  little: [lf_mcp_joint, lf_dip_joint]
+# TODO(指导老师): 确认四个 distal 关节对应真实机构的 PIP/DIP 机械关系。
+# 当前 0.65/0.35 仅为可配置的软件初始标定值，不代表真实硬件传动参数。
+human_mapping:
+  th_cmc_joint: {sources: {thumb_mcp: 1.0}}
+  th_mcp_joint: {sources: {thumb_pip: 1.0}}
+  th_ip_joint: {sources: {thumb_dip: 1.0}}
+  ff_mcp_joint: {sources: {index_mcp: 1.0}}
+  ff_dip_joint: {sources: {index_pip: 0.65, index_dip: 0.35}}
+  mf_mcp_joint: {sources: {middle_mcp: 1.0}}
+  mf_dip_joint: {sources: {middle_pip: 0.65, middle_dip: 0.35}}
+  rf_mcp_joint: {sources: {ring_mcp: 1.0}}
+  rf_dip_joint: {sources: {ring_pip: 0.65, ring_dip: 0.35}}
+  lf_mcp_joint: {sources: {little_mcp: 1.0}}
+  lf_dip_joint: {sources: {little_pip: 0.65, little_dip: 0.35}}
+# tip_local_m 来自 STL 经 MuJoCo mesh ref pose 变换后的指端顶点簇中心。
+kinematic_chains:
+  thumb:
+    base_pos_m: [-0.020000, 0.038192, 0.011000]
+    joints:
+      - {name: th_cmc_joint, axis: [0, 1, 0], child_offset_m: [-0.021716, -0.010654, 0]}
+      - {name: th_mcp_joint, axis: [0, 0, -1], child_offset_m: [-0.036720, 0.025744, -0.00071118]}
+      - {name: th_ip_joint, axis: [0, 0, -1], child_offset_m: [0, 0, 0]}
+    tip_local_m: [-0.037691, 0.025565, 0.000682]
+  index:
+    base_pos_m: [-0.032828, 0.092985, 0.001710]
+    base_quat_wxyz: [0.999848, 0, 0, 0.0174526]
+    joints:
+      - {name: ff_mcp_joint, axis: [1, 0, 0], child_offset_m: [0.009250, 0.0293939, -0.006000]}
+      - {name: ff_dip_joint, axis: [1, 0, 0], child_offset_m: [0, 0, 0]}
+    tip_local_m: [-0.003247, 0.039409, 0.009286]
+  middle:
+    base_pos_m: [-0.015000, 0.093700, 0.001710]
+    joints:
+      - {name: mf_mcp_joint, axis: [1, 0, 0], child_offset_m: [0.009350, 0.0344819, -0.006000]}
+      - {name: mf_dip_joint, axis: [1, 0, 0], child_offset_m: [0, 0, 0]}
+    tip_local_m: [-0.003247, 0.039409, 0.009286]
+  ring:
+    base_pos_m: [0.0033422, 0.093403, 0.001710]
+    base_quat_wxyz: [0.999848, 0, 0, -0.0174526]
+    joints:
+      - {name: rf_mcp_joint, axis: [1, 0, 0], child_offset_m: [0.009250, 0.0293939, -0.006000]}
+      - {name: rf_dip_joint, axis: [1, 0, 0], child_offset_m: [0, 0, 0]}
+    tip_local_m: [-0.003247, 0.039409, 0.009286]
+  little:
+    base_pos_m: [0.021077, 0.091595, 0.001710]
+    base_quat_wxyz: [0.999391, 0, 0, -0.0348994]
+    joints:
+      - {name: lf_mcp_joint, axis: [1, 0, 0], child_offset_m: [0.009250, 0.0293939, -0.006000]}
+      - {name: lf_dip_joint, axis: [1, 0, 0], child_offset_m: [0, 0, 0]}
+    tip_local_m: [-0.003217, 0.034416, 0.009229]
+simulation_names:
+  palm_body: palm_link
+  palm_geom: ch_m6_palm_collision
+  finger_body_prefixes: {thumb: th_, index: ff_, middle: mf_, ring: rf_, little: lf_}
+  fingertip_bodies: {thumb: th_distal_link, index: ff_distal_link, middle: mf_distal_link, ring: rf_distal_link, little: lf_distal_link}
+  fingertip_sites: {thumb: thumb_tip, index: index_tip, middle: middle_tip, ring: ring_tip, little: little_tip}
+  fingertip_geoms: {thumb: thumb_pad, index: index_pad, middle: middle_pad, ring: ring_pad, little: little_pad}
+  # TODO(指导老师): 指腹球为接触代理；需按真实指腹/触觉区域校准位置和半径。
+  fingertip_radius_m: {thumb: 0.0070, index: 0.0060, middle: 0.0060, ring: 0.0060, little: 0.0055}
+# TODO(指导老师): 若真实 CH-M6 存在电机/腱耦合，在此增加实测 synergy 约束。
+synergies: {}

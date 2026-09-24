@@ -1,6 +1,19 @@
 # VALIDATION
 
 本文档汇总项目的历史版本验证记录。测试日期、通过数量和实验数值仅代表对应版本及当时环境，不代表当前代码状态。
+## CH-M6 当前版本（2026-09-23）
+
+统一模型为 `CH-M6/CH-M6_L.xml`，项目侧通过运行时适配器注入 STL assets、指尖 site、接触 geom、桌面和任务物体，第三方目录保持只读。
+
+```powershell
+pytest -p no:cacheprovider -rA
+```
+
+结果：`48 passed in 171.35s`。全量测试包含 800 帧 neutral、PINCH、WRAP 真实 MuJoCo 试验：neutral 流程通过；PINCH 连续双指腹接触通过；WRAP 连续接触与稳定接触通过。
+
+当前架构：`CH-M6_L, nominal DoF=11, effective actuators=11`。模拟手套和人体特征仍使用 15 个标准语义通道，随后由配置映射为 CH-M6 11 个物理关节。
+
+待指导老师确认的机械参数见 `configs/robot_hand.yaml` 中 `TODO(指导老师)`。
 
 ## v0.3
 
