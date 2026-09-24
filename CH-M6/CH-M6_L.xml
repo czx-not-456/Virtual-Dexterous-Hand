@@ -1,0 +1,100 @@
+<mujoco model="CH-M6_L">
+  <compiler angle="radian" meshdir="meshes/" />
+  <size njmax="500" nconmax="100" />
+  <asset>
+    <mesh name="ff_distal_link" file="ff_distal_link.STL"/>
+    <mesh name="ff_proximal_link" file="ff_proximal_link.STL"/>
+    <mesh name="lf_distal_link" file="lf_distal_link.STL"/>
+    <mesh name="lf_proximal_link" file="lf_proximal_link.STL"/>
+    <mesh name="mf_distal_link" file="mf_distal_link.STL"/>
+    <mesh name="mf_proximal_link" file="mf_proximal_link.STL"/>
+    <mesh name="palm_link" file="palm_link.STL"/>
+    <mesh name="rf_distal_link" file="rf_distal_link.STL"/>
+    <mesh name="rf_proximal_link" file="rf_proximal_link.STL"/>
+    <mesh name="th_distal_link" file="th_distal_link.STL"/>
+    <mesh name="th_metacarpal_link" file="th_metacarpal_link.STL"/>
+    <mesh name="th_proximal_link" file="th_proximal_link.STL"/>
+  </asset>
+  <default>
+    <default class="casia">
+      <joint damping="15" armature="0.01" frictionloss="0.1" limited="true"/>
+      <position kp="200" forcerange="-100 100" ctrllimited="true" />
+      <geom type="mesh" rgba="0.75 0.75 0.75 1" contype="1" conaffinity="1" />
+    </default>
+  </default>
+  <worldbody>
+    <body name="palm_link" pos="0 0 0">
+      <geom mesh="palm_link" class="casia"/>
+    <body name="th_metacarpal_link" pos="-0.02 0.038192 0.011" quat="1 0 0 0">
+      <joint name="th_cmc_joint" axis="0 1 0" range="0 1.745" class="casia"/>
+      <geom mesh="th_metacarpal_link" class="casia"/>
+      <body name="th_proximal_link" pos="-0.021716 -0.010654 0" quat="1 0 0 0">
+        <joint name="th_mcp_joint" axis="0 0 -1" range="0 0.62" class="casia"/>
+        <geom mesh="th_proximal_link" class="casia"/>
+        <body name="th_distal_link" pos="-0.03672 0.025744 -0.00071118" quat="1 0 0 0">
+          <joint name="th_ip_joint" axis="0 0 -1" range="0 0.96" class="casia"/>
+          <geom mesh="th_distal_link" class="casia"/>
+        </body>
+      </body>
+    </body>
+    <body name="ff_proximal_link" pos="-0.032828 0.092985 0.00171" quat="0.999848 0 0 0.0174526">
+      <joint name="ff_mcp_joint" axis="1 0 0" range="0 1.57" class="casia"/>
+      <geom mesh="ff_proximal_link" class="casia"/>
+      <body name="ff_distal_link" pos="0.00925 0.0293939 -0.006" quat="1 0 0 0">
+        <joint name="ff_dip_joint" axis="1 0 0" range="0 1.51" class="casia"/>
+        <geom mesh="ff_distal_link" class="casia"/>
+      </body>
+    </body>
+    <body name="mf_proximal_link" pos="-0.015 0.0937 0.00171" quat="1 0 0 0">
+      <joint name="mf_mcp_joint" axis="1 0 0" range="0 1.57" class="casia"/>
+      <geom mesh="mf_proximal_link" class="casia"/>
+      <body name="mf_distal_link" pos="0.00935 0.0344819 -0.006" quat="1 0 0 0">
+        <joint name="mf_dip_joint" axis="1 0 0" range="0 1.54" class="casia"/>
+        <geom mesh="mf_distal_link" class="casia"/>
+      </body>
+    </body>
+    <body name="rf_proximal_link" pos="0.0033422 0.093403 0.00171" quat="0.999848 0 0 -0.0174526">
+      <joint name="rf_mcp_joint" axis="1 0 0" range="0 1.57" class="casia"/>
+      <geom mesh="rf_proximal_link" class="casia"/>
+      <body name="rf_distal_link" pos="0.00925 0.0293939 -0.006" quat="1 0 0 0">
+        <joint name="rf_dip_joint" axis="1 0 0" range="0 1.51" class="casia"/>
+        <geom mesh="rf_distal_link" class="casia"/>
+      </body>
+    </body>
+    <body name="lf_proximal_link" pos="0.021077 0.091595 0.00171" quat="0.999391 0 0 -0.0348994">
+      <joint name="lf_mcp_joint" axis="1 0 0" range="0 1.57" class="casia"/>
+      <geom mesh="lf_proximal_link" class="casia"/>
+      <body name="lf_distal_link" pos="0.00925 0.0293939 -0.006" quat="1 0 0 0">
+        <joint name="lf_dip_joint" axis="1 0 0" range="0 1.54" class="casia"/>
+        <geom mesh="lf_distal_link" class="casia"/>
+      </body>
+    </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <position name="th_cmc_joint" joint="th_cmc_joint" ctrlrange="0 1.745" class="casia"/>
+    <position name="th_mcp_joint" joint="th_mcp_joint" ctrlrange="0 0.62" class="casia"/>
+    <position name="th_ip_joint" joint="th_ip_joint" ctrlrange="0 0.96" class="casia"/>
+    <position name="ff_mcp_joint" joint="ff_mcp_joint" ctrlrange="0 1.57" class="casia"/>
+    <position name="ff_dip_joint" joint="ff_dip_joint" ctrlrange="0 1.51" class="casia"/>
+    <position name="mf_mcp_joint" joint="mf_mcp_joint" ctrlrange="0 1.57" class="casia"/>
+    <position name="mf_dip_joint" joint="mf_dip_joint" ctrlrange="0 1.54" class="casia"/>
+    <position name="rf_mcp_joint" joint="rf_mcp_joint" ctrlrange="0 1.57" class="casia"/>
+    <position name="rf_dip_joint" joint="rf_dip_joint" ctrlrange="0 1.51" class="casia"/>
+    <position name="lf_mcp_joint" joint="lf_mcp_joint" ctrlrange="0 1.57" class="casia"/>
+    <position name="lf_dip_joint" joint="lf_dip_joint" ctrlrange="0 1.54" class="casia"/>
+  </actuator>
+  <contact>
+    <exclude body1="palm_link" body2="th_metacarpal_link"/>
+    <exclude body1="th_metacarpal_link" body2="th_proximal_link"/>
+    <exclude body1="th_proximal_link" body2="th_distal_link"/>
+    <exclude body1="palm_link" body2="ff_proximal_link"/>
+    <exclude body1="ff_proximal_link" body2="ff_distal_link"/>
+    <exclude body1="palm_link" body2="mf_proximal_link"/>
+    <exclude body1="mf_proximal_link" body2="mf_distal_link"/>
+    <exclude body1="palm_link" body2="rf_proximal_link"/>
+    <exclude body1="rf_proximal_link" body2="rf_distal_link"/>
+    <exclude body1="palm_link" body2="lf_proximal_link"/>
+    <exclude body1="lf_proximal_link" body2="lf_distal_link"/>
+  </contact>
+</mujoco>
