@@ -15,6 +15,7 @@ from src.evaluation.metrics import joint_rmse, velocity_rms
 from src.evaluation.task_evaluator import TaskEpisodeEvaluator
 from src.features.feature_extractor import FeatureExtractor
 from src.features.intent_recognition import IntentRecognizer
+from src.glove.adapter import CapturedGloveInput, GloveAdapter, SimGloveAdapter
 from src.glove.calibration import AdaptiveCalibrator
 from src.glove.dataset_driver import CSVGloveDatasetDriver
 from src.glove.mock_driver import MockGloveDriver
@@ -93,7 +94,13 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="测试物体名称；见 configs/simulation.yaml -> task_objects，例如 wrap/pinch/sphere/card/bottle/box",
     )
-    p.add_argument("--input", choices=["mock", "dataset"], default="dataset", help="模拟输入来源")
+    p.add_argument(
+        "--input",
+        choices=["sim", "glove", "mock", "dataset"],
+        default="sim",
+        help="输入源；mock/dataset 是兼容旧命令的 sim 别名",
+    )
+    p.add_argument("--sim-source", choices=["mock", "dataset"], default="dataset")
     p.add_argument(
         "--dataset",
         type=Path,
@@ -101,6 +108,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="CSV 模拟数据集路径",
     )
     p.add_argument("--dataset-trial", type=int, default=0, help="使用数据集中的某个 trial_id")
+    p.add_argument("--glove-samples", type=Path, default=None, help="真实手套 captured_samples (.xlsx/.csv)")
+    p.add_argument("--base-mapping", type=Path, default=None, help="老师提供的 base_mapping.json")
+    p.add_argument("--glove-manifest", type=Path, default=None, help="真实手套 manifest.json")
     p.add_argument("--seed", type=int, default=7, help="procedural mock 模式随机种子")
     p.add_argument("--output-dir", type=Path, default=ROOT / "outputs")
     p.add_argument("--run-name", default=None, help="固定输出文件名前缀，便于批量实验")
@@ -139,7 +149,8 @@ def _empty_contact_metrics() -> dict[str, float | int | bool]:
 def _make_driver(args: argparse.Namespace, glove_cfg: dict):
     channels = list(glove_cfg["channels"])
     hz = float(glove_cfg["sampling_hz"])
-    if args.input == "dataset":
+    source = args.input if args.input in {"mock", "dataset"} else args.sim_source
+    if source == "dataset":
         driver = CSVGloveDatasetDriver(
             args.dataset,
             channels,
@@ -161,6 +172,11 @@ def _make_driver(args: argparse.Namespace, glove_cfg: dict):
     )
     print(f"[INFO] 输入=procedural mock seed={args.seed}")
     return driver
+
+
+def _project_path(value: str | Path) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else ROOT / path
 
 
 def main() -> None:
@@ -185,13 +201,37 @@ def main() -> None:
     task_mode = str(task_spec.get("interaction", task_name))
     active_intent = str(task_spec.get("active_intent", "PINCH" if task_mode == "pinch" else "WRAP"))
 
-    driver = _make_driver(args, glove_cfg)
-    calibrator = AdaptiveCalibrator(channels, epsilon=float(glove_cfg["calibration_epsilon"]))
-    calibrator.fit(driver.calibration_samples())
-    input_filter = MovingAverageFilter(channels, int(glove_cfg["moving_average_window"]))
-
     human = HumanHandModel()
     robot = RobotHandModel()
+    input_mode = "glove" if args.input == "glove" else "sim"
+    sim_source = args.input if args.input in {"mock", "dataset"} else args.sim_source
+    glove_input = None
+    driver = None
+    sim_adapter = None
+    if input_mode == "glove":
+        real_cfg = dict(glove_cfg["real"])
+        samples_path = _project_path(args.glove_samples or real_cfg["captured_samples"])
+        mapping_path = _project_path(args.base_mapping or real_cfg["base_mapping"])
+        manifest_path = _project_path(args.glove_manifest or real_cfg["manifest"])
+        glove_adapter = GloveAdapter(
+            human,
+            robot,
+            base_mapping_path=mapping_path,
+            manifest_path=manifest_path,
+            output_bindings=real_cfg["output_bindings"],
+        )
+        glove_input = CapturedGloveInput(samples_path, glove_adapter, loop=True)
+        print(
+            f"[INFO] 输入=glove captures: {glove_input.path} samples={len(glove_input.samples)} "
+            f"mapping={glove_adapter.base_mapping.path}"
+        )
+    else:
+        driver = _make_driver(args, glove_cfg)
+        calibrator = AdaptiveCalibrator(channels, epsilon=float(glove_cfg["calibration_epsilon"]))
+        calibrator.fit(driver.calibration_samples())
+        input_filter = MovingAverageFilter(channels, int(glove_cfg["moving_average_window"]))
+        sim_adapter = SimGloveAdapter(human, calibrator, input_filter)
+
     extractor = FeatureExtractor(human)
     intent_cfg = algo_cfg["intent"]
     recognizer = IntentRecognizer(
@@ -291,10 +331,13 @@ def main() -> None:
                 break
 
             pipeline_t0 = time.perf_counter()
-            sample = driver.sample()
-            norm = calibrator.normalize(sample)
-            norm = input_filter.apply(norm)
-            q_h = human.angles_from_normalized(norm)
+            if input_mode == "glove":
+                assert glove_input is not None
+                hand_frame = glove_input.sample()
+            else:
+                assert driver is not None and sim_adapter is not None
+                hand_frame = sim_adapter.adapt(driver.sample())
+            q_h = hand_frame.joint_angles_rad
             features = extractor.extract(q_h)
             intent = recognizer.update(features)
             task_active = intent.value == active_intent
@@ -317,6 +360,7 @@ def main() -> None:
                 intent,
                 q_prev_opt,
                 dynamic=True,
+                q_base=hand_frame.robot_joint_targets_rad,
             )
             optimizer_ms = (time.perf_counter() - opt_t0) * 1000.0
             q_prev_opt = result.q_target.copy()
@@ -392,7 +436,7 @@ def main() -> None:
             logger.write(
                 [
                     frame,
-                    sample.timestamp,
+                    hand_frame.timestamp,
                     intent.value,
                     features.pinch_distance_m,
                     features.wrap_score,
@@ -448,10 +492,13 @@ def main() -> None:
         summary.update(
             {
                 "version": "ch-m6-adapter-v1",
-                "input_source": args.input,
-                "dataset": str(args.dataset) if args.input == "dataset" else None,
-                "dataset_trial": int(args.dataset_trial) if args.input == "dataset" else None,
-                "mock_seed": int(args.seed) if args.input == "mock" else None,
+                "input_source": input_mode,
+                "sim_source": sim_source if input_mode == "sim" else None,
+                "dataset": str(args.dataset) if input_mode == "sim" and sim_source == "dataset" else None,
+                "dataset_trial": int(args.dataset_trial) if input_mode == "sim" and sim_source == "dataset" else None,
+                "mock_seed": int(args.seed) if input_mode == "sim" and sim_source == "mock" else None,
+                "glove_samples": str(glove_input.path) if glove_input is not None else None,
+                "base_mapping": str(glove_input.adapter.base_mapping.path) if glove_input is not None else None,
                 "simulation": "mujoco" if simulator is not None else "none",
                 "robot_model": "CH-M6_L",
                 "robot_dof": robot.nominal_dof,

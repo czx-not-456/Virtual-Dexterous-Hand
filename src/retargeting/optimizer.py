@@ -101,8 +101,18 @@ class IntentDrivenRetargeter:
         intent: Intent,
         q_prev: np.ndarray | None = None,
         dynamic: bool = True,
+        q_base: np.ndarray | None = None,
     ) -> RetargetResult:
-        q_base = self.topology.map(q_h)
+        if q_base is None:
+            q_base = self.topology.map(q_h)
+        else:
+            q_base = np.asarray(q_base, dtype=float)
+            if q_base.shape != (len(self.robot.joint_order),):
+                raise ValueError(
+                    f"external base mapping expected {len(self.robot.joint_order)} targets, "
+                    f"got {q_base.shape}"
+                )
+            q_base = np.clip(q_base, self.robot.ranges[:, 0], self.robot.ranges[:, 1])
         if q_prev is None:
             q_prev = q_base.copy()
         mode = intent.value if dynamic else Intent.NEUTRAL.value

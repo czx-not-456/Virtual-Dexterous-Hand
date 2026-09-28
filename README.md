@@ -7,6 +7,7 @@
 - 指导老师提供的 CH-M6_L 模型（11 DoF / 11 position actuator）；
 - OPEN、NEUTRAL、PINCH、WRAP 意图识别；
 - 数据集回放和程序化 Mock 输入；
+- 老师提供的真实数据手套标定样本、base mapping 和 sim/glove 输入切换；
 - neutral、PINCH、WRAP 三类标准场景；
 - 基于物体位姿、指尖 Jacobian 和欠驱动可达方向的任务空间伺服；
 - 每帧 CSV、任务 summary JSON、批量 CSV、Markdown 报告和 HTML 看板；
@@ -104,6 +105,23 @@ WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射�
 不要把帧数改为 600 后再用于标准 benchmark，因为那样不会覆盖完整 WRAP 阶段。
 
 ## 4. 运行单个任务
+
+输入源统一为 `sim` 或 `glove`。模拟源默认回放数据集，也可改为程序化 Mock：
+
+    python -m src.main --sim none --input sim --sim-source dataset --dataset-trial 0 --steps 120
+    python -m src.main --sim none --input sim --sim-source mock --steps 120
+
+真实手套标定数据回放使用 `数据手套数据` 中的 `captured_samples.xlsx`、`base_mapping.json` 和 `manifest.json`。下载产生的 `(1)` 文件名会自动兼容：
+
+    python -m src.main --sim none --input glove --task pinch --steps 24
+
+也可通过 `--glove-samples`、`--base-mapping`、`--glove-manifest` 指定其他标定快照。旧的 `--input dataset` 和 `--input mock` 命令仍作为兼容别名保留。
+
+对比 base mapping 与个性化 mapping 在 manifest 声明的每姿态第 4 帧留出集上的误差：
+
+    python experiments\compare_glove_calibration.py
+
+结果写入 `outputs\glove_calibration\mapping_comparison.json` 和 `mapping_comparison_by_pose.csv`。脚本只读取老师提供的模型评估结果，不重新训练或设计映射算法。
 
 ### 4.1 PINCH
 
