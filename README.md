@@ -1,13 +1,13 @@
 # Virtual-Dexterous-Hand CH-M6
 
-基于模拟数据手套、意图驱动重定向和 MuJoCo 的虚拟灵巧手实验系统。
+支持合成手套数据与真实手套标定数据回放、意图驱动重定向和 MuJoCo 仿真的虚拟灵巧手实验系统。
 
 当前版本提供：
 
 - 指导老师提供的 CH-M6_L 模型（11 DoF / 11 position actuator）；
-- OPEN、NEUTRAL、PINCH、WRAP 意图识别；
+- NEUTRAL、PINCH、WRAP 意图识别；合成数据另包含 OPEN 过渡阶段；
 - 数据集回放和程序化 Mock 输入；
-- 老师提供的真实数据手套标定样本、base mapping 和 sim/glove 输入切换；
+- 指导老师提供的真实数据手套标定样本、base mapping、留出样本个性化映射对照和 `sim`/`glove` 输入切换；
 - neutral、PINCH、WRAP 三类标准场景；
 - 基于物体位姿、指尖 Jacobian 和欠驱动可达方向的任务空间伺服；
 - 每帧 CSV、任务 summary JSON、批量 CSV、Markdown 报告和 HTML 看板；
@@ -71,7 +71,7 @@ requirements.txt 包含 NumPy、SciPy、PyYAML、MuJoCo 和 pytest。
 
 当前版本包含纯算法、配置、MuJoCo schema、可达性以及 neutral/PINCH/WRAP canonical trial 集成测试。安装了 MuJoCo 的标准环境应执行全部测试，不应跳过物理运行测试。
 
-当前仓库在 Python 3.11.9、MuJoCo 3.13.0 环境的基准结果为 58 passed。
+测试结果以本机实际运行输出为准；其中 MuJoCo 集成测试需要已安装的物理后端。
 
 检查依赖：
 
@@ -83,9 +83,9 @@ requirements.txt 包含 NumPy、SciPy、PyYAML、MuJoCo 和 pytest。
 
 WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射同时显著降低欠驱动 coupling penalty。测试设置了退化上限，防止该指标继续静默恶化。
 
-## 3. 数据集
+## 3. 输入数据
 
-默认数据集：
+默认合成数据集：
 
     datasets\synthetic_glove_v1.csv
 
@@ -104,6 +104,8 @@ WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射�
 
 不要把帧数改为 600 后再用于标准 benchmark，因为那样不会覆盖完整 WRAP 阶段。
 
+`数据手套数据/` 另有指导老师交付的 `captured_samples(1).xlsx`（24 帧、6 种标定姿态）、`base_mapping(1).json` 和 `manifest(1).json`。它们是实采标定数据，与上述 8 个合成 trial 分开使用；程序会兼容省略 `(1)` 的路径写法。
+
 ## 4. 运行单个任务
 
 输入源统一为 `sim` 或 `glove`。模拟源默认回放数据集，也可改为程序化 Mock：
@@ -111,9 +113,15 @@ WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射�
     python -m src.main --sim none --input sim --sim-source dataset --dataset-trial 0 --steps 120
     python -m src.main --sim none --input sim --sim-source mock --steps 120
 
-真实手套标定数据回放使用 `数据手套数据` 中的 `captured_samples.xlsx`、`base_mapping.json` 和 `manifest.json`。下载产生的 `(1)` 文件名会自动兼容：
+真实手套标定数据回放使用 `数据手套数据` 中的样本、base mapping 和 manifest。`--input glove` 的主程序运行 base mapping；默认循环回放这 24 帧：
 
     python -m src.main --sim none --input glove --task pinch --steps 24
+
+在 MuJoCo 中回放相同输入：
+
+    python -m src.main --sim mujoco --input glove --task pinch --steps 240
+
+这两条命令用于检查实采输入和 base mapping 链路；标定姿态顺序不保证产生有效 PINCH 成绩。需要比较两种映射的任务指标时，使用下方的配对实验脚本。
 
 也可通过 `--glove-samples`、`--base-mapping`、`--glove-manifest` 指定其他标定快照。旧的 `--input dataset` 和 `--input mock` 命令仍作为兼容别名保留。
 
@@ -122,6 +130,12 @@ WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射�
     python experiments\compare_glove_calibration.py
 
 结果写入 `outputs\glove_calibration\mapping_comparison.json` 和 `mapping_comparison_by_pose.csv`。脚本只读取老师提供的模型评估结果，不重新训练或设计映射算法。
+
+使用相同的实采留出姿态输入，在 MuJoCo 中分别运行 base 和 personalized mapping 的 PINCH、WRAP 配对试验：
+
+    python experiments\compare_glove_tasks.py
+
+默认每组 240 帧，结果写入 `outputs\glove_tasks\summary.csv`、`summary.json` 和 `frames.csv`；运行参数、指标定义和实验限制见 `experiments/GLOVE_TASK_COMPARISON.md`。交付包没有个性化模型权重，脚本使用 manifest 中的第 4 帧预测并重复回放姿态，不能据此声称已完成连续在线推理。
 
 ### 4.1 PINCH
 
@@ -145,11 +159,7 @@ CH-M6 PINCH 方块沿 X 轴由拇指/食指对向夹持，实际尺寸为 16 × 
 
     python -m src.main --sim mujoco --render --realtime --input dataset --dataset datasets\synthetic_glove_v1.csv --dataset-trial 0 --task wrap --steps 800 --camera overview
 
-### 4.3 其他标准物体
-
-
-
-### 4.4 纯算法模式
+### 4.3 纯算法模式
 
 不启动 MuJoCo：
 
@@ -157,7 +167,7 @@ CH-M6 PINCH 方块沿 X 轴由拇指/食指对向夹持，实际尺寸为 16 × 
 
 此模式用于检查数据、标定、意图、映射、日志链路；因为没有物理后端，接触指标应为零。
 
-### 4.5 Viewer 操作
+### 4.4 Viewer 操作
 
 可用相机预设：
 
@@ -166,18 +176,15 @@ CH-M6 PINCH 方块沿 X 轴由拇指/食指对向夹持，实际尺寸为 16 × 
 - side；
 - free。
 
-示例：
-
-
 预设仅设置自由相机初始位置，启动后仍可用 MuJoCo Viewer 鼠标旋转、平移和缩放。
 
 ## 5. 三场景批量 benchmark
 
-运行所有六类任务、trial 0：
+运行全部三类任务（neutral、pinch、wrap）、trial 0：
 
     python experiments\benchmark_synthetic.py --trials 1
 
-运行所有六类任务、前 5 个 trial：
+运行全部三类任务、前 5 个 trial：
 
     python experiments\benchmark_synthetic.py --trials 5
 
@@ -260,14 +267,17 @@ neutral 要求流程无错误；PINCH 要求 contact；WRAP 要求 stable。接�
 
     python experiments\compare_mapping.py
 
+实采手套标定误差对照与 MuJoCo 任务对照分别使用 `experiments\compare_glove_calibration.py` 和 `experiments\compare_glove_tasks.py`；后者输出的 `summary.csv` 每个任务与映射一行，`frames.csv` 保存逐帧指标。
+
 生成的 CSV 使用 UTF-8 BOM，便于 Windows Excel 正确识别中文和字段名；JSON、Markdown 与 HTML 使用 UTF-8。
 
 ## 8. 主要目录
 
     configs/       手套、人体手、机器人手、算法和仿真配置
     datasets/      可复现模拟手套数据
-    experiments/   benchmark、映射对照和结果分析
-    models/        MuJoCo MJCF 手与任务场景
+    数据手套数据/  指导老师交付的真实手套标定样本、映射和评估 manifest
+    CH-M6/        指导老师提供的 CH-M6 模型与网格
+    experiments/   benchmark、实采手套映射/任务对照和结果分析
     scripts/       数据生成和辅助运行脚本
     src/           主程序、驱动、特征、映射、仿真和评测
     tests/         单元、回归和三场景 MuJoCo 集成测试
@@ -282,11 +292,12 @@ neutral 要求流程无错误；PINCH 要求 contact；WRAP 要求 stable。接�
 
 ## 9. 当前边界与已知问题
 
-- 当前使用模拟数据，不等于真实数据手套实验；
+- 已接入真实手套标定数据并完成留出姿态的 MuJoCo 回放；合成数据 benchmark 与这组实采实验应分别解读；
+- 个性化模型权重未随数据交付，当前任务对照使用 manifest 的留出帧预测重复回放，不是连续在线手套控制；
 - 手掌基座固定，没有手腕/机械臂抓起和搬运阶段；
 - 结构、摩擦、腱路和关节参数仍是工程近似；
 - PINCH 的接触成功可能包含接近夹具阶段，稳定成功只统计释放后的自由体帧；
 - WRAP vector MSE 相对静态映射约退化 8.47%，作为欠驱动 coupling 改善的已知多目标权衡保留；
-- 正式论文实验仍需要真实硬件、真实受试者/手套标定和标准物体重复试验。
+- 正式论文若要论证真实抓取或跨用户效果，仍需要真实硬件、更多受试者和标准物体重复试验。
 
 版本演进与设计依据见 CHANGELOG_v0.md、LITERATURE_INFORMED_DESIGN.md 和 VALIDATION.md。
