@@ -27,3 +27,7 @@ htmlcov/
 
 # Experiment outputs
 outputs/
+
+# Teacher portable runtime stays local
+/数据手套数据/_internal/
+/数据手套数据/multi_teleop.exe

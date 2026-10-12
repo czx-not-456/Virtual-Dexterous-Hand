@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "20260907_154558",
+  "status": "trained",
+  "glove": {
+    "serial_number": "G15LB010902",
+    "hand_side": "left",
+    "glove_model": "CH-M6"
+  },
+  "sample_counts": {
+    "captured": 250,
+    "training_total": 498,
+    "synthetic": 248
+  },
+  "data": {
+    "captured_samples": "records/chm6_calibrations/20260907_154558_G15LB010902_left/captured_samples.csv",
+    "captured_samples_sha256": "b154425ee49d94bf466a3a06d96e1de83502ad6bdd8d41d13bd46a94955ab81b",
+    "training_samples": "records/chm6_calibrations/20260907_154558_G15LB010902_left/training_samples.csv",
+    "training_samples_sha256": "023df1863beba582213fcd245e797d13abd977dd4ad97f8ae48e7d284b4c92d8",
+    "target_source": "current_chm6_pose_table"
+  },
+  "normalization": {
+    "method": "minmax",
+    "min": [
+      2.5799999237060547,
+      3.819999933242798,
+      0.0,
+      23.200000762939453,
+      11.970000267028809,
+      0.07000000029802322,
+      0.0,
+      12.1899995803833,
+      0.4000000059604645,
+      0.0,
+      0.0,
+      0.5600000023841858,
+      0.0,
+      0.0,
+      0.8600000143051147
+    ],
+    "max": [
+      90.56999969482422,
+      34.290000915527344,
+      47.119998931884766,
+      60.0,
+      104.27999877929688,
+      74.58000183105469,
+      1.0,
+      105.0,
+      66.0,
+      1.0,
+      100.29000091552734,
+      74.75,
+      1.0,
+      105.0,
+      77.36000061035156
+    ]
+  },
+  "training_config": {
+    "adapter_type": "PwlLassoAdapter",
+    "n_knots": 3,
+    "lora_rank": 4,
+    "random_seed": 0,
+    "epochs": 1000,
+    "learning_rate": 0.01,
+    "patience": 60,
+    "min_epochs": 100,
+    "validation": {
+      "strategy": "grouped_temporal_block",
+      "ratio": 0.2,
+      "random_seed": 0,
+      "block_size": 5
+    },
+    "pwl_init": "identity",
+    "tune_backbone": true,
+    "residual_structure": "dense_lora",
+    "off_group_penalty": 0.0
+  },
+  "base_mapping": {
+    "path": "records/chm6_calibrations/20260907_154558_G15LB010902_left/base_mapping.json",
+    "source_path": "config/chm6_mapping.json",
+    "sha256": "c67871b84c78fa027e137de430ad9959ffcaff0ff7acf35cb2cf9cbe93a25abc"
+  },
+  "planned_model": "models/glove_correction_CHM6_G15LB010902_left_20260907_154558.pt",
+  "model": {
+    "path": "models/glove_correction_CHM6_G15LB010902_left_20260907_154558.pt",
+    "sha256": "748e43093a00a7111913e1785aae730076befc9315f721046066189829d11e30"
+  },
+  "adaptation_result": {
+    "baseline_mse": 131.07675170898438,
+    "final_mse": 139.89639282226562,
+    "epochs": 1000,
+    "best_epoch": 1,
+    "best_val_mse": 136.24899291992188,
+    "norm_stats_source": "per_glove",
+    "reverted_to_identity": false,
+    "lora_rank": 4,
+    "random_seed": 0,
+    "validation_strategy": "grouped",
+    "validation_group_count": 56,
+    "train_sample_count": 363,
+    "validation_sample_count": 135
+  }
+}

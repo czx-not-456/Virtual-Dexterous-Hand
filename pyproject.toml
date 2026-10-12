@@ -1,4 +1,4 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["tests"]
+testpaths = ["test/tests_20261012"]
 addopts = "-q"

@@ -81,7 +81,7 @@ requirements.txt 包含 NumPy、SciPy、PyYAML、MuJoCo 和 pytest。
 
     python experiments\compare_mapping.py
 
-WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射同时显著降低欠驱动 coupling penalty。测试设置了退化上限，防止该指标继续静默恶化。
+2026-10-08 基线下，PINCH 位置 MSE 降低 31.08%，PINCH 向量 MSE 增加 10.24%，WRAP 向量 MSE 降低 0.33%；当前 `synergies: {}`，协同惩罚为零。请按各指标分别解读，不沿用旧模型阶段的欠驱耦合改善结论。
 
 ## 3. 输入数据
 
@@ -105,6 +105,13 @@ WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射�
 不要把帧数改为 600 后再用于标准 benchmark，因为那样不会覆盖完整 WRAP 阶段。
 
 `数据手套数据/` 另有指导老师交付的 `captured_samples(1).xlsx`（24 帧、6 种标定姿态）、`base_mapping(1).json` 和 `manifest(1).json`。它们是实采标定数据，与上述 8 个合成 trial 分开使用；程序会兼容省略 `(1)` 的路径写法。
+
+2026-10-12 新增的交付包另含 27 组 CH-M6 标定快照，其中 26 组有对应校正权重，1 组因归一化无效被拒绝；还包含一个初始化权重。标定 CSV 的 `elapsed_ms` 在每个姿态片段重新计时，片段之间没有记录连续过渡。`scripts/audit_teacher_delivery.py` 可只读核对哈希与时间轴；`experiments/replay_teacher_clips.py` 使用其中一组快照按片段内真实时间戳回放基础映射。两者的输出见 `test/test_results_newdata_20261012/`。
+
+    python scripts\audit_teacher_delivery.py --output test\test_results_newdata_20261012\delivery_audit.json
+    python experiments\replay_teacher_clips.py --output-dir test\test_results_newdata_20261012\teacher_clips
+
+后一个实验输出基础映射角度误差、由老师的六控制量耦合规则计算的指尖位置误差、片段内输出速度，以及分阶段耗时和 PINCH/WRAP 接触指标。它不加载未知 `.pt`，也不把独立姿态片段解释为自然连续任务。
 
 ## 4. 运行单个任务
 
@@ -135,7 +142,7 @@ WRAP vector MSE 当前存在约 -8.47% 的已知多目标权衡；动态映射�
 
     python experiments\compare_glove_tasks.py
 
-默认每组 240 帧，结果写入 `outputs\glove_tasks\summary.csv`、`summary.json` 和 `frames.csv`；运行参数、指标定义和实验限制见 `experiments/GLOVE_TASK_COMPARISON.md`。交付包没有个性化模型权重，脚本使用 manifest 中的第 4 帧预测并重复回放姿态，不能据此声称已完成连续在线推理。
+默认每组 240 帧，结果写入 `outputs\glove_tasks\summary.csv`、`summary.json` 和 `frames.csv`；运行参数、指标定义和实验限制见 `experiments/GLOVE_TASK_COMPARISON.md`。该旧实验仍使用旧 manifest 的第 4 帧预测并重复回放姿态，不加载新增权重，不能据此声称已完成连续在线推理。
 
 ### 4.1 PINCH
 
@@ -275,13 +282,16 @@ neutral 要求流程无错误；PINCH 要求 contact；WRAP 要求 stable。接�
 
     configs/       手套、人体手、机器人手、算法和仿真配置
     datasets/      可复现模拟手套数据
-    数据手套数据/  指导老师交付的真实手套标定样本、映射和评估 manifest
+    数据手套数据/  指导老师交付的标定样本、映射、权重及便携式软件
     CH-M6/        指导老师提供的 CH-M6 模型与网格
     experiments/   benchmark、实采手套映射/任务对照和结果分析
     scripts/       数据生成和辅助运行脚本
     src/           主程序、驱动、特征、映射、仿真和评测
-    tests/         单元、回归和三场景 MuJoCo 集成测试
+    test/          按日期归档的测试套件与各版本测试结果
+    项目进度简报/  按日期归档的项目进度简报
     outputs/       运行结果；默认被 Git 忽略
+
+当前自动化测试位于 `test/tests_20261012/`，`pyproject.toml` 将 pytest 收集范围限定为该目录，避免扫描历史结果或老师的便携式软件。后续测试套件按 `test/tests_日期编号/` 命名；新结果按 `test/test_results_版本号/测试目的_日期编号/` 归档，并同步更新 pytest 的当前测试目录。既有测试结果保留原归档名称，不改写历史记录。
 
 核心配置：
 
@@ -289,15 +299,16 @@ neutral 要求流程无错误；PINCH 要求 contact；WRAP 要求 stable。接�
 - configs/algorithm.yaml：意图阈值、优化器权重、任务空间伺服和任务专属参数；
 - configs/robot_hand.yaml：CH-M6 11 DoF、15→11 映射、运动学链和可配置待确认参数；
 - CH-M6/CH-M6_L.xml：指导老师原始只读模型；`src/simulation/ch_m6_adapter.py`：项目侧运行时适配。
+- `src/simulation/teacher_chm6_control.py`：可选的老师版 6 维命令到 11 个仿真关节的独立适配层；不修改原始 MJCF 或默认 11 actuator 配置。
 
 ## 9. 当前边界与已知问题
 
 - 已接入真实手套标定数据并完成留出姿态的 MuJoCo 回放；合成数据 benchmark 与这组实采实验应分别解读；
-- 个性化模型权重未随数据交付，当前任务对照使用 manifest 的留出帧预测重复回放，不是连续在线手套控制；
+- 新增包包含 26 个与有效快照配对的个性化权重，但缺少可核验的 PWL/LoRA 前向推理实现；本工程未反序列化或运行这些权重。旧任务对照依然只使用 manifest 预测，不是连续在线推理；
 - 手掌基座固定，没有手腕/机械臂抓起和搬运阶段；
 - 结构、摩擦、腱路和关节参数仍是工程近似；
 - PINCH 的接触成功可能包含接近夹具阶段，稳定成功只统计释放后的自由体帧；
-- WRAP vector MSE 相对静态映射约退化 8.47%，作为欠驱动 coupling 改善的已知多目标权衡保留；
+- 新增标定记录是分段姿态采集，各段有时间戳，段间过渡未被采集；不能当成自然连续操作或跨用户任务试验；
 - 正式论文若要论证真实抓取或跨用户效果，仍需要真实硬件、更多受试者和标准物体重复试验。
 
 版本演进与设计依据见 CHANGELOG_v0.md、LITERATURE_INFORMED_DESIGN.md 和 VALIDATION.md。

@@ -1,0 +1,3 @@
+from src.common import load_yaml
+def test_ch_m6_combines_wrap_and_pinch_contact_tuning():
+ s=load_yaml("configs/algorithm.yaml")["task_space_servo"]; assert s["enabled"] is True; assert s["damping"]==.018; assert s["max_joint_step_deg"]==6.0; assert s["wrap"]["clearance_m"]==.0045; assert s["pinch"]["stop_on_contact"]=="tip"; assert s["pinch"]["target_offset_m"]==.0045; assert "ff_dip_joint" in s["pinch"]["posture_prior_deg"]

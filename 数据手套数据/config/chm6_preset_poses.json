@@ -1,0 +1,14 @@
+{
+  "hand_model": "CH-M6",
+  "description": "CH-M6 标准姿态预设目标角度（Qn_glove URDF active 关节），用于元训练时替代当前映射输出的 target",
+  "joint_names": ["thumb_rot", "thumb_bend", "index", "middle", "ring", "pinky"],
+  "notes": "thumb_bend 上限 35° 对应 Qn_glove URDF th_mcp limit 0.62 rad",
+  "poses": {
+    "张开":       [0,  0,  0,  0,  0,  0],
+    "对食指":     [80, 23, 43, 0,  0,  0],
+    "对中指":     [100, 20, 0, 45, 0,  0],
+    "三指捏":     [90, 25, 40, 40, 0,  0],
+    "半握":       [0,  0,  45, 45, 45, 45],
+    "握拳":       [70, 30, 80, 80, 80, 80]
+  }
+}

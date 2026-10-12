@@ -1,0 +1,72 @@
+{
+  "name": "BrainCo Revo2 映射配置",
+  "description": "将手套传感器数据映射到 BrainCo Revo2 机械手的关节角度",
+  "version": "1.0",
+  "calculations": {
+    "0": "&4",
+    "1": "&2 * 0.8 + &1 * 0.5",
+    "2": "&6 * 0.5 + &5 * 0.5",
+    "3": "&9 * 0.5 + &8 * 0.5",
+    "4": "&12 * 0.5 + &11 * 0.5",
+    "5": "&15 * 0.5 + &14 * 0.5"
+  },
+  "joint_mappings": [
+    {
+      "joint_id": 0,
+      "name": "Thumb",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.0, 1.8]
+    },
+    {
+      "joint_id": 1,
+      "name": "Aux",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.0, 1.0]
+    },
+    {
+      "joint_id": 2,
+      "name": "Index",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.0, 1.8]
+    },
+    {
+      "joint_id": 3,
+      "name": "Middle",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.0, 1.8]
+    },
+    {
+      "joint_id": 4,
+      "name": "Ring",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.0, 1.8]
+    },
+    {
+      "joint_id": 5,
+      "name": "Pinky",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.0, 1.8]
+    }
+  ],
+  "sensor_config": {
+    "total_sensors": 15,
+    "used_sensors": [2, 3, 4, 6, 9, 12, 15],
+    "unit": "degrees"
+  },
+  "controller_config": {
+    "joint_count": 6,
+    "max_angle": 1.57,
+    "min_angle": 0.0,
+    "default_speed": 300,
+    "default_torque": 500,
+    "smoothing_alpha": 0.3,
+    "deadzone_threshold": 0.5,
+    "min_send_interval": 0.05
+  }
+}

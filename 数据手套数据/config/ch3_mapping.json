@@ -1,0 +1,94 @@
+{
+  "sensor_config": {
+    "total_sensors": 15,
+    "used_sensors": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      11,
+      12
+    ],
+    "unit": "degrees",
+    "count": 15
+  },
+  "calculations": {
+    "0": "1.309086*&5 - 4.348188",
+    "1": "0.957877*&11 - 12.711676",
+    "2": "0.586575*&2 + 10.786455",
+    "3": "3.107087*&4 - 27.275364"
+  },
+  "learned": true,
+  "target_hand": "CH-3",
+  "description": "Auto-generated using grouped Lasso for CH-3",
+  "mapping_type": "grouped_lasso",
+  "joint_mappings": [
+    {
+      "joint_id": 0,
+      "joint_name": "index_bend",
+      "glove_sensors": [
+        5,
+        6
+      ],
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0,
+        90
+      ],
+      "description": "食指弯曲角度 (传感器5和6的平均值)"
+    },
+    {
+      "joint_id": 1,
+      "joint_name": "middle_bend",
+      "glove_sensors": [
+        11,
+        12
+      ],
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0,
+        90
+      ],
+      "description": "中指弯曲角度 (传感器11和12)"
+    },
+    {
+      "joint_id": 2,
+      "joint_name": "thumb_bend",
+      "glove_sensors": [
+        2,
+        3
+      ],
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0,
+        90
+      ],
+      "description": "拇指弯曲角度 (传感器2和3的平均值)"
+    },
+    {
+      "joint_id": 3,
+      "joint_name": "thumb_rotation",
+      "glove_sensors": [
+        4
+      ],
+      "ratio": 1.5,
+      "offset": 0.0,
+      "limits": [
+        0,
+        180
+      ],
+      "description": "拇指旋转角度 (传感器4的值)"
+    }
+  ],
+  "metadata": {
+    "version": "1.1",
+    "description": "手套数据到CH-3机械手控制指令的映射配置",
+    "date": "2026-02-09",
+    "glove_type": "Generic Data Glove",
+    "robot_type": "CH-3 Hand"
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "20260904_140001",
+  "status": "trained",
+  "glove": {
+    "serial_number": "G15RB010901",
+    "hand_side": "right",
+    "glove_model": "CH-M6"
+  },
+  "sample_counts": {
+    "captured": 189,
+    "training_total": 441,
+    "synthetic": 252
+  },
+  "data": {
+    "captured_samples": "records/chm6_calibrations/20260904_140001_G15RB010901_right/captured_samples.csv",
+    "captured_samples_sha256": "6b6b05ca8e4a073ce26a4bd1aee67b97856bd163fa2b9e3be1b1b8b59f26661b",
+    "training_samples": "records/chm6_calibrations/20260904_140001_G15RB010901_right/training_samples.csv",
+    "training_samples_sha256": "28645e57ee217d074fa072cb8a40abdf3179ee2338d028d76c5024bb32d7c0f6",
+    "target_source": "current_chm6_pose_table"
+  },
+  "normalization": {
+    "method": "minmax",
+    "min": [
+      14.199999809265137,
+      7.699999809265137,
+      10.699999809265137,
+      6.199999809265137,
+      16.799999237060547,
+      7.199999809265137,
+      0.0,
+      18.799999237060547,
+      23.200000762939453,
+      0.0,
+      28.100000381469727,
+      0.0,
+      0.0,
+      10.600000381469727,
+      12.300000190734863
+    ],
+    "max": [
+      53.70000076293945,
+      30.299999237060547,
+      23.799999237060547,
+      50.099998474121094,
+      100.80000305175781,
+      75.0,
+      1.0,
+      105.0,
+      75.0,
+      1.0,
+      104.0999984741211,
+      66.30000305175781,
+      1.0,
+      92.19999694824219,
+      83.0999984741211
+    ]
+  },
+  "training_config": {
+    "adapter_type": "PwlLassoAdapter",
+    "n_knots": 3,
+    "lora_rank": 4,
+    "random_seed": 0,
+    "epochs": 1000,
+    "learning_rate": 0.01,
+    "patience": 60,
+    "min_epochs": 100,
+    "validation": {
+      "strategy": "random_frame",
+      "ratio": 0.2,
+      "random_seed": 0
+    },
+    "pwl_init": "identity",
+    "tune_backbone": true,
+    "residual_structure": "dense_lora",
+    "off_group_penalty": 0.0
+  },
+  "base_mapping": {
+    "path": "records/chm6_calibrations/20260904_140001_G15RB010901_right/base_mapping.json",
+    "source_path": "config/chm6_mapping.json",
+    "sha256": "4b440b5a7d17f71989edb9e336fc6810dbdae81bf4ba8dc21cb80bb3575d7fa3"
+  },
+  "planned_model": "models/glove_correction_CHM6_G15RB010901_right_20260904_140001.pt",
+  "model": {
+    "path": "models/glove_correction_CHM6_G15RB010901_right_20260904_140001.pt",
+    "sha256": "41be451cac67b53f5f8a2a2a5e87dd255e639a65dea9c8de20db2fb0cdeee764"
+  },
+  "adaptation_result": {
+    "baseline_mse": 29.804487228393555,
+    "final_mse": 3.0504331588745117,
+    "epochs": 1000,
+    "best_epoch": 1000,
+    "best_val_mse": 3.0504331588745117,
+    "norm_stats_source": "per_glove",
+    "reverted_to_identity": false,
+    "lora_rank": 4,
+    "random_seed": 0
+  }
+}
