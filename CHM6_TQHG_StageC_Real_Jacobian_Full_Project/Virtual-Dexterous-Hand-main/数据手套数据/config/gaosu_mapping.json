@@ -1,0 +1,57 @@
+{
+  "name": "Gaosu (Casia Hand-S) 映射配置",
+  "description": "高速自适应灵巧手，3主动自由度，15被动自由度",
+  "version": "1.0",
+  "calculations": {
+    "0": "&15 * 0.9 + &12 * 0.9",
+    "1": "&9 * 0.9 + &6 * 0.9",
+    "2": "&2 * 0.9 + &1 * 0.9"
+  },
+  "joint_mappings": [
+    {
+      "joint_id": 0,
+      "name": "FingerGroup1",
+      "description": "四指1组（食指/中指）",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.3, 2.2]
+    },
+    {
+      "joint_id": 1,
+      "name": "FingerGroup2",
+      "description": "四指2组（无名指/小拇指）",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.3, 2.2]
+    },
+    {
+      "joint_id": 2,
+      "name": "Thumb",
+      "description": "大拇指",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [0.3, 2.2]
+    }
+  ],
+  "sensor_config": {
+    "total_sensors": 16,
+    "used_sensors": [1, 2, 6, 9, 12, 15],
+    "unit": "degrees"
+  },
+  "controller_config": {
+    "joint_count": 3,
+    "max_angle": 1.57,
+    "min_angle": 0.0,
+    "default_speed": 150,
+    "default_force": 300,
+    "smoothing_alpha": 0.3,
+    "deadzone_threshold": 5.0,
+    "min_send_interval": 0.05
+  },
+  "settings": {
+    "filter_enabled": true,
+    "filter_alpha": 0.8,
+    "smoothing_enabled": false,
+    "smoothing_window": 5
+  }
+}

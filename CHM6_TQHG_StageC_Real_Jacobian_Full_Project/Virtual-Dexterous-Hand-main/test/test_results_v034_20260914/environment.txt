@@ -1,0 +1,25 @@
+﻿Test timestamp: 2026-09-14T11:59:40+08:00
+Working directory: F:\大三上\大创\项目文件夹\Virtual-Dexterous-Hand-v0.3.4
+OS: Microsoft Windows NT 10.0.22631.0
+Architecture: 64-bit
+PowerShell: 5.1.22621.3880
+Python: Python 3.11.9
+pytest: pytest 9.1.1
+Packages:
+absl-py==2.5.0
+colorama==0.4.6
+etils==1.14.0
+fsspec==2026.7.0
+glfw==2.10.2
+iniconfig==2.3.0
+mujoco==3.13.0
+numpy==2.4.6
+packaging==26.3
+pluggy==1.6.0
+Pygments==2.21.0
+PyOpenGL==3.1.10
+pytest==9.1.1
+PyYAML==6.0.3
+scipy==1.17.1
+typing_extensions==4.16.0
+zipp==4.1.0

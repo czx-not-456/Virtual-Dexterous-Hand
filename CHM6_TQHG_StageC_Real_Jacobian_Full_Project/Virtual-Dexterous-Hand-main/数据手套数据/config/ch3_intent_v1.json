@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "enabled": true,
+  "description": "CH-3 对食指/对中指意图识别与轻量软吸附。左右手规则一致，状态独立。",
+  "recognition_sigma": 0.22,
+  "state_machine": {
+    "enter_threshold": 0.72,
+    "stay_threshold": 0.45,
+    "enter_hold_ms": 120,
+    "exit_hold_ms": 140
+  },
+  "poses": {
+    "index_pinch": {
+      "target_deg": [52.0, 0.0, 50.0, 86.0],
+      "recognition_weights": [1.0, 0.7, 1.0, 0.8],
+      "mask": [1, 0, 1, 1],
+      "snap_strength": 0.25,
+      "simulation_pose_strength": 0.8,
+      "no_reverse_controls": ["thumb_bend"]
+    },
+    "middle_pinch": {
+      "target_deg": [0.0, 52.0, 50.0, 142.0],
+      "recognition_weights": [0.7, 1.0, 1.0, 0.8],
+      "mask": [0, 1, 1, 1],
+      "snap_strength": 0.25,
+      "simulation_pose_strength": 0.8,
+      "no_reverse_controls": ["thumb_bend"]
+    }
+  },
+  "max_output_speed_deg_s": [700.0, 700.0, 600.0, 900.0],
+  "shared_result_max_age_ms": 50,
+  "simulation_smoothing_time_constant_ms": 55,
+  "simulation_max_joint_speed_deg_s": 360
+}

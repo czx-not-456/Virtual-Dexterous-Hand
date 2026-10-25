@@ -1,0 +1,358 @@
+{
+  "mappings": [
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260901_152909.pt",
+      "created_at": "2026-09-01T15:29:09.462775",
+      "glove_model": "CH-M6",
+      "sample_count": 191,
+      "serial_number": "G15RB010901",
+      "hand_side": "right"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260901_164550.pt",
+      "created_at": "2026-09-01T16:45:50.769783",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15RB010901",
+      "hand_side": "right"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260901_175016.pt",
+      "created_at": "2026-09-01T17:50:16.520145",
+      "glove_model": "CH-M6",
+      "sample_count": 187,
+      "serial_number": "G15RB010901",
+      "hand_side": "right"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260902_104413.pt",
+      "created_at": "2026-09-02T10:44:13.969397",
+      "glove_model": "CH-M6",
+      "sample_count": 191,
+      "serial_number": "G15RB010901",
+      "hand_side": "right"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260902_110329.pt",
+      "created_at": "2026-09-02T11:03:29.464132",
+      "glove_model": "CH-M6",
+      "sample_count": 188,
+      "serial_number": "G15RB010901",
+      "hand_side": "right"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260902_111629.pt",
+      "created_at": "2026-09-02T11:16:29.832808",
+      "glove_model": "CH-M6",
+      "sample_count": 187,
+      "serial_number": "G15RB010901",
+      "hand_side": "right"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260903_102052.pt",
+      "created_at": "2026-09-03T10:20:54.677165",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260903_102052_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260903_135328.pt",
+      "created_at": "2026-09-03T13:53:30.522850",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260903_135328_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260903_150537.pt",
+      "created_at": "2026-09-03T15:05:39.777400",
+      "glove_model": "CH-M6",
+      "sample_count": 190,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260903_150537_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260903_173730.pt",
+      "created_at": "2026-09-03T17:37:32.889700",
+      "glove_model": "CH-M6",
+      "sample_count": 191,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260903_173730_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260903_180440.pt",
+      "created_at": "2026-09-03T18:04:41.643702",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260903_180440_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260904_091200.pt",
+      "created_at": "2026-09-04T09:12:02.927875",
+      "glove_model": "CH-M6",
+      "sample_count": 187,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260904_091200_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260904_100609.pt",
+      "created_at": "2026-09-04T10:06:12.309552",
+      "glove_model": "CH-M6",
+      "sample_count": 188,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260904_100609_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260904_105429.pt",
+      "created_at": "2026-09-04T10:54:31.648835",
+      "glove_model": "CH-M6",
+      "sample_count": 192,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260904_105429_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260904_113022.pt",
+      "created_at": "2026-09-04T11:30:24.920366",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260904_113022_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260904_140001.pt",
+      "created_at": "2026-09-04T14:00:04.343109",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260904_140001_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260904_142848.pt",
+      "created_at": "2026-09-04T14:28:51.348719",
+      "glove_model": "CH-M6",
+      "sample_count": 190,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260904_142848_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260904_145537.pt",
+      "created_at": "2026-09-04T14:55:40.163462",
+      "glove_model": "CH-M6",
+      "sample_count": 187,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260904_145537_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB010902_left_20260907_151504.pt",
+      "created_at": "2026-09-07T15:15:06.766508",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15LB010902",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260907_151504_G15LB010902_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB010902_left_20260907_151957.pt",
+      "created_at": "2026-09-07T15:19:58.945027",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15LB010902",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260907_151957_G15LB010902_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB010902_left_20260907_153317.pt",
+      "created_at": "2026-09-07T15:33:20.188755",
+      "glove_model": "CH-M6",
+      "sample_count": 190,
+      "serial_number": "G15LB010902",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260907_153317_G15LB010902_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB010902_left_20260907_154558.pt",
+      "created_at": "2026-09-07T15:45:59.436746",
+      "glove_model": "CH-M6",
+      "sample_count": 250,
+      "serial_number": "G15LB010902",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260907_154558_G15LB010902_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB010902_left_20260907_154807.pt",
+      "created_at": "2026-09-07T15:48:09.176901",
+      "glove_model": "CH-M6",
+      "sample_count": 251,
+      "serial_number": "G15LB010902",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260907_154807_G15LB010902_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB010902_left_20260907_155431.pt",
+      "created_at": "2026-09-07T15:54:32.621913",
+      "glove_model": "CH-M6",
+      "sample_count": 251,
+      "serial_number": "G15LB010902",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260907_155431_G15LB010902_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB010902_left_20260907_160109.pt",
+      "created_at": "2026-09-07T16:01:12.141043",
+      "glove_model": "CH-M6",
+      "sample_count": 190,
+      "serial_number": "G15LB010902",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260907_160109_G15LB010902_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260908_161120.pt",
+      "created_at": "2026-09-08T16:11:22.846226",
+      "glove_model": "CH-M6",
+      "sample_count": 187,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260908_161120_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15RB010901_right_20260917_102405.pt",
+      "created_at": "2026-09-17T10:24:11.208893",
+      "glove_model": "CH-M6",
+      "sample_count": 190,
+      "serial_number": "G15RB010901",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260917_102405_G15RB010901_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12LC040704_left_20260917_102742.pt",
+      "created_at": "2026-09-17T10:27:43.537563",
+      "glove_model": "CH-M6",
+      "sample_count": 190,
+      "serial_number": "G12LC040704",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260917_102742_G12LC040704_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12RC061002_right_20260917_103458.pt",
+      "created_at": "2026-09-17T10:35:01.820858",
+      "glove_model": "CH-M6",
+      "sample_count": 188,
+      "serial_number": "G12RC061002",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260917_103458_G12RC061002_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12RC043002C_right_20260917_163003.pt",
+      "created_at": "2026-09-17T16:30:08.571943",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G12RC043002C",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260917_163003_G12RC043002C_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12LB091101_left_20260917_163205.pt",
+      "created_at": "2026-09-17T16:32:06.147036",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G12LB091101",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260917_163205_G12LB091101_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12RB091102_right_20260917_163430.pt",
+      "created_at": "2026-09-17T16:34:32.038058",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G12RB091102",
+      "hand_side": "right",
+      "support_snapshot": "records/chm6_calibrations/20260917_163430_G12RB091102_right/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12LB082701_left_20260917_163642.pt",
+      "created_at": "2026-09-17T16:36:44.098559",
+      "glove_model": "CH-M6",
+      "sample_count": 190,
+      "serial_number": "G12LB082701",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260917_163642_G12LB082701_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12LC042806_left_20260917_164058.pt",
+      "created_at": "2026-09-17T16:41:02.970960",
+      "glove_model": "CH-M6",
+      "sample_count": 191,
+      "serial_number": "G12LC042806",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260917_164058_G12LC042806_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12LC042806_left_20260917_164156.pt",
+      "created_at": "2026-09-17T16:41:56.703611",
+      "glove_model": "CH-M6",
+      "sample_count": 190,
+      "serial_number": "G12LC042806",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260917_164156_G12LC042806_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12LC042806_left_20260917_164258.pt",
+      "created_at": "2026-09-17T16:43:03.179130",
+      "glove_model": "CH-M6",
+      "sample_count": 187,
+      "serial_number": "G12LC042806",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260917_164258_G12LC042806_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G12LC090201_left_20260917_164456.pt",
+      "created_at": "2026-09-17T16:44:57.504751",
+      "glove_model": "CH-M6",
+      "sample_count": 188,
+      "serial_number": "G12LC090201",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260917_164456_G12LC090201_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB102001_left_20260918_103057.pt",
+      "created_at": "2026-09-18T10:31:03.316051",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15LB102001",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260918_103057_G15LB102001_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LC030302_left_20260918_103345.pt",
+      "created_at": "2026-09-18T10:33:47.121470",
+      "glove_model": "CH-M6",
+      "sample_count": 189,
+      "serial_number": "G15LC030302",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260918_103345_G15LC030302_left/manifest.json"
+    },
+    {
+      "file": "models/glove_correction_CHM6_G15LB102001_left_20260918_103603.pt",
+      "created_at": "2026-09-18T10:36:04.318185",
+      "glove_model": "CH-M6",
+      "sample_count": 188,
+      "serial_number": "G15LB102001",
+      "hand_side": "left",
+      "support_snapshot": "records/chm6_calibrations/20260918_103603_G15LB102001_left/manifest.json"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+# v0.2 仍沿用工程默认值，不代表实验室真实人体/手套标定参数。
+joint_ranges_deg:
+  thumb_mcp: [-15, 55]
+  thumb_pip: [0, 80]
+  thumb_dip: [0, 70]
+  index_mcp: [0, 90]
+  index_pip: [0, 105]
+  index_dip: [0, 80]
+  middle_mcp: [0, 90]
+  middle_pip: [0, 105]
+  middle_dip: [0, 80]
+  ring_mcp: [0, 90]
+  ring_pip: [0, 105]
+  ring_dip: [0, 80]
+  little_mcp: [0, 95]
+  little_pip: [0, 105]
+  little_dip: [0, 80]
+finger_lengths_m:
+  thumb: [0.035, 0.025, 0.020]
+  index: [0.045, 0.028, 0.020]
+  middle: [0.050, 0.030, 0.021]
+  ring: [0.047, 0.028, 0.020]
+  little: [0.038, 0.023, 0.017]
+base_offsets_m:
+  thumb: [-0.035, -0.030, 0.0]
+  index: [-0.020, 0.000, 0.0]
+  middle: [0.000, 0.005, 0.0]
+  ring: [0.020, 0.000, 0.0]
+  little: [0.038, -0.008, 0.0]
+base_yaw_deg:
+  thumb: -45
+  index: 0
+  middle: 0
+  ring: 2
+  little: 6

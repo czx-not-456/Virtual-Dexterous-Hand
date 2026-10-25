@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "20260928_103926",
+  "status": "trained",
+  "glove": {
+    "serial_number": "G12LC040704",
+    "hand_side": "left",
+    "glove_model": "CH-M6"
+  },
+  "sample_counts": {
+    "captured": 24,
+    "training_total": 18,
+    "synthetic": 0
+  },
+  "data": {
+    "captured_samples": "records/chm6_calibrations/20260928_103926_G12LC040704_left/captured_samples.csv",
+    "captured_samples_sha256": "a960df61b2fd6b4617c741ac38ce1fae8e800b85d23862084199b21d9381f12d",
+    "training_samples": "records/chm6_calibrations/20260928_103926_G12LC040704_left/training_samples.csv",
+    "training_samples_sha256": "ea87d81c5fa7164a943b01e1976c58d3c679726df91bd503aa1a4c8f97f5f694",
+    "target_source": "current_chm6_pose_table"
+  },
+  "normalization": {
+    "method": "minmax",
+    "min": [
+      2.0,
+      0.20000000298023224,
+      3.0999999046325684,
+      0.0,
+      5.099999904632568,
+      1.0,
+      0.0,
+      4.199999809265137,
+      10.100000381469727,
+      0.0,
+      0.0,
+      7.699999809265137,
+      0.0,
+      14.5,
+      0.0
+    ],
+    "max": [
+      92.0999984741211,
+      15.800000190734863,
+      30.700000762939453,
+      18.100000381469727,
+      98.5,
+      75.19999694824219,
+      1.0,
+      103.5,
+      84.0999984741211,
+      1.0,
+      96.69999694824219,
+      79.4000015258789,
+      1.0,
+      95.5999984741211,
+      82.30000305175781
+    ]
+  },
+  "training_config": {
+    "adapter_type": "PwlLassoAdapter",
+    "n_knots": 3,
+    "lora_rank": 4,
+    "random_seed": 0,
+    "epochs": 1000,
+    "learning_rate": 0.01,
+    "patience": 60,
+    "min_epochs": 100,
+    "validation": {
+      "strategy": "per_pose_fourth_frame",
+      "sample_count": 6,
+      "ratio": null,
+      "random_seed": 0
+    },
+    "pwl_init": "identity",
+    "tune_backbone": true,
+    "residual_structure": "dense_lora",
+    "off_group_penalty": 0.0,
+    "residual_gp": {
+      "mean": "zero",
+      "length_scales": [
+        0.3,
+        1.0,
+        3.0
+      ],
+      "noise": 0.001,
+      "acceptance": "validation_mse_not_worse_than_pwl_lora"
+    }
+  },
+  "base_mapping": {
+    "path": "records/chm6_calibrations/20260928_103926_G12LC040704_left/base_mapping.json",
+    "source_path": "config/chm6_mapping.json",
+    "sha256": "08d8ff570d93684d4d733140ae9811f3605932ad4a50e462b34d5407d5557e68"
+  },
+  "planned_model": "models/glove_correction_CHM6_G12LC040704_left_20260928_103926.pt",
+  "model": {
+    "path": "models/glove_correction_CHM6_G12LC040704_left_20260928_103926.pt",
+    "sha256": "5d2557c923289644bc5529624804739d34d07fc415a0dc54c2fe6ffdc51e01c5"
+  },
+  "adaptation_result": {
+    "baseline_mse": 264.4078674316406,
+    "final_mse": 0.48463118076324463,
+    "epochs": 1000,
+    "best_epoch": 352,
+    "best_val_mse": 0.48463118076324463,
+    "norm_stats_source": "per_glove",
+    "reverted_to_identity": false,
+    "lora_rank": 4,
+    "random_seed": 0,
+    "validation_strategy": "explicit",
+    "pose_validation": [
+      {
+        "pose": "张开",
+        "target_deg": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "pwl_lora_prediction_deg": [
+          0.26543426513671875,
+          0.1490476131439209,
+          0.40656566619873047,
+          0.18703174591064453,
+          -0.1376490592956543,
+          -0.014056205749511719
+        ],
+        "final_prediction_deg": [
+          0.09671567380428314,
+          0.08377980440855026,
+          0.12291344255208969,
+          0.0031081032939255238,
+          -0.078488789498806,
+          -0.0038155566435307264
+        ],
+        "pwl_lora_rmse_deg": 0.22806867957115173,
+        "final_rmse_deg": 0.07923109829425812
+      },
+      {
+        "pose": "对食指",
+        "target_deg": [
+          80.0,
+          23.0,
+          43.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "pwl_lora_prediction_deg": [
+          79.95394897460938,
+          22.93136215209961,
+          42.92976379394531,
+          -0.35930299758911133,
+          0.44614267349243164,
+          -0.0023317337036132812
+        ],
+        "final_prediction_deg": [
+          79.74726867675781,
+          22.72797393798828,
+          43.014705657958984,
+          -0.015822192654013634,
+          -0.03626047074794769,
+          0.06934596598148346
+        ],
+        "pwl_lora_rmse_deg": 0.23801691830158234,
+        "final_rmse_deg": 0.15516743063926697
+      },
+      {
+        "pose": "对中指",
+        "target_deg": [
+          100.0,
+          20.0,
+          0.0,
+          45.0,
+          0.0,
+          0.0
+        ],
+        "pwl_lora_prediction_deg": [
+          99.78262329101562,
+          19.78162384033203,
+          0.2927989959716797,
+          45.36024475097656,
+          -0.04298114776611328,
+          -0.13620281219482422
+        ],
+        "final_prediction_deg": [
+          99.84307861328125,
+          20.016162872314453,
+          -0.04641886055469513,
+          44.98731231689453,
+          -0.048451025038957596,
+          -0.060486577451229095
+        ],
+        "pwl_lora_rmse_deg": 0.23482152819633484,
+        "final_rmse_deg": 0.07439464330673218
+      },
+      {
+        "pose": "三指捏",
+        "target_deg": [
+          90.0,
+          25.0,
+          40.0,
+          40.0,
+          0.0,
+          0.0
+        ],
+        "pwl_lora_prediction_deg": [
+          88.08131408691406,
+          24.05062484741211,
+          40.03567123413086,
+          41.03953552246094,
+          -0.5259404182434082,
+          0.03845691680908203
+        ],
+        "final_prediction_deg": [
+          89.70392608642578,
+          24.746702194213867,
+          39.92801284790039,
+          40.426490783691406,
+          -0.02230607159435749,
+          -0.0650545209646225
+        ],
+        "pwl_lora_rmse_deg": 0.9952108263969421,
+        "final_rmse_deg": 0.2393135130405426
+      },
+      {
+        "pose": "半握",
+        "target_deg": [
+          0.0,
+          0.0,
+          45.0,
+          45.0,
+          45.0,
+          45.0
+        ],
+        "pwl_lora_prediction_deg": [
+          -0.14099884033203125,
+          0.09682989120483398,
+          45.40911102294922,
+          45.00883483886719,
+          45.48420715332031,
+          45.375648498535156
+        ],
+        "final_prediction_deg": [
+          0.07048873603343964,
+          0.04957742616534233,
+          45.229888916015625,
+          45.042564392089844,
+          45.11707305908203,
+          45.013370513916016
+        ],
+        "pwl_lora_rmse_deg": 0.30883514881134033,
+        "final_rmse_deg": 0.11252561956644058
+      },
+      {
+        "pose": "握拳",
+        "target_deg": [
+          70.0,
+          30.0,
+          80.0,
+          80.0,
+          80.0,
+          80.0
+        ],
+        "pwl_lora_prediction_deg": [
+          66.99588775634766,
+          29.69155502319336,
+          79.47821807861328,
+          79.80310821533203,
+          79.63815307617188,
+          79.37779235839844
+        ],
+        "final_prediction_deg": [
+          69.7469711303711,
+          29.743318557739258,
+          79.69837951660156,
+          79.91912078857422,
+          79.89331817626953,
+          79.76567077636719
+        ],
+        "pwl_lora_rmse_deg": 1.2876935005187988,
+        "final_rmse_deg": 0.2212527096271515
+      }
+    ],
+    "residual_gp": {
+      "accepted": true,
+      "base_val_mse": 0.48463112952252313,
+      "candidate_val_mse": 0.02579592125074465,
+      "selected_length_scale": 0.3,
+      "training_samples": 18,
+      "validation_samples": 6
+    }
+  }
+}

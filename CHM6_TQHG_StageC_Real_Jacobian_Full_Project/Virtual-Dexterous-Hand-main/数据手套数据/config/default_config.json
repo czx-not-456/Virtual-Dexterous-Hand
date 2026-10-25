@@ -1,0 +1,26 @@
+{
+    "device": {
+        "auto_connect": false,
+        "device_id": null
+    },
+    "simulation": {
+        "default_model": "CH-8",
+        "fps": 30,
+        "show_fps": true
+    },
+    "imu": {
+        "enabled": true,
+        "show_data": false,
+        "use_raw_data": false
+    },
+    "display": {
+        "language": "cn",
+        "theme": "light",
+        "font_size": "medium"
+    },
+    "logging": {
+        "enabled": true,
+        "level": "info",
+        "log_dir": "Logs"
+    }
+}

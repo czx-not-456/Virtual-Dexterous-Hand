@@ -1,0 +1,7 @@
+{
+  "COM4": {
+    "protocol": "casia_hand",
+    "device_id": 32,
+    "checksum_mode": "crc16"
+  }
+}

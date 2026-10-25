@@ -1,0 +1,95 @@
+{
+  "sensor_config": {
+    "total_sensors": 15,
+    "used_sensors": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      11,
+      12,
+      14,
+      15
+    ],
+    "unit": "degrees",
+    "count": 15
+  },
+  "calculations": {
+    "0": "0.61668*&14 + 0.752182*&15 + 4.875964",
+    "1": "0.61668*&11 + 0.752182*&12 + 4.875964",
+    "2": "0.61668*&8 + 0.752182*&9 + 4.875964",
+    "3": "0.61668*&5 + 0.752182*&6 + 4.875964",
+    "4": "-0.22443*&1 + 2.839531*&2 - 0.999732*&3 + 0.870189*&4 + 6.587499",
+    "5": "-1.570899*&1 + 4.6787*&2 - 2.656349*&3 + 3.877343*&4 + 22.306534"
+  },
+  "learned": true,
+  "target_hand": "Inspire",
+  "description": "Auto-generated using grouped Lasso for Inspire",
+  "mapping_type": "grouped_lasso",
+  "joint_mappings": [
+    {
+      "joint_id": 0,
+      "name": "Pinky",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0.3,
+        1.8
+      ]
+    },
+    {
+      "joint_id": 1,
+      "name": "Ring",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0.3,
+        1.8
+      ]
+    },
+    {
+      "joint_id": 2,
+      "name": "Middle",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0.3,
+        1.8
+      ]
+    },
+    {
+      "joint_id": 3,
+      "name": "Index",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0.3,
+        1.8
+      ]
+    },
+    {
+      "joint_id": 4,
+      "name": "Thumb",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0.3,
+        1.8
+      ]
+    },
+    {
+      "joint_id": 5,
+      "name": "Aux",
+      "ratio": 1.0,
+      "offset": 0.0,
+      "limits": [
+        0.1,
+        1.0
+      ]
+    }
+  ]
+}
