@@ -1,4 +1,0 @@
-trial_id,frame,gesture,timestamp_s,palm_roll,palm_pitch,palm_yaw,a,b
-0,0,OPEN,0,0,0,0,1,2
-1,0,PINCH,0,0,0,0,3,4
-1,1,WRAP,0.1,0,0,0,5,6
