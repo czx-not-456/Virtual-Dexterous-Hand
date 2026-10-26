@@ -1,3 +1,0 @@
-﻿task,frames,active_frames,median_source_interval_ms,fixture_contact_frames,free_contact_frames,free_stable_frames,contact_success_proxy,stable_success_proxy,processing_mean_ms,optimizer_mean_ms,simulation_mean_ms,pipeline_mean_ms,pipeline_p95_ms
-pinch,62,31,62.236000000000104,1,5,5,False,False,0.6355435483372628,55.13324354841085,2.2030548386517754,59.168166128954674,193.80435499929231
-wrap,63,32,62.15100000000007,0,13,12,False,False,0.7110365079406331,49.71485555554301,3.259255555565774,54.78657619050142,106.12757999988389
