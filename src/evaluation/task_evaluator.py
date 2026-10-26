@@ -33,6 +33,16 @@ class TaskEpisodeEvaluator:
     first_stable_success_frame: int | None = None
     contact_success: bool = False
     stable_success: bool = False
+    # NEW: sustained free-object relative palm pose, reset on any active failure.
+    hold_stable_frames: int = 0
+    hold_stable_streak: int = 0
+    max_hold_stable_streak: int = 0
+    first_hold_stable_frame: int | None = None
+    hold_stable_at_last_active_frame: bool = False
+    ever_hold_stable: bool = False
+    free_object_contact_frames: int = 0
+    _hold_translation_span_m: list[float] = field(default_factory=list)
+    _hold_rotation_span_deg: list[float] = field(default_factory=list)
     _latency_ms: list[float] = field(default_factory=list)
     _optimizer_ms: list[float] = field(default_factory=list)
     _rmse_rad: list[float] = field(default_factory=list)
@@ -67,9 +77,12 @@ class TaskEpisodeEvaluator:
                 "task_active": False,
                 "task_contact_proxy": False,
                 "contact_success_proxy": bool(self.contact_success),
-                "stable_success_proxy": bool(self.stable_success),
+                "stable_success_proxy": bool(self.hold_stable_at_last_active_frame),
+                "legacy_stable_success_proxy": bool(self.stable_success),
+                "hold_stable_proxy": False,
                 "contact_success_streak_frames": 0,
                 "stable_success_streak_frames": 0,
+                "hold_stable_streak_frames": 0,
             }
 
         self.active_frames += 1
@@ -77,7 +90,29 @@ class TaskEpisodeEvaluator:
             self.first_active_frame = int(frame)
 
         task_proxy = bool(contact.get("task_contact_proxy", contact.get("stable_contact_proxy", False)))
+        # Historical predicate is retained for reproducing legacy benchmarks.
         stable = bool(contact.get("stable_contact_proxy", False))
+        # No permissive fallback: missing relative-pose telemetry is NOT success.
+        hold_stable = bool(contact.get("hold_stable_proxy", False))
+        free_contact = bool(contact.get("hold_object_free", False) and task_proxy)
+        if free_contact:
+            self.free_object_contact_frames += 1
+        if hold_stable:
+            self.hold_stable_frames += 1
+            self.hold_stable_streak += 1
+            self.max_hold_stable_streak = max(self.max_hold_stable_streak,
+                                               self.hold_stable_streak)
+            self.ever_hold_stable = True
+            if self.first_hold_stable_frame is None:
+                self.first_hold_stable_frame = int(frame)
+        else:
+            # Losing contact or moving beyond the rolling window thresholds
+            # invalidates CURRENT stable success on this active task frame.
+            self.hold_stable_streak = 0
+        self.hold_stable_at_last_active_frame = hold_stable
+        if free_contact:
+            self._hold_translation_span_m.append(float(contact.get("hold_relative_translation_span_m", 0)))
+            self._hold_rotation_span_deg.append(float(contact.get("hold_relative_rotation_span_deg", 0)))
         if task_proxy:
             self.contact_frames += 1
             if self.first_contact_frame is None:
@@ -123,9 +158,12 @@ class TaskEpisodeEvaluator:
             "task_active": True,
             "task_contact_proxy": task_proxy,
             "contact_success_proxy": bool(self.contact_success),
-            "stable_success_proxy": bool(self.stable_success),
+            "stable_success_proxy": bool(self.hold_stable_at_last_active_frame),
+            "legacy_stable_success_proxy": bool(self.stable_success),
+            "hold_stable_proxy": bool(hold_stable),
             "contact_success_streak_frames": int(self.contact_success_streak),
-            "stable_success_streak_frames": int(self.stable_success_streak),
+            "stable_success_streak_frames": int(self.hold_stable_streak),
+            "hold_stable_streak_frames": int(self.hold_stable_streak),
         }
 
     @staticmethod
@@ -146,30 +184,46 @@ class TaskEpisodeEvaluator:
         return {
             "task": self.task_name,
             "contact_success_proxy": bool(self.contact_success),
-            "stable_success_proxy": bool(self.stable_success),
+            "stable_success_proxy": bool(self.hold_stable_at_last_active_frame),
+            "legacy_stable_success_proxy": bool(self.stable_success),
+            "ever_hold_stable_proxy": bool(self.ever_hold_stable),
             "contact_success_definition": (
                 f"task_contact_proxy consecutive >= {self.min_success_streak_frames} active frames; "
                 "may include configured approach-fixture frames"
             ),
             "stable_success_definition": (
-                f"stable_contact_proxy consecutive >= {self.min_success_streak_frames} active frames; "
-                "fixed-base simulation, not full lift/transport success"
+                "most recent active task frame passes rolling post-release 1-second "
+                "relative object-to-palm pose window AND continuous task contact; "
+                "resets on active-frame loss; fixed-base, not lift/transport or force-based proof"
+            ),
+            "legacy_stable_success_definition": (
+                f"historical stable_contact_proxy >= {self.min_success_streak_frames} "
+                "consecutive active frames at any point in the run; initial orientation threshold from simulation.yaml"
             ),
             "total_frames": int(self.total_frames),
             "active_frames": int(self.active_frames),
             "contact_frames": int(self.contact_frames),
-            "stable_frames": int(self.stable_frames),
+            "stable_frames": int(self.hold_stable_frames),
+            "legacy_stable_frames": int(self.stable_frames),
+            "free_object_contact_frames": int(self.free_object_contact_frames),
             "contact_frame_ratio": float(self.contact_frames / active) if self.active_frames else 0.0,
-            "stable_frame_ratio": float(self.stable_frames / active) if self.active_frames else 0.0,
+            "stable_frame_ratio": float(self.hold_stable_frames / active) if self.active_frames else 0.0,
+            "legacy_stable_frame_ratio": float(self.stable_frames / active) if self.active_frames else 0.0,
             "max_contact_success_streak_frames": int(self.max_contact_success_streak),
-            "max_stable_success_streak_frames": int(self.max_stable_success_streak),
+            "max_stable_success_streak_frames": int(self.max_hold_stable_streak),
+            "legacy_max_stable_success_streak_frames": int(self.max_stable_success_streak),
             "first_contact_latency_ms": self._frames_to_ms(self.first_active_frame, self.first_contact_frame),
             "first_contact_success_latency_ms": self._frames_to_ms(
                 self.first_active_frame, self.first_contact_success_frame
             ),
             "first_stable_success_latency_ms": self._frames_to_ms(
+                self.first_active_frame, self.first_hold_stable_frame
+            ),
+            "legacy_first_stable_success_latency_ms": self._frames_to_ms(
                 self.first_active_frame, self.first_stable_success_frame
             ),
+            "hold_max_relative_translation_span_m": max(self._hold_translation_span_m, default=0.0),
+            "hold_max_relative_rotation_span_deg": max(self._hold_rotation_span_deg, default=0.0),
             "mean_pipeline_latency_ms": self._avg(self._latency_ms),
             "p95_pipeline_latency_ms": self._p95(self._latency_ms),
             "mean_optimizer_ms": self._avg(self._optimizer_ms),

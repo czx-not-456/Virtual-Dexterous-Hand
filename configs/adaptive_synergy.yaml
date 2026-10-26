@@ -1,0 +1,14 @@
+# Prototype, not tuned on an independent grasp benchmark.
+# k is chosen from the task-space Jacobian of the 6-command CH-M6 model.
+k_min: 2
+k_max: 5
+projection_abs_m: 0.0015
+projection_relative: 0.12
+jacobian_step: 0.0001
+# Secondary control fidelity in meters-equivalent, for dimension selection.
+command_scale_m: {NEUTRAL: 0.010, PINCH: 0.003, WRAP: 0.006}
+# Maximum coefficient in complementary PCA axes, normalized control units.
+residual_caps: {NEUTRAL: 0.10, PINCH: 0.22, WRAP: 0.16}
+lambda_residual: 0.025
+lambda_reference: 0.15
+maxiter: 80

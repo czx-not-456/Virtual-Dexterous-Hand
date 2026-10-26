@@ -16,7 +16,11 @@ mujoco:
   object_min_z_m: 0.040
   stability_orientation_deg: 5.0
   evaluation:
-    min_success_streak_frames: 12
+    min_success_streak_frames: 12  # LEGACY 0.2s absolute-orientation proxy
+    # NEW: uninterrupted contact AFTER approach fixture release; relative object/palm
+    hold_window_s: 1.0
+    hold_max_translation_m: 0.001  # 1 mm; research threshold requiring calibration
+    hold_max_rotation_deg: 1.0     # 1 degree; research threshold requiring calibration
   camera_presets:
     overview: {lookat: [0.0, 0.09, 0.16], distance: 0.48, azimuth: 135.0, elevation: -22.0}
     closeup: {lookat: [0.02, 0.10, 0.18], distance: 0.30, azimuth: 135.0, elevation: -18.0}

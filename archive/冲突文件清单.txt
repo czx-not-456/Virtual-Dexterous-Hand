@@ -1,0 +1,11 @@
+# 与内层较完整项目发生内容冲突的外层旧版本（已保留在 archive/older_root_versions/）
+
+- configs/simulation.yaml
+- src/evaluation/task_evaluator.py
+- src/glove/adapter.py
+- src/main.py
+- src/retargeting/optimizer.py
+- src/retargeting/task_space_servo.py
+- src/simulation/mujoco_env.py
+- test/tests_20261012/test_standard_tasks_integration.py
+- test/tests_20261012/test_task_evaluator.py

@@ -1,0 +1,36 @@
+{
+  "source_zip": "Virtual-Dexterous-Hand-1.3.0.zip",
+  "reference": "uploaded ZIP only; not live GitHub",
+  "strategy": "nested Stage C main tree + outer-only files; older conflicting outer files under archive/",
+  "outer_files": 399,
+  "inner_files": 478,
+  "same_path_identical_files": 381,
+  "same_path_content_conflicts": 9,
+  "outer_only_files": 9,
+  "inner_only_files": 88,
+  "conflicts": [
+    "configs/simulation.yaml",
+    "src/evaluation/task_evaluator.py",
+    "src/glove/adapter.py",
+    "src/main.py",
+    "src/retargeting/optimizer.py",
+    "src/retargeting/task_space_servo.py",
+    "src/simulation/mujoco_env.py",
+    "test/tests_20261012/test_standard_tasks_integration.py",
+    "test/tests_20261012/test_task_evaluator.py"
+  ],
+  "outer_only": [
+    "CHM6_TEQS_Pinch_Guard_Fix.zip",
+    "PINCH_GUARD_FIX_README.md",
+    "SCHEMES/SCHEME_B_ADAPTIVE_GUIDE.md",
+    "SCHEMES/SCHEME_B_VALIDATION.json",
+    "SCHEMES/SCHEME_C_RESEARCH_GUIDE.md",
+    "SCHEMES/SCHEME_D_RESEARCH_AND_VALIDATION.md",
+    "SCHEMES/SCHEME_E_THEORY_AND_VALIDATION.md",
+    "SCHEMES/映射方法改进与创新.md",
+    "项目进度简报/验证证据_v0.md"
+  ],
+  "python_syntax_scanned": 143,
+  "python_syntax_errors": [],
+  "tests_executed": false
+}

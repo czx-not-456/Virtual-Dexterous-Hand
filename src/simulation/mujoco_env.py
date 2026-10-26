@@ -8,6 +8,7 @@ import numpy as np
 from src.common import ROOT
 from src.hand_model.robot_hand import RobotHandModel
 from src.simulation.ch_m6_adapter import build_ch_m6_scene
+from src.evaluation.relative_grasp_stability import RelativeGraspHold
 
 
 class MujocoSimulator:
@@ -33,6 +34,9 @@ class MujocoSimulator:
         object_workspace_radius_m: float = 0.28,
         object_min_z_m: float = 0.045,
         stability_orientation_deg: float = 3.0,
+        hold_window_s: float = 1.0,
+        hold_max_translation_m: float = 0.001,
+        hold_max_rotation_deg: float = 1.0,
         camera_presets: dict | None = None,
         scene_config: dict | None = None,
         control_dt_s: float | None = None,
@@ -57,6 +61,14 @@ class MujocoSimulator:
         self.stability_orientation_deg = float(stability_orientation_deg)
         self.camera_presets = dict(camera_presets or {})
         self._contact_streak_frames = 0
+        self._object_held_by_fixture = False
+        self._object_reset_this_step = False
+        self._hold_tracker = RelativeGraspHold(
+            sampling_hz=1.0 / float(control_dt_s) if control_dt_s is not None else 60.0,
+            hold_window_s=hold_window_s,
+            max_translation_m=hold_max_translation_m,
+            max_rotation_deg=hold_max_rotation_deg,
+        )
         # The glove/control loop runs at 60 Hz, while the MJCF physics timestep is
         # 3 ms. Older versions advanced MuJoCo only once per control frame, so
         # 16.67 ms of control time advanced only 3 ms of physics. That made the
@@ -112,6 +124,11 @@ class MujocoSimulator:
         self._object_dof_adr: int | None = None
         self._object_qpos0: np.ndarray | None = None
         self._init_task_object(task_object_body)
+        palm_name = str(self.robot.simulation_names["palm_body"])
+        self._palm_body_id = int(mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_BODY, palm_name))
+        if self._palm_body_id < 0:
+            raise RuntimeError(f"Missing palm body for stability metric: {palm_name}")
 
         if render:
             import mujoco.viewer
@@ -214,6 +231,8 @@ class MujocoSimulator:
             dadr = self._object_dof_adr
             self.data.qvel[dadr : dadr + 6] = 0.0
         self._contact_streak_frames = 0
+        self._hold_tracker.reset()
+        self._object_reset_this_step = True
         self.mujoco.mj_forward(self.model, self.data)
 
     def _maybe_reset_task_object(self) -> None:
@@ -245,6 +264,10 @@ class MujocoSimulator:
             self.mujoco.mj_forward(self.model, self.data)
 
     def step(self, target_q: np.ndarray, *, hold_object: bool = False) -> np.ndarray:
+        self._object_reset_this_step = False
+        self._object_held_by_fixture = bool(hold_object)
+        if hold_object:
+            self._hold_tracker.reset()
         target_q = np.asarray(target_q, dtype=float)
         controls = self.robot.actuator_targets_from_joint_targets(target_q)
         for aid, u in zip(self.act_ids, controls):
@@ -375,7 +398,19 @@ class MujocoSimulator:
             and any(f in digit_contacts for f in ("index", "middle", "ring", "little"))
         )
         task_proxy = pinch_proxy if self.task_mode == "pinch" else wrap_proxy
-        stable_contact_proxy = bool(task_proxy and stable_orientation)
+        stable_contact_proxy = bool(task_proxy and stable_orientation and not self._object_held_by_fixture)
+        free_object = bool(self._task_active and self._object_qpos_adr is not None
+                           and not self._object_held_by_fixture and not self._object_reset_this_step)
+        if self._object_body_id is not None:
+            object_pos, object_rot = self.task_object_pose()
+        else:
+            object_pos = object_rot = None
+        hold_info = self._hold_tracker.update(
+            contact=bool(task_proxy), free_object=free_object,
+            palm_pos=np.asarray(self.data.xpos[self._palm_body_id], dtype=float).copy(),
+            palm_rot=np.asarray(self.data.xmat[self._palm_body_id], dtype=float).reshape(3, 3).copy(),
+            object_pos=object_pos, object_rot=object_rot,
+        )
 
         return {
             "contact_count": int(hand_contact_count),
@@ -402,6 +437,7 @@ class MujocoSimulator:
             "task_contact_proxy": bool(task_proxy),
             "stable_contact_proxy": stable_contact_proxy,
             "object_displacement_m": float(self.object_displacement_m()),
+            **hold_info,
         }
 
     def object_displacement_m(self) -> float:
@@ -437,6 +473,8 @@ class MujocoSimulator:
         elif not active and hold_when_inactive:
             self.reset_task_object()
         self._task_active = active
+        if not active:
+            self._hold_tracker.reset()
         return rising
 
     def task_object_pose(self) -> tuple[np.ndarray, np.ndarray]:
