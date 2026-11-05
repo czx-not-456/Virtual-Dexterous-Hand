@@ -1,0 +1,107 @@
+{
+  "scope": "24 labeled preset frames; no real tracking/contact ground truth",
+  "frame_count": 24,
+  "runs": {
+    "original_direct": {
+      "control_label_MAE_deg": 15.392427163610181,
+      "optimizer_median_ms": 27.278444999979,
+      "optimizer_p95_ms": 46.641598750022695,
+      "pipeline_p95_ms": 46.91409334988066,
+      "coupling_error_max_rad": 0.2472114735617018,
+      "limit_violations": 0
+    },
+    "fixed_PCA4": {
+      "control_label_MAE_deg": 20.84659692705305,
+      "optimizer_median_ms": 13.84011750008085,
+      "optimizer_p95_ms": 36.10819925006579,
+      "pipeline_p95_ms": 38.211981300014465,
+      "coupling_error_max_rad": 0.0,
+      "limit_violations": 0
+    },
+    "scheme_C": {
+      "control_label_MAE_deg": 20.57725608081428,
+      "optimizer_median_ms": 39.62332449998485,
+      "optimizer_p95_ms": 50.413570199884816,
+      "pipeline_p95_ms": 50.912052549892906,
+      "coupling_error_max_rad": 1.1102230246251565e-16,
+      "limit_violations": 0
+    },
+    "scheme_D": {
+      "control_label_MAE_deg": 20.262653885209644,
+      "optimizer_median_ms": 43.08630200000607,
+      "optimizer_p95_ms": 47.64081560002751,
+      "pipeline_p95_ms": 48.22034104997783,
+      "coupling_error_max_rad": 1.1102230246251565e-16,
+      "limit_violations": 0
+    },
+    "scheme_E": {
+      "control_label_MAE_deg": 16.521284403300186,
+      "optimizer_median_ms": 5.408843500049443,
+      "optimizer_p95_ms": 5.678263200024958,
+      "pipeline_p95_ms": 6.779583449849724,
+      "coupling_error_max_rad": 1.1102230246251565e-16,
+      "limit_violations": 0,
+      "selected_modes_mean": 5.458333333333333,
+      "low_rank_output_fraction": 0.16666666666666666,
+      "selected_modes_histogram": {
+        "1": 2,
+        "2": 0,
+        "3": 0,
+        "4": 1,
+        "5": 1,
+        "6": 20
+      },
+      "final_guard_rate": 0.0,
+      "internal_fallback_rate": 0.375,
+      "final_task_guard_pass_rate": 1.0,
+      "speed_box_pass_rate": 1.0,
+      "local_spectral_residual_mean_m": 0.0006888772066779011
+    },
+    "E_full6_feasible": {
+      "control_label_MAE_deg": 16.480079647840583,
+      "optimizer_median_ms": 5.608358000017688,
+      "optimizer_p95_ms": 5.9752378498956205,
+      "pipeline_p95_ms": 7.206122249942837,
+      "coupling_error_max_rad": 2.220446049250313e-16,
+      "limit_violations": 0,
+      "selected_modes_mean": 6.0,
+      "low_rank_output_fraction": 0.0,
+      "selected_modes_histogram": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 24
+      },
+      "final_guard_rate": 0.0,
+      "internal_fallback_rate": 1.0,
+      "final_task_guard_pass_rate": 1.0,
+      "speed_box_pass_rate": 1.0,
+      "local_spectral_residual_mean_m": 0.0007323192705876834
+    },
+    "E_with_lowpass": {
+      "control_label_MAE_deg": 16.481715000572446,
+      "optimizer_median_ms": 5.557243499993092,
+      "optimizer_p95_ms": 6.107682750030108,
+      "pipeline_p95_ms": 7.315707449947695,
+      "coupling_error_max_rad": 1.1102230246251565e-16,
+      "limit_violations": 0,
+      "selected_modes_mean": 5.375,
+      "low_rank_output_fraction": 0.20833333333333334,
+      "selected_modes_histogram": {
+        "1": 2,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 1,
+        "6": 19
+      },
+      "final_guard_rate": 0.8333333333333334,
+      "internal_fallback_rate": 0.375,
+      "final_task_guard_pass_rate": 1.0,
+      "speed_box_pass_rate": 1.0,
+      "local_spectral_residual_mean_m": 0.0008365676262276564
+    }
+  }
+}

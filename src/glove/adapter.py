@@ -4,7 +4,10 @@ import json
 from pathlib import Path
 import re
 import time
-from typing import Mapping
+from typing import Mapping, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.retargeting.latent_synergy import LatentSynergyMapper
 
 import numpy as np
 
@@ -110,10 +113,14 @@ class GloveAdapter:
         base_mapping_path: str | Path,
         manifest_path: str | Path,
         output_bindings: Mapping[str, str],
+        latent_mapper: LatentSynergyMapper | None = None,
+        latent_source: str = "sensor",
     ) -> None:
         self.human = human
         self.robot = robot
         self.base_mapping = BaseMapping(base_mapping_path)
+        self.latent_mapper = latent_mapper
+        self.latent_source = latent_source
         self.manifest_path, manifest = _load_json(manifest_path)
         normalization = manifest["normalization"]
         if normalization.get("method") != "minmax":
@@ -142,11 +149,18 @@ class GloveAdapter:
         normalized_vector = np.clip(normalized_vector, 0.0, 1.0)
         normalized = dict(zip(self.human.joint_order, normalized_vector.tolist()))
         mapped_deg = self.base_mapping.predict_deg(sensors)
-        robot_deg = np.asarray(
-            [mapped_deg[self.output_bindings[joint]] for joint in self.robot.joint_order],
-            dtype=float,
-        )
-        robot_targets = np.clip(np.radians(robot_deg), self.robot.ranges[:, 0], self.robot.ranges[:, 1])
+        if self.latent_mapper is None:
+            # Legacy baseline: keeps original behavior for comparative experiments.
+            robot_deg = np.asarray(
+                [mapped_deg[self.output_bindings[joint]] for joint in self.robot.joint_order],
+                dtype=float,
+            )
+            robot_targets = np.clip(np.radians(robot_deg), self.robot.ranges[:, 0], self.robot.ranges[:, 1])
+        else:
+            ordered_controls = np.array([mapped_deg[name] for name in self.base_mapping.output_names])
+            robot_targets = self.latent_mapper.from_observation(
+                sensors, ordered_controls, source=self.latent_source
+            )
         return HumanHandFrame(
             timestamp=time.perf_counter() if timestamp is None else float(timestamp),
             joint_order=tuple(self.human.joint_order),
@@ -159,6 +173,7 @@ class GloveAdapter:
                 "pose_frame_index": sample.pose_frame_index,
                 "elapsed_ms": sample.elapsed_ms,
                 "base_mapping_outputs_deg": mapped_deg,
+                "raw_sensors_deg": sensors.copy(),
             },
         )
 

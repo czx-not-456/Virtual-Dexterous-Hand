@@ -1,0 +1,67 @@
+{
+  "software_version": "scheme-B-prototype-2026-10-14",
+  "test_scope": "non-MuJoCo only; unit, integration-free, 24-frame preset-label diagnostics",
+  "tests_without_mujoco": "63 passed, 1 skipped (mujoco missing), 3 contact integration tests deselected",
+  "model_training": {
+    "rows": 190,
+    "unique_target_vectors": 6,
+    "centered_target_rank": 5,
+    "hand": "left, G12LC040704",
+    "target_provenance": "six predefined control pose labels"
+  },
+  "diagnostic_comparison": {
+    "data": "/mnt/data/chm6_workspace/Virtual-Dexterous-Hand-main/数据手套数据/captured_samples(1).xlsx",
+    "reference_type": "six predefined pose labels, not joint ground truth",
+    "contact_or_grasp_metric": "not measured",
+    "input_source": "sensor",
+    "runs": {
+      "fixed_PCA_k4": {
+        "frames": 24,
+        "teacher_label_mae_deg": 20.84659692705305,
+        "teacher_label_mae_per_control_deg": [
+          39.71213,
+          11.70215,
+          19.77227,
+          19.64842,
+          17.12231,
+          17.12231
+        ],
+        "max_software_coupling_error_rad": 0.0,
+        "joint_range_violations": 0,
+        "optimizer_median_ms": 13.94009849991562,
+        "pipeline_p95_ms": 37.200599000061615
+      },
+      "adaptive_B": {
+        "frames": 24,
+        "teacher_label_mae_deg": 20.32917865926565,
+        "teacher_label_mae_per_control_deg": [
+          39.86287,
+          11.5773,
+          19.17317,
+          19.19737,
+          16.07749,
+          16.08688
+        ],
+        "max_software_coupling_error_rad": 1.1102230246251565e-16,
+        "joint_range_violations": 0,
+        "optimizer_median_ms": 24.741259999927934,
+        "pipeline_p95_ms": 32.96403520018884,
+        "dynamic_k_histogram": {
+          "2": 13,
+          "3": 5,
+          "4": 4,
+          "5": 2
+        },
+        "mean_residual_coefficient_norm": 0.0696075398976898,
+        "optimizer_feasible_fraction": 1.0
+      }
+    }
+  },
+  "known_limits": [
+    "All replayed 24 frames classified NEUTRAL; no natural contact task tested.",
+    "The sixth PCA direction has zero training label variance; complement is exploratory.",
+    "No MuJoCo package installed; physical grasp/contact metrics not measured.",
+    "Software 6-to-11 coupling is not verified hardware transmission.",
+    "Runtime comparisons are not controlled real-time throughput benchmarks."
+  ]
+}

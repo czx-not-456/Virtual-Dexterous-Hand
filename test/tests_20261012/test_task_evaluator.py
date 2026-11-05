@@ -21,14 +21,18 @@ def test_task_evaluator_requires_consecutive_stable_frames():
             velocity_rms_rad_s=0.2,
         )
     assert state["contact_success_proxy"] is True
-    assert state["stable_success_proxy"] is True
+    assert state["legacy_stable_success_proxy"] is True
+    assert state["stable_success_proxy"] is False
     summary = ev.summary()
     assert summary["contact_success_proxy"] is True
-    assert summary["stable_success_proxy"] is True
+    assert summary["legacy_stable_success_proxy"] is True
+    assert summary["stable_success_proxy"] is False
     assert summary["max_contact_success_streak_frames"] == 3
-    assert summary["max_stable_success_streak_frames"] == 3
+    assert summary["legacy_max_stable_success_streak_frames"] == 3
+    assert summary["max_stable_success_streak_frames"] == 0
     assert summary["first_contact_success_latency_ms"] == 100.0
-    assert summary["first_stable_success_latency_ms"] == 100.0
+    assert summary["legacy_first_stable_success_latency_ms"] == 100.0
+    assert summary["first_stable_success_latency_ms"] is None
 
 
 def test_task_evaluator_ignores_inactive_frames_for_contact_ratio():
