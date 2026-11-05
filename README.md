@@ -1,4 +1,4 @@
-> **新增可选研究方案 B：任务自适应协同 + 受限残差。** 运行方法、公式、实验记录和局限见 [`SCHEME_B_ADAPTIVE_GUIDE.md`](SCHEME_B_ADAPTIVE_GUIDE.md)。默认入口仍按原工程执行，启用时需传 `--latent-model configs/latent_chm6_adaptive.json --adaptive-synergy`。
+> **新增可选研究方案 B：任务自适应协同 + 受限残差。** 运行方法、公式、实验记录和局限见 [`SCHEME_B_ADAPTIVE_GUIDE.md`](SCHEMES/SCHEME_B_ADAPTIVE_GUIDE.md)。默认入口仍按原工程执行，启用时需传 `--latent-model configs/latent_chm6_adaptive.json --adaptive-synergy`。
 
 # Virtual-Dexterous-Hand CH-M6
 
