@@ -1,6 +1,14 @@
+# Virtual-Dexterous-Hand · 项目导航
+
+**映射对比实验按“一组实验一个文件夹”放在仓库根目录**，见 [00_映射对比实验_从这里开始.md](00_映射对比实验_从这里开始.md)。Stage B、静态/动态、手套标定、手套抓握、方案 B/C/D/E、Stage C 仿真与稳定性已分成 **10 个独立文件夹**，每个都有脚本、结果位置和说明。
+
+> **注意**：本次只整理文件结构、保留兼容命令，并删除仓库内原有的补丁 ZIP（未安装该补丁）；没有重新采集数据或生成新实验结论。原始数据、共享算法、模型和测试仍在原位置。
+
+---
+
 > **新增可选研究方案 B：任务自适应协同 + 受限残差。** 运行方法、公式、实验记录和局限见 [`SCHEME_B_ADAPTIVE_GUIDE.md`](SCHEMES/SCHEME_B_ADAPTIVE_GUIDE.md)。默认入口仍按原工程执行，启用时需传 `--latent-model configs/latent_chm6_adaptive.json --adaptive-synergy`。
 
-# Virtual-Dexterous-Hand CH-M6
+## 项目介绍：Virtual-Dexterous-Hand CH-M6
 
 支持合成手套数据与真实手套标定数据回放、意图驱动重定向和 MuJoCo 仿真的虚拟灵巧手实验系统。
 

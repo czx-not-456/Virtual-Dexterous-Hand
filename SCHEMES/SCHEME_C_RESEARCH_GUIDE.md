@@ -98,7 +98,7 @@ python -m pytest -q -k 'not canonical_trial_establishes_sustained_real_contact'
 
 测试结果：70 项不依赖 MuJoCo 的测试通过；3 项标准任务集成测试因执行环境缺少 `mujoco` 未能运行，不可当作“测试通过”。
 
-**关键评价：方案 C 相比 B 显著改进了“真正低维优化+按需补偿”的算法结构，但本批数据未证明角度精度或计算速度优势。** 这一结论应写进实验章节，而不应被隐藏。详细 JSON：`experiments/results/reachability_5way_offline_24frames.json`。
+**关键评价：方案 C 相比 B 显著改进了“真正低维优化+按需补偿”的算法结构，但本批数据未证明角度精度或计算速度优势。** 这一结论应写进实验章节，而不应被隐藏。详细 JSON：`实验06_PCA与可达性协同对比/results/reachability_5way_offline_24frames.json`。
 
 ## 6. 发表论文需要继续研究的突破口
 

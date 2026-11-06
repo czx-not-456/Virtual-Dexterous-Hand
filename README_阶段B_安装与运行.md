@@ -1,3 +1,5 @@
+> **整理说明（2026-11-06）：** 阶段B源文件、结果现统一收于 [`实验01_StageB七方法消融/`](实验01_StageB七方法消融/)；下述 `scripts/` 入口仍兼容执行。历史报告中原有的输出位置示例保留。
+
 # CH-M6 TQHG 阶段B：同等增强训练与七组离线消融
 
 ## 目的
@@ -14,7 +16,7 @@ scripts/train_stageB_robust_ridge6.py   30维掩码增强6维Ridge训练；只�
 scripts/evaluate_stageB_ablation.py    固定独立24帧，配对相同故障掩码测试七种方法
 configs/stageB_robust_ridge6.json      本包预训练可复核模型；可用训练命令重建
  test/tests_20261012/test_stageB_ablation.py   逻辑与端到端测试
-examples/stageB_ablation/              示例CSV、JSON、报告和图片
+实验01_StageB七方法消融/results/published_example/              示例CSV、JSON、报告和图片
 ```
 
 ## Windows 安装（以你之前的工程为例）

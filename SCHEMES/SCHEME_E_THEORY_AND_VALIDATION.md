@@ -98,7 +98,7 @@ lo_t ≤ u_out ≤ hi_t.
 
 运行 `python experiments/benchmark_task_effect_spectrum.py`。数据仅有6类预设姿态标签；24帧里没有真实接触与实测机械手关节角。**此处 MAE 是软件输出的6个主控制关节与预设姿态标签之间的误差。** 此结果不是“真实人手→机器人末端精度”。
 
-见 `experiments/results/schemeE_paired_comparison.json`；在同一运行机器上，离线重放的一组结果为（耗时可能因机器或系统负载波动）：
+见 `实验08_任务效应谱方案对比/results/schemeE_paired_comparison.json`；在同一运行机器上，离线重放的一组结果为（耗时可能因机器或系统负载波动）：
 
 | 模式 | 标签 MAE (°) | 优化中位 (ms) | 管线 P95 (ms) |
 |---|---:|---:|---:|
