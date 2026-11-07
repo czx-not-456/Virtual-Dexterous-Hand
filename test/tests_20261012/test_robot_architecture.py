@@ -6,7 +6,7 @@ from src.retargeting.topology_mapping import TopologyMapper
 def test_robot_exposes_ch_m6_11dof_11actuator_architecture():
     r=RobotHandModel(); assert r.nominal_dof==11; assert r.effective_actuators==11
     assert len(r.joint_order)==len(r.actuator_order)==11
-    assert r.source_model_path=="CH-M6/CH-M6_L.xml"
+    assert r.source_model_path=="数据手套数据/CH-M6型号_虚拟手模型/CH-M6_L.xml"
 
 def test_joint_targets_map_one_to_one_to_ch_m6_actuators():
     r=RobotHandModel(); q=r.ranges.mean(axis=1); u=r.actuator_targets_from_joint_targets(q)

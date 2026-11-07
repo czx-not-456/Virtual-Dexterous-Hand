@@ -8,6 +8,6 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 if __name__ == '__main__':
     import runpy
-    runpy.run_module('实验09_StageC五方法MuJoCo对比.calibrate_stageC_task_gate', run_name='__main__')
+    runpy.run_module('experiments.实验09_StageC五方法MuJoCo对比.calibrate_stageC_task_gate', run_name='__main__')
 else:
-    from 实验09_StageC五方法MuJoCo对比.calibrate_stageC_task_gate import *
+    from experiments.实验09_StageC五方法MuJoCo对比.calibrate_stageC_task_gate import *

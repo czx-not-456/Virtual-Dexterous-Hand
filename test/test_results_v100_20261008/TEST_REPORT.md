@@ -48,7 +48,7 @@ Mock 对照脚本每种姿态计算 80 次。PINCH 位置 MSE：0.02339360 → 0
 
 交付数据为 24 帧、6 种姿态，每姿态第 4 帧留出；本次复算 6 个样本 × 6 个输出。base RMSE **16.2204°**；personalized manifest 预测 RMSE **0.1606°**；降低 **99.01%**。
 
-本次读取交付预测，未重新训练或加载个性化模型。样本少且来自固定标定姿态，不能推断跨用户或连续动作泛化。结果见 [JSON](glove_calibration/mapping_comparison.json) 和 [逐姿态 CSV](glove_calibration/mapping_comparison_by_pose.csv)。
+本次读取交付预测，未重新训练或加载个性化模型。样本少且来自固定标定姿态，不能推断跨用户或连续动作泛化。结果见 [JSON](../../experiments/实验03_手套标定映射对比/results/mapping_comparison.json) 和 [逐姿态 CSV](../../experiments/实验03_手套标定映射对比/results/mapping_comparison_by_pose.csv)。
 
 ## 6. 实采姿态 MuJoCo 配对实验
 
@@ -63,7 +63,7 @@ Mock 对照脚本每种姿态计算 80 次。PINCH 位置 MSE：0.02339360 → 0
 
 误差列是物体目标点到机器人指尖的平均距离，和标定角度 RMSE 是不同指标。个性化预测的角度误差改善不保证任务接触／稳定指标同步改善。本次 WRAP 的个性化映射稳定帧比例由基础映射的 89.52% 降至 77.62%；两个任务的物体目标点距离误差也均增大。重复帧不构成独立受试样本；PINCH 接触可包含接近夹具帧；这些结果不代表真实抓起、搬运或放置。
 
-结果见 [summary.csv](glove_tasks/summary.csv)、[summary.json](glove_tasks/summary.json)、[frames.csv](glove_tasks/frames.csv)。
+结果见 [summary.csv](../../experiments/实验04_手套抓握任务对比/results/summary.csv)、[summary.json](../../experiments/实验04_手套抓握任务对比/results/summary.json)、[frames.csv](../../experiments/实验04_手套抓握任务对比/results/frames.csv)。
 
 ## 7. 三种输入链路与结果完整性
 

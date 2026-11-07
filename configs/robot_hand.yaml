@@ -1,6 +1,6 @@
 # CH-M6 左手的软件适配配置。第三方原始资源位于 CH-M6/，运行时只读。
 version: ch-m6-adapter-v1
-source_model_path: CH-M6/CH-M6_L.xml
+source_model_path: 数据手套数据/CH-M6型号_虚拟手模型/CH-M6_L.xml
 joint_order: [th_cmc_joint, th_mcp_joint, th_ip_joint, ff_mcp_joint, ff_dip_joint, mf_mcp_joint, mf_dip_joint, rf_mcp_joint, rf_dip_joint, lf_mcp_joint, lf_dip_joint]
 joint_ranges_deg:
   th_cmc_joint: [0.0, 99.981]

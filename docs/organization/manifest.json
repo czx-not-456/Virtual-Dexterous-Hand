@@ -1,0 +1,200 @@
+{
+  "moves": [
+    {
+      "from": "实验01_StageB七方法消融",
+      "to": "experiments/实验01_StageB七方法消融"
+    },
+    {
+      "from": "实验02_静态与动态映射对比",
+      "to": "experiments/实验02_静态与动态映射对比"
+    },
+    {
+      "from": "实验03_手套标定映射对比",
+      "to": "experiments/实验03_手套标定映射对比"
+    },
+    {
+      "from": "实验04_手套抓握任务对比",
+      "to": "experiments/实验04_手套抓握任务对比"
+    },
+    {
+      "from": "实验05_PCA与自适应协同对比",
+      "to": "experiments/实验05_PCA与自适应协同对比"
+    },
+    {
+      "from": "实验06_PCA与可达性协同对比",
+      "to": "experiments/实验06_PCA与可达性协同对比"
+    },
+    {
+      "from": "实验07_可信度协同方案对比",
+      "to": "experiments/实验07_可信度协同方案对比"
+    },
+    {
+      "from": "实验08_任务效应谱方案对比",
+      "to": "experiments/实验08_任务效应谱方案对比"
+    },
+    {
+      "from": "实验09_StageC五方法MuJoCo对比",
+      "to": "experiments/实验09_StageC五方法MuJoCo对比"
+    },
+    {
+      "from": "实验10_StageC稳定性对比",
+      "to": "experiments/实验10_StageC稳定性对比"
+    },
+    {
+      "from": "scripts/analyze_expert_complementarity.py",
+      "to": "experiments/StageA_专家互补性/analyze_expert_complementarity.py"
+    },
+    {
+      "from": "scripts/evaluate_tqhg_v2_faults.py",
+      "to": "experiments/实验01_StageB七方法消融/evaluate_tqhg_v2_faults.py"
+    },
+    {
+      "from": "00_映射对比实验_从这里开始.md",
+      "to": "experiments/映射对比实验导航.md"
+    },
+    {
+      "from": "整理说明_映射对比实验.md",
+      "to": "experiments/整理记录/整理说明_映射对比实验.md"
+    },
+    {
+      "from": "对比实验_文件迁移清单.csv",
+      "to": "experiments/整理记录/对比实验_文件迁移清单.csv"
+    },
+    {
+      "from": "SCHEMES/SCHEME_B_VALIDATION.json",
+      "to": "experiments/实验05_PCA与自适应协同对比/results/SCHEME_B_VALIDATION.json"
+    },
+    {
+      "from": "SCHEMES",
+      "to": "docs/design/SCHEMES"
+    },
+    {
+      "from": "tqhg_online_patch",
+      "to": "archive/patches/tqhg_online_patch"
+    },
+    {
+      "from": "申报书.pdf",
+      "to": "项目进度报告相关文件/申报书.pdf"
+    },
+    {
+      "from": "成果梳理_版本1.3.0.md",
+      "to": "项目进度报告相关文件/成果梳理_版本1.3.0.md"
+    },
+    {
+      "from": "CAMERA_CONTROLS.md",
+      "to": "docs/guides/CAMERA_CONTROLS.md"
+    },
+    {
+      "from": "LATENT_SYNERGY_GUIDE.md",
+      "to": "docs/guides/LATENT_SYNERGY_GUIDE.md"
+    },
+    {
+      "from": "README_阶段B_安装与运行.md",
+      "to": "docs/guides/README_阶段B_安装与运行.md"
+    },
+    {
+      "from": "STABLE_GRASP_V2_README_CN.md",
+      "to": "docs/guides/STABLE_GRASP_V2_README_CN.md"
+    },
+    {
+      "from": "TQHG_V2_使用与验证说明.md",
+      "to": "docs/guides/TQHG_V2_使用与验证说明.md"
+    },
+    {
+      "from": "PROJECT_BASIS.md",
+      "to": "docs/design/PROJECT_BASIS.md"
+    },
+    {
+      "from": "LITERATURE_INFORMED_DESIGN.md",
+      "to": "docs/design/LITERATURE_INFORMED_DESIGN.md"
+    },
+    {
+      "from": "VALIDATION.md",
+      "to": "docs/validation/VALIDATION.md"
+    },
+    {
+      "from": "CONTACT_VALIDATION.md",
+      "to": "docs/validation/CONTACT_VALIDATION.md"
+    },
+    {
+      "from": "CHANGELOG_v0.md",
+      "to": "docs/history/CHANGELOG_v0.md"
+    },
+    {
+      "from": "MIGRATION.md",
+      "to": "docs/history/MIGRATION.md"
+    },
+    {
+      "from": "整理说明_先读.md",
+      "to": "docs/history/整理说明_先读.md"
+    },
+    {
+      "from": "PINCH_GUARD_FIX_README.md",
+      "to": "docs/history/PINCH_GUARD_FIX_README.md"
+    },
+    {
+      "from": "outputs/glove_smoke",
+      "to": "test/outputs/glove_smoke"
+    },
+    {
+      "from": "outputs/glove_tasks_smoke",
+      "to": "test/outputs/glove_tasks_smoke"
+    },
+    {
+      "from": "outputs/readme_check",
+      "to": "test/outputs/readme_check"
+    },
+    {
+      "from": "outputs/test_logs",
+      "to": "test/outputs/test_logs"
+    }
+  ],
+  "deleted": [
+    {
+      "removed": "outputs/glove_calibration_check/mapping_comparison.json",
+      "retained": "experiments/实验03_手套标定映射对比/results/mapping_comparison.json",
+      "sha256": "661a9c440ac339a48e11a84a819eecc4e6db190c70d0cacf4f232d8ec38399ef"
+    },
+    {
+      "removed": "outputs/glove_calibration_check/mapping_comparison_by_pose.csv",
+      "retained": "experiments/实验03_手套标定映射对比/results/mapping_comparison_by_pose.csv",
+      "sha256": "68ef2d21891943f98e2e5f3c68294c51affa626b8422c496cf317718a753b615"
+    },
+    {
+      "removed": "test/test_results_v100_20261008/glove_calibration/mapping_comparison.json",
+      "retained": "experiments/实验03_手套标定映射对比/results/mapping_comparison.json",
+      "sha256": "661a9c440ac339a48e11a84a819eecc4e6db190c70d0cacf4f232d8ec38399ef"
+    },
+    {
+      "removed": "test/test_results_v100_20261008/glove_calibration/mapping_comparison_by_pose.csv",
+      "retained": "experiments/实验03_手套标定映射对比/results/mapping_comparison_by_pose.csv",
+      "sha256": "68ef2d21891943f98e2e5f3c68294c51affa626b8422c496cf317718a753b615"
+    },
+    {
+      "removed": "test/test_results_v100_20261008/glove_tasks/frames.csv",
+      "retained": "experiments/实验04_手套抓握任务对比/results/frames.csv",
+      "sha256": "fd4325dd1ac91a742da6529082e038f70d39b222e4b3b732782e10d570ad1184"
+    },
+    {
+      "removed": "test/test_results_v100_20261008/glove_tasks/summary.csv",
+      "retained": "experiments/实验04_手套抓握任务对比/results/summary.csv",
+      "sha256": "49caf09b5dc386f036aa9de6a6abb9cec9776e0b0513cf40b984431ad8bacb27"
+    },
+    {
+      "removed": "test/test_results_v100_20261008/glove_tasks/summary.json",
+      "retained": "experiments/实验04_手套抓握任务对比/results/summary.json",
+      "sha256": "582ea0d22509d5f3d7a91864bf99843ebd4b84b3d0fba358d1a865d1bb952dd3"
+    }
+  ],
+  "retained_notes": [
+    "现有 experiments 内容未遍历、未读取、未比对；只对新增目标检查冲突。",
+    "test/test_results_* 保留系统验证、审计、JUnit、回归日志与混合报告，仅去除已确认重复的研究结果；报告链接已更新。",
+    "outputs/ 的历史 run_*、manual 及未确认用途文件保留；不凭文件名推断研究结论用途。",
+    "数据手套数据/ 的原始采集、设备配置、模型及软件依赖保留完整。",
+    "scripts/ 的训练、标定、数据生成、交付审计脚本属于共享工具，保留；旧实验入口保留以兼容调用。",
+    "configs/ 的共享算法和消融参数仍被测试与运行入口使用，保留共享位置。",
+    "archive/older_root_versions 及补丁 payload 保留版本历史和完整性，不按内容相同删减补丁。",
+    "旧 CSV 迁移清单、历史报告中的命令和哈希是当时状态记录，不重写历史证据；当前路径以本次清单为准。",
+    "已有用户模型迁移、验证文档变动和 experiments/对比实验.md 保留，不恢复、不覆盖。"
+  ]
+}

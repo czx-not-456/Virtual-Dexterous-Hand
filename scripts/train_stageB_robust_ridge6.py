@@ -8,6 +8,6 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 if __name__ == '__main__':
     import runpy
-    runpy.run_module('实验01_StageB七方法消融.train_stageB_robust_ridge6', run_name='__main__')
+    runpy.run_module('experiments.实验01_StageB七方法消融.train_stageB_robust_ridge6', run_name='__main__')
 else:
-    from 实验01_StageB七方法消融.train_stageB_robust_ridge6 import *
+    from experiments.实验01_StageB七方法消融.train_stageB_robust_ridge6 import *
