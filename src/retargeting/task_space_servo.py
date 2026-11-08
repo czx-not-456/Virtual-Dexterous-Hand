@@ -15,22 +15,113 @@ class TaskSpaceSimulator(Protocol):
 class ServoDiagnostics:
     active: bool=False; thumb_error_m: float=0.0; index_error_m: float=0.0
     mean_error_m: float=0.0; max_error_m: float=0.0; corrected_digits: int=0
+    thumb_recovery_active: bool=False; wrap_coordination_active: bool=False
+    thumb_loss_event: bool=False
     def as_dict(self):
-        return {"task_servo_active":self.active,"servo_thumb_error_m":self.thumb_error_m,"servo_index_error_m":self.index_error_m,"servo_mean_error_m":self.mean_error_m,"servo_max_error_m":self.max_error_m,"servo_corrected_digits":self.corrected_digits}
+        return {
+            "task_servo_active": self.active,
+            "servo_thumb_error_m": self.thumb_error_m,
+            "servo_index_error_m": self.index_error_m,
+            "servo_mean_error_m": self.mean_error_m,
+            "servo_max_error_m": self.max_error_m,
+            "servo_corrected_digits": self.corrected_digits,
+            "servo_thumb_recovery_active": self.thumb_recovery_active,
+            "servo_wrap_coordination_active": self.wrap_coordination_active,
+            "servo_thumb_loss_event": self.thumb_loss_event,
+        }
 
 class ObjectAwareTaskServo:
     """Variable-DoF damped-least-squares task servo for CH-M6 digits."""
+    WRAP_POLICIES = ("original", "low_gain", "thumb_recovery", "coordinated")
+
     def __init__(self, robot: RobotHandModel, cfg: dict | None, *,
-                 coupled_ablation: str = "original") -> None:
+                 coupled_ablation: str = "original",
+                 wrap_policy: str = "original") -> None:
         self.robot, self.cfg = robot, dict(cfg or {})
         if coupled_ablation not in {"original", "prior", "hold", "both"}:
             raise ValueError("coupled_ablation must be original/prior/hold/both")
         self.coupled_ablation = coupled_ablation
+        if wrap_policy not in self.WRAP_POLICIES:
+            raise ValueError(f"Unknown WRAP servo policy: {wrap_policy}")
+        self.wrap_policy = wrap_policy
         self.enabled=bool(self.cfg.get("enabled",False)); self.gain=float(self.cfg.get("gain",.7))
         self.damping=float(self.cfg.get("damping",.02)); self.blend=float(self.cfg.get("blend",.8))
         self.max_joint_step=math.radians(float(self.cfg.get("max_joint_step_deg",4.0)))
         self.stop_error_m=float(self.cfg.get("stop_error_m",.0045)); self.idx={n:i for i,n in enumerate(robot.joint_order)}
-    def reset(self)->None: return None
+        self.reset()
+
+    def reset(self) -> None:
+        """Reset episode-local contact history; no state leaks between trials."""
+        self._thumb_seen_physical_contact = False
+        self._thumb_lost_frames = 0
+        self._thumb_last_contact_target = None
+        self._thumb_recovery_target = None
+
+    def _wrap_params(self, cfg: dict) -> dict:
+        params = dict(cfg.get("wrap_control_ablation", {}))
+        defaults = {
+            "low_gain": 0.40,
+            "recovery_gain": 0.22,
+            "recovery_max_joint_step_deg": 0.8,
+            "recovery_max_frames": 18,
+            "target_follow_step_m": 0.00035,
+            "target_follow_total_m": 0.003,
+            "other_finger_step_deg": 0.2,
+        }
+        defaults.update(params)
+        for k in ("low_gain", "recovery_gain", "recovery_max_joint_step_deg",
+                  "target_follow_step_m", "target_follow_total_m", "other_finger_step_deg"):
+            if not math.isfinite(float(defaults[k])) or float(defaults[k]) <= 0.0:
+                raise ValueError(f"WRAP control parameter {k} must be finite and positive")
+        if int(defaults["recovery_max_frames"]) < 1:
+            raise ValueError("recovery_max_frames must be >= 1")
+        return defaults
+
+    def _update_thumb_recovery(self, contact: dict, cfg: dict) -> tuple[bool, bool]:
+        """Previous-frame *force-backed* contact only; never use hold-window truth.
+
+        Returns (recovering, fresh_thumb_loss). A recovery is allowed only if
+        the thumb really contacted before and another finger still contacts.
+        """
+        thumb = bool(contact.get("raw_thumb_contact", contact.get("thumb_contact", False)))
+        others = any(bool(contact.get(f"raw_{f}_contact", contact.get(f"{f}_contact", False)))
+                     for f in ("index", "middle", "ring", "little"))
+        if thumb:
+            self._thumb_seen_physical_contact = True
+            self._thumb_lost_frames = 0
+            self._thumb_recovery_target = None
+            return False, False
+        if not self._thumb_seen_physical_contact or not others:
+            self._thumb_lost_frames = 0
+            self._thumb_recovery_target = None
+            return False, False
+        self._thumb_lost_frames += 1
+        return (self._thumb_lost_frames <= int(cfg["recovery_max_frames"]),
+                self._thumb_lost_frames == 1)
+
+    def _bounded_recovery_target(self, observed_target: np.ndarray, cfg: dict) -> np.ndarray:
+        """Rate- and distance-limit pursuit of a moving cylinder surface."""
+        observed_target = np.asarray(observed_target, float)
+        anchor = self._thumb_last_contact_target
+        if anchor is None:
+            # Never invent a historical contact target.
+            return observed_target.copy()
+        if self._thumb_recovery_target is None:
+            self._thumb_recovery_target = anchor.copy()
+        delta = observed_target - self._thumb_recovery_target
+        distance = float(np.linalg.norm(delta))
+        step = float(cfg["target_follow_step_m"])
+        if distance > step:
+            delta = delta * (step / distance)
+        updated = self._thumb_recovery_target + delta
+        displacement = updated - anchor
+        norm = float(np.linalg.norm(displacement))
+        radius = float(cfg["target_follow_total_m"])
+        if norm > radius:
+            updated = anchor + displacement * (radius / norm)
+        self._thumb_recovery_target = updated
+        return updated.copy()
+
     def _task_cfg(self, task_name, task_mode):
         cfg=self.cfg.get(task_name); cfg=cfg if isinstance(cfg,dict) else self.cfg.get(task_mode)
         return dict(cfg) if isinstance(cfg,dict) else None
@@ -40,36 +131,111 @@ class ObjectAwareTaskServo:
         if policy=="never": return False
         tip=bool(contact.get(f"{finger}_tip_contact",False))
         return tip if policy=="tip" else tip or bool(contact.get(f"{finger}_contact",False))
-    def _dls(self,J,error):
-        J=np.asarray(J,float); A=J@J.T+(self.damping**2)*np.eye(3)
-        dq=J.T@np.linalg.pinv(A)@(self.gain*np.asarray(error,float))
-        return np.clip(dq,-self.max_joint_step,self.max_joint_step)
-    def apply(self,q_target:np.ndarray,*,simulator:TaskSpaceSimulator,task_name:str,intent_value:str,contact:dict,task_mode:str|None=None):
-        q_target=np.asarray(q_target,float); diag=ServoDiagnostics(); mode=str(task_mode or task_name); cfg=self._task_cfg(task_name,mode)
-        if not self.enabled or cfg is None or str(intent_value)!=str(cfg.get("active_intent","")): return q_target.copy(),diag
-        clearance=float(cfg.get("target_offset_m",cfg.get("clearance_m",.007))); margin=float(cfg.get("vertical_margin_m",.01))
-        policy=str(cfg.get("stop_on_contact","any")).lower(); blend=float(np.clip(cfg.get("command_blend",self.blend),0,1))
-        actual=np.asarray(simulator.joint_positions(),float); cmd=q_target.copy(); errors=[]; diag.active=True
-        prior=dict(cfg.get("posture_prior_deg",{})); prior_blend=float(cfg.get("posture_prior_blend",0))
+    def _dls(self, J, error, *, gain: float | None = None,
+             max_joint_step: float | None = None):
+        J = np.asarray(J, float)
+        A = J @ J.T + (self.damping ** 2) * np.eye(3)
+        use_gain = self.gain if gain is None else float(gain)
+        step = self.max_joint_step if max_joint_step is None else float(max_joint_step)
+        dq = J.T @ np.linalg.pinv(A) @ (use_gain * np.asarray(error, float))
+        return np.clip(dq, -step, step)
+    def apply(self, q_target: np.ndarray, *, simulator: TaskSpaceSimulator,
+              task_name: str, intent_value: str, contact: dict,
+              task_mode: str | None = None):
+        q_target = np.asarray(q_target, float)
+        diag = ServoDiagnostics()
+        mode = str(task_mode or task_name)
+        cfg = self._task_cfg(task_name, mode)
+        if not self.enabled or cfg is None or str(intent_value) != str(cfg.get("active_intent", "")):
+            return q_target.copy(), diag
+        clearance = float(cfg.get("target_offset_m", cfg.get("clearance_m", .007)))
+        margin = float(cfg.get("vertical_margin_m", .01))
+        policy = str(cfg.get("stop_on_contact", "any")).lower()
+        blend = float(np.clip(cfg.get("command_blend", self.blend), 0, 1))
+        actual = np.asarray(simulator.joint_positions(), float)
+        cmd = q_target.copy()
+        errors = []
+        diag.active = True
+        prior = dict(cfg.get("posture_prior_deg", {}))
+        prior_blend = float(cfg.get("posture_prior_blend", 0))
+
+        # These policies are WRAP-only.  Original PINCH and original WRAP are
+        # byte-for-byte equivalent in intention to the pre-ablation controller.
+        wrap_ablation = mode == "wrap" and self.wrap_policy != "original"
+        params = self._wrap_params(cfg) if wrap_ablation else {}
+        local_gain = float(params["low_gain"]) if wrap_ablation else self.gain
+        recovering = False
+        if wrap_ablation and self.wrap_policy in {"thumb_recovery", "coordinated"}:
+            recovering, diag.thumb_loss_event = self._update_thumb_recovery(contact, params)
+            diag.thumb_recovery_active = recovering
+            diag.wrap_coordination_active = recovering and self.wrap_policy == "coordinated"
+
         for finger in self._active_fingers(mode):
-            joints=self.robot.joints_for_finger(finger); indices=np.array([self.idx[j] for j in joints],int)
-            current=np.asarray(simulator.fingertip_position(finger),float); target=np.asarray(simulator.task_contact_target(finger,mode,clearance_m=clearance,vertical_margin_m=margin),float)
-            error=target-current; err=float(np.linalg.norm(error)); errors.append(err)
-            if finger=="thumb": diag.thumb_error_m=err
-            if finger=="index": diag.index_error_m=err
-            if self._contacted(finger,contact,policy): cmd[indices]=actual[indices]; continue
-            nominal=q_target[indices].copy()
-            if prior_blend>0:
-                p=nominal.copy(); found=False
-                for k,j in enumerate(joints):
-                    if j in prior: p[k]=math.radians(float(prior[j])); found=True
-                if found: nominal=(1-prior_blend)*nominal+prior_blend*p
-            if err<=self.stop_error_m: cmd[indices]=blend*actual[indices]+(1-blend)*nominal; continue
-            desired=actual[indices]+self._dls(simulator.fingertip_jacobian(finger,joints),error)
-            cmd[indices]=blend*desired+(1-blend)*nominal; diag.corrected_digits+=1
-        cmd=np.clip(cmd,self.robot.ranges[:,0],self.robot.ranges[:,1])
-        if errors: diag.mean_error_m=float(np.mean(errors)); diag.max_error_m=float(np.max(errors))
-        return cmd,diag
+            joints = self.robot.joints_for_finger(finger)
+            indices = np.array([self.idx[j] for j in joints], int)
+            current = np.asarray(simulator.fingertip_position(finger), float)
+            target = np.asarray(simulator.task_contact_target(
+                finger, mode, clearance_m=clearance, vertical_margin_m=margin), float)
+            if wrap_ablation and finger == "thumb" and bool(contact.get(
+                    "raw_thumb_contact", contact.get("thumb_contact", False))):
+                self._thumb_last_contact_target = target.copy()
+            if recovering and finger == "thumb":
+                target = self._bounded_recovery_target(target, params)
+            error = target - current
+            err = float(np.linalg.norm(error))
+            errors.append(err)
+            if finger == "thumb":
+                diag.thumb_error_m = err
+            if finger == "index":
+                diag.index_error_m = err
+
+            if recovering and finger == "thumb":
+                # Finite, rate-limited corrective step; no unbounded chase.
+                # Bypass nominal pull during recovery so large mapping changes
+                # cannot undo the recovery rate bound.
+                dq = self._dls(simulator.fingertip_jacobian(finger, joints), error,
+                               gain=params["recovery_gain"],
+                               max_joint_step=math.radians(params["recovery_max_joint_step_deg"]))
+                cmd[indices] = actual[indices] + dq
+                diag.corrected_digits += int(err > self.stop_error_m)
+                continue
+            if diag.wrap_coordination_active and finger != "thumb":
+                # Keep already-contacting fingers from continuing to push the
+                # cylinder while thumb contact is being recovered. Noncontacting
+                # fingers may move, but only by a tiny bounded joint step.
+                physical = bool(contact.get(f"raw_{finger}_contact", contact.get(f"{finger}_contact", False)))
+                if physical:
+                    cmd[indices] = actual[indices]
+                else:
+                    step = math.radians(params["other_finger_step_deg"])
+                    cmd[indices] = actual[indices] + np.clip(
+                        q_target[indices] - actual[indices], -step, step)
+                continue
+            if self._contacted(finger, contact, policy):
+                cmd[indices] = actual[indices]
+                continue
+            nominal = q_target[indices].copy()
+            if prior_blend > 0:
+                posture = nominal.copy()
+                found = False
+                for k, joint in enumerate(joints):
+                    if joint in prior:
+                        posture[k] = math.radians(float(prior[joint]))
+                        found = True
+                if found:
+                    nominal = (1 - prior_blend) * nominal + prior_blend * posture
+            if err <= self.stop_error_m:
+                cmd[indices] = blend * actual[indices] + (1 - blend) * nominal
+                continue
+            desired = actual[indices] + self._dls(
+                simulator.fingertip_jacobian(finger, joints), error, gain=local_gain)
+            cmd[indices] = blend * desired + (1 - blend) * nominal
+            diag.corrected_digits += 1
+        cmd = np.clip(cmd, self.robot.ranges[:, 0], self.robot.ranges[:, 1])
+        if errors:
+            diag.mean_error_m = float(np.mean(errors))
+            diag.max_error_m = float(np.max(errors))
+        return cmd, diag
 
     def apply_coupled(self, q_target: np.ndarray, *, simulator: TaskSpaceSimulator,
                       task_name: str, intent_value: str, contact: dict,
