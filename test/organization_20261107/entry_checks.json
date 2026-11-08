@@ -1,0 +1,99 @@
+{
+  "checks": [
+    {
+      "command": [
+        "scripts/evaluate_stageB_ablation.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: evaluate_stageB_ablation.py [-h] [--test TEST] [--model-v2 MODEL_V2]\n                                   [--robust-ridge6 ROBUST_RIDGE6]\n                                   [--outdir OUTDIR] [--trials TRIALS]\n                                   [--seed SEED] [--bootstrap BOOTSTRAP]\n\noptions:\n  -h, --help            show this help message and exit\n  --test TEST\n  --model-v2 MODEL_V2\n  --robust-ridge6 ROBUST_RIDGE6\n  --outdir OUTDIR\n  --trials TRIALS\n  --seed SEED\n  --bootstrap BOOTSTRAP\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "scripts/train_stageB_robust_ridge6.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: train_stageB_robust_ridge6.py [-h] [--history HISTORY]\n                                     [--v2-model V2_MODEL] [--output OUTPUT]\n                                     [--seed SEED] [--regularizer REGULARIZER]\n\noptions:\n  -h, --help            show this help message and exit\n  --history HISTORY\n  --v2-model V2_MODEL\n  --output OUTPUT\n  --seed SEED\n  --regularizer REGULARIZER\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "scripts/calibrate_stageC_task_gate.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: calibrate_stageC_task_gate.py [-h] [--history HISTORY]\n                                     [--v2-model V2_MODEL]\n                                     [--robust6-model ROBUST6_MODEL]\n                                     [--output OUTPUT] [--seed SEED]\n                                     [--mask-trials MASK_TRIALS]\n\noptions:\n  -h, --help            show this help message and exit\n  --history HISTORY\n  --v2-model V2_MODEL\n  --robust6-model ROBUST6_MODEL\n  --output OUTPUT\n  --seed SEED\n  --mask-trials MASK_TRIALS\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "scripts/run_stageC_mujoco.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: run_stageC_mujoco.py [-h] [--glove GLOVE] [--conditions CONDITIONS]\n                            [--methods METHODS] [--outdir OUTDIR]\n                            [--steps STEPS] [--task {pinch,wrap,sphere}]\n                            [--fault-start FAULT_START]\n                            [--fault-stop FAULT_STOP] [--dry-run]\n\noptions:\n  -h, --help            show this help message and exit\n  --glove GLOVE\n  --conditions CONDITIONS\n                        Comma-separated clean,mask_one,mask_three,mask_five\n  --methods METHODS\n  --outdir OUTDIR\n  --steps STEPS\n  --task {pinch,wrap,sphere}\n  --fault-start FAULT_START\n  --fault-stop FAULT_STOP\n  --dry-run             Show commands without requiring MuJoCo\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "scripts/analyze_expert_complementarity.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: analyze_expert_complementarity.py [-h] [--model MODEL] [--test TEST]\n                                         [--trials TRIALS] [--seed SEED]\n                                         [--tie-epsilon TIE_EPSILON]\n                                         [--outdir OUTDIR]\n\nStage A: leakage-aware, held-out expert complementarity audit for TQHG-v2. No\ntraining occurs and no model weights are altered. Uses the SAME held-out 24\nglove records, explicit faulty masks, and seed scheme as the original\nscripts/evaluate_tqhg_v2_faults.py. Distinguishes *sample oracle* (diagnostic\nlower bound using ground-truth labels) from a deployable predictor. Without\nMuJoCo, J=0, P=0 and N=I; this audits whole-control gating, NOT independent\ntask/null-space contributions. Small fixed-pose test; do not use sample-level\nwin rates as independent-trial hypothesis tests.\n\noptions:\n  -h, --help            show this help message and exit\n  --model MODEL\n  --test TEST\n  --trials TRIALS\n  --seed SEED\n  --tie-epsilon TIE_EPSILON\n  --outdir OUTDIR\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "scripts/evaluate_tqhg_v2_faults.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: evaluate_tqhg_v2_faults.py [-h] [--test TEST] [--model MODEL]\n                                  [--seed SEED] [--trials TRIALS]\n\noptions:\n  -h, --help       show this help message and exit\n  --test TEST\n  --model MODEL\n  --seed SEED\n  --trials TRIALS\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "CHM6_StageC_Precision_Compare.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: CHM6_StageC_Precision_Compare.py [-h] [--outputs OUTPUTS]\n                                        [--start START] [--stop STOP]\n\nCH-M6 Stage C fingertip target-error audit: Hold vs original, same 120..239\nwindow. Usage from project root: python CHM6_StageC_Precision_Compare.py\n--outputs ./outputs Pure Python standard library; never modifies experiments\nor trained models.\n\noptions:\n  -h, --help         show this help message and exit\n  --outputs OUTPUTS\n  --start START\n  --stop STOP\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "CHM6_StageC_Fault_Joint_Audit.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: CHM6_StageC_Fault_Joint_Audit.py [-h] [--outputs OUTPUTS]\n                                        [--start START] [--stop STOP]\n                                        [--save SAVE]\n\nCH-M6 Stage C faulty-vs-clean real joint-position audit\n\noptions:\n  -h, --help         show this help message and exit\n  --outputs OUTPUTS\n  --start START\n  --stop STOP        ��������֡\n  --save SAVE\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "CHM6_StageC_Control_Path_Audit(1).py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: CHM6_StageC_Control_Path_Audit(1).py [-h] [--outputs OUTPUTS]\n                                            [--start START] [--stop STOP]\n\nStage C pipeline audit: paired methods within the SAME sensor condition. Usage\nfrom CH-M6 Stage C project root: python CHM6_StageC_Control_Path_Audit.py\n--outputs outputs Read only. Requires original Stage-C run CSV files with\n--servo-trace. Reports per-stage max and mean absolute differences in\n*degrees*.\n\noptions:\n  -h, --help         show this help message and exit\n  --outputs OUTPUTS\n  --start START\n  --stop STOP\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "scripts/run_stageC_mujoco.py",
+        "--dry-run",
+        "--conditions",
+        "clean",
+        "--methods",
+        "robust6"
+      ],
+      "exit_code": 0,
+      "stdout": "[RUN] F:\\������\\��\\��Ŀ�ļ���\\Virtual-Dexterous-Hand-v0\\.venv\\Scripts\\python.exe -m src.main --input glove --glove-samples ������������\\CHM6_pinch_hold_diagnostic_only.xlsx --sim mujoco --task pinch --steps 360 --output-dir F:\\������\\��\\��Ŀ�ļ���\\Virtual-Dexterous-Hand-v0\\experiments\\ʵ��09_StageC�巽��MuJoCo�Ա�\\results\\generated\\stageC_mujoco --run-name stageC_pinch_clean_robust6 --mapping-method robust6 --stagec-robust6-model configs/stageB_robust_ridge6.json --stagec-gate-model configs/stageC_task_gate.json --tqhg-v2-calibration configs/tqhg_online_v2.json --coupled-servo-ablation hold --servo-trace --stagec-fault-channels  --stagec-fault-start 120 --stagec-fault-stop 240\n",
+      "stderr": ""
+    }
+  ],
+  "syntax_errors": []
+}

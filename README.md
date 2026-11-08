@@ -1,6 +1,14 @@
-> **新增可选研究方案 B：任务自适应协同 + 受限残差。** 运行方法、公式、实验记录和局限见 [`SCHEME_B_ADAPTIVE_GUIDE.md`](SCHEMES/SCHEME_B_ADAPTIVE_GUIDE.md)。默认入口仍按原工程执行，启用时需传 `--latent-model configs/latent_chm6_adaptive.json --adaptive-synergy`。
+# Virtual-Dexterous-Hand · 项目导航
 
-# Virtual-Dexterous-Hand CH-M6
+**映射对比实验按“一组实验一个文件夹”集中放在 `experiments/`**，见 [00_映射对比实验_从这里开始.md](experiments/映射对比实验导航.md)。Stage B、静态/动态、手套标定、手套抓握、方案 B/C/D/E、Stage C 仿真与稳定性已分成 **10 个独立文件夹**，每个都有脚本、结果位置和说明。
+
+> **注意**：本次只整理文件结构、保留兼容命令，并删除仓库内原有的补丁 ZIP（未安装该补丁）；没有重新采集数据或生成新实验结论。原始数据、共享算法、模型和测试仍在原位置。
+
+---
+
+> **新增可选研究方案 B：任务自适应协同 + 受限残差。** 运行方法、公式、实验记录和局限见 [`SCHEME_B_ADAPTIVE_GUIDE.md`](docs/design/SCHEMES/SCHEME_B_ADAPTIVE_GUIDE.md)。默认入口仍按原工程执行，启用时需传 `--latent-model configs/latent_chm6_adaptive.json --adaptive-synergy`。
+
+## 项目介绍：Virtual-Dexterous-Hand CH-M6
 
 支持合成手套数据与真实手套标定数据回放、意图驱动重定向和 MuJoCo 仿真的虚拟灵巧手实验系统。
 
@@ -144,7 +152,7 @@ requirements.txt 包含 NumPy、SciPy、PyYAML、MuJoCo 和 pytest。
 
     python experiments\compare_glove_tasks.py
 
-默认每组 240 帧，结果写入 `outputs\glove_tasks\summary.csv`、`summary.json` 和 `frames.csv`；运行参数、指标定义和实验限制见 `experiments/GLOVE_TASK_COMPARISON.md`。该旧实验仍使用旧 manifest 的第 4 帧预测并重复回放姿态，不加载新增权重，不能据此声称已完成连续在线推理。
+默认每组 240 帧，结果写入 `outputs\glove_tasks\summary.csv`、`summary.json` 和 `frames.csv`；运行参数、指标定义和实验限制见 `experiments/实验04_手套抓握任务对比/GLOVE_TASK_COMPARISON.md`。该旧实验仍使用旧 manifest 的第 4 帧预测并重复回放姿态，不加载新增权重，不能据此声称已完成连续在线推理。
 
 ### 4.1 PINCH
 
@@ -300,7 +308,7 @@ neutral 要求流程无错误；PINCH 要求 contact；WRAP 要求 stable。接�
 - configs/simulation.yaml：物体尺寸、位置、任务类型、相机和稳定阈值；
 - configs/algorithm.yaml：意图阈值、优化器权重、任务空间伺服和任务专属参数；
 - configs/robot_hand.yaml：CH-M6 11 DoF、15→11 映射、运动学链和可配置待确认参数；
-- CH-M6/CH-M6_L.xml：指导老师原始只读模型；`src/simulation/ch_m6_adapter.py`：项目侧运行时适配。
+- 数据手套数据/CH-M6型号_虚拟手模型/CH-M6_L.xml：指导老师原始只读模型；`src/simulation/ch_m6_adapter.py`：项目侧运行时适配。
 - `src/simulation/teacher_chm6_control.py`：可选的老师版 6 维命令到 11 个仿真关节的独立适配层；不修改原始 MJCF 或默认 11 actuator 配置。
 
 ## 9. 当前边界与已知问题
@@ -314,3 +322,11 @@ neutral 要求流程无错误；PINCH 要求 contact；WRAP 要求 stable。接�
 - 正式论文若要论证真实抓取或跨用户效果，仍需要真实硬件、更多受试者和标准物体重复试验。
 
 版本演进与设计依据见 CHANGELOG_v0.md、LITERATURE_INFORMED_DESIGN.md 和 VALIDATION.md。
+
+
+## 目录整理（2026-11-07）
+
+- 系统测试、报告和输出：`test/`。
+- 研究对比与消融：[实验导航](experiments/映射对比实验导航.md)。
+- 通用文档：`docs/`；项目材料：`项目进度报告相关文件/`。
+- 迁移、去重与保留说明：[整理记录](docs/organization/README.md)。

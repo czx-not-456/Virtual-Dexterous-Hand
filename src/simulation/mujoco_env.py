@@ -24,7 +24,7 @@ class MujocoSimulator:
     def __init__(
         self,
         robot: RobotHandModel,
-        model_path: str = "CH-M6/CH-M6_L.xml",
+        model_path: str = "数据手套数据/CH-M6型号_虚拟手模型/CH-M6_L.xml",
         render: bool = False,
         camera: str = "overview",
         task_object_body: str = "grasp_object",

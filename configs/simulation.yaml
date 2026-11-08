@@ -1,5 +1,5 @@
 mujoco:
-  model_path: CH-M6/CH-M6_L.xml
+  model_path: 数据手套数据/CH-M6型号_虚拟手模型/CH-M6_L.xml
   robot_model: CH-M6_L
   task_object_body: grasp_object
   default_camera: overview
