@@ -10,7 +10,7 @@ import subprocess
 import sys
 import time
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 OUT = Path(__file__).resolve().parent
 os.chdir(ROOT)
 env = dict(os.environ, PYTHONUTF8="1", PYTHONDONTWRITEBYTECODE="1")
@@ -23,7 +23,7 @@ metadata = {"started_at": datetime.now().astimezone().isoformat(), "python": sys
             "initial_git_status": git("status", "--short"),
             "packages": {p: importlib.metadata.version(p) for p in ["numpy", "scipy", "PyYAML", "mujoco", "pytest"]},
             "sha256": {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in tracked
-                       if p and (ROOT / p).is_file() and (p.startswith(("src/", "configs/", "tests/", "experiments/", "CH-M6/", "datasets/", "数据手套数据/")) or p in ["requirements.txt", "pyproject.toml"])}}
+                       if p and (ROOT / p).is_file() and (p.startswith(("src/", "configs/", "test/", "experiments/", "CH-M6/", "datasets/", "数据手套数据/")) or p in ["requirements.txt", "pyproject.toml"])}}
 (OUT / "environment.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
 checks = [
  ("01_pip_check", ["-m", "pip", "check"]),

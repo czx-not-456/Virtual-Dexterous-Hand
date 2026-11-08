@@ -1,5 +1,6 @@
 """Summarize completed checks and verify saved experiment artifacts."""
 from pathlib import Path
+import os
 import csv
 import hashlib
 import json
@@ -8,7 +9,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 OUT = Path(__file__).resolve().parent
-ROOT = OUT.parent
+ROOT = OUT.parents[1]
 def read_json(path):
     return json.loads(path.read_text(encoding="utf-8"))
 def read_csv(path):
@@ -31,8 +32,14 @@ failed = sum(int(s.get("failures", 0)) + int(s.get("errors", 0)) for s in suites
 skipped = sum(int(s.get("skipped", 0)) for s in suites)
 benchmark = read_csv(OUT / "benchmark" / "benchmark_runs.csv")
 aggregates = read_csv(OUT / "benchmark" / "benchmark_summary.csv")
-glove = read_json(OUT / "glove_tasks" / "summary.json")["trials"]
-calibration = read_json(OUT / "glove_calibration" / "mapping_comparison.json")
+GLOVE_TASKS = OUT / "glove_tasks"
+if not GLOVE_TASKS.exists():
+    GLOVE_TASKS = ROOT / "experiments" / "实验04_手套抓握任务对比" / "results"
+GLOVE_CALIBRATION = OUT / "glove_calibration"
+if not GLOVE_CALIBRATION.exists():
+    GLOVE_CALIBRATION = ROOT / "experiments" / "实验03_手套标定映射对比" / "results"
+glove = read_json(GLOVE_TASKS / "summary.json")["trials"]
+calibration = read_json(GLOVE_CALIBRATION / "mapping_comparison.json")
 issues = []
 def check(condition, message):
     if not condition:
@@ -64,14 +71,14 @@ for name, expected in [("dataset", 800), ("mock", 800), ("glove", 24)]:
     rows = read_csv(OUT / "input_checks" / (name + ".csv"))
     check(len(rows) == summary["total_frames"] == expected, "Input frame count mismatch: " + name)
     check(summary["contact_frames"] == summary["stable_frames"] == 0, "Nonphysics run reported contact: " + name)
-frames = read_csv(OUT / "glove_tasks" / "frames.csv")
+frames = read_csv(GLOVE_TASKS / "frames.csv")
 check(len(frames) == 960, "Expected 960 paired-glove frame rows")
 for trial in glove:
     finite(trial, trial["task"] + "/" + trial["mapping"])
     check(trial["frames"] == 240 and trial["active_frames"] == 210, "Unexpected paired-glove protocol frame counts")
 changed = []
 for path, digest in environment["sha256"].items():
-    if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest:
+    if not (ROOT / path).is_file() or hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest:
         changed.append(path)
 check(not changed, "Reviewed source/config/model/data changed during tests: " + ", ".join(changed))
 command_failures = sum(not truth(r.get("run_ok")) for r in benchmark)
@@ -87,6 +94,8 @@ verified = {"checked_at": datetime.now().astimezone().isoformat(), "artifact_che
             "benchmark_task_metric_failures": metric_failures, "paired_glove_trials": len(glove),
             "benchmark_p95_latency_ms_range": [min(latencies), max(latencies)]}
 (OUT / "artifact_verification.json").write_text(json.dumps(verified, ensure_ascii=False, indent=2), encoding="utf-8")
+glove_tasks_link = Path(os.path.relpath(GLOVE_TASKS, OUT)).as_posix()
+glove_calibration_link = Path(os.path.relpath(GLOVE_CALIBRATION, OUT)).as_posix()
 command_table = table(["检查", "退出码", "总耗时 s", "原始日志"], [[r["name"], r["returncode"], r["elapsed_seconds"], f'[{r["name"]}.log]({r["name"]}.log)'] for r in execution])
 report = f'''# Virtual-Dexterous-Hand 测试报告
 
@@ -124,7 +133,7 @@ Mock 对照脚本每种姿态计算 80 次。PINCH 位置 MSE：0.02339360 → 0
 
 交付数据为 24 帧、6 种姿态，每姿态第 4 帧留出；本次复算 6 个样本 × 6 个输出。base RMSE **{calibration["base_mapping"]["rmse_deg"]:.4f}°**；personalized manifest 预测 RMSE **{calibration["personalized_mapping"]["rmse_deg"]:.4f}°**；降低 **{calibration["rmse_improvement_percent"]:.2f}%**。
 
-本次读取交付预测，未重新训练或加载个性化模型。样本少且来自固定标定姿态，不能推断跨用户或连续动作泛化。结果见 [JSON](glove_calibration/mapping_comparison.json) 和 [逐姿态 CSV](glove_calibration/mapping_comparison_by_pose.csv)。
+本次读取交付预测，未重新训练或加载个性化模型。样本少且来自固定标定姿态，不能推断跨用户或连续动作泛化。结果见 [JSON]({glove_calibration_link}/mapping_comparison.json) 和 [逐姿态 CSV]({glove_calibration_link}/mapping_comparison_by_pose.csv)。
 
 ## 6. 实采姿态 MuJoCo 配对实验
 
@@ -134,7 +143,7 @@ Mock 对照脚本每种姿态计算 80 次。PINCH 位置 MSE：0.02339360 → 0
 
 误差列是物体目标点到机器人指尖的平均距离，和标定角度 RMSE 是不同指标。个性化预测的角度误差改善不保证任务接触／稳定指标同步改善。本次 WRAP 的个性化映射稳定帧比例由基础映射的 89.52% 降至 77.62%；两个任务的物体目标点距离误差也均增大。重复帧不构成独立受试样本；PINCH 接触可包含接近夹具帧；这些结果不代表真实抓起、搬运或放置。
 
-结果见 [summary.csv](glove_tasks/summary.csv)、[summary.json](glove_tasks/summary.json)、[frames.csv](glove_tasks/frames.csv)。
+结果见 [summary.csv]({glove_tasks_link}/summary.csv)、[summary.json]({glove_tasks_link}/summary.json)、[frames.csv]({glove_tasks_link}/frames.csv)。
 
 ## 7. 三种输入链路与结果完整性
 
@@ -149,14 +158,14 @@ dataset 800 帧、Mock 800 帧、实采 glove 24 帧的主程序无物理后端�
 在项目根目录复现本次测试：
 
 ```powershell
-.\\.venv\\Scripts\\python.exe test_results_v100_20261008\\run_validation.py
-.\\.venv\\Scripts\\python.exe test_results_v100_20261008\\finalize_report.py
+.\\.venv\\Scripts\\python.exe test\\test_results_v100_20261008\\run_validation.py
+.\\.venv\\Scripts\\python.exe test\\test_results_v100_20261008\\finalize_report.py
 ```
 
 重新运行会更新本目录测试文件及 pytest 临时目录；请先复制本次归档以保留历史证据。
 '''
 (OUT / "TEST_REPORT.md").write_text(report, encoding="utf-8")
-progress = ROOT / "项目进度简报_20260921.md"
+progress = ROOT / "项目进度报告相关文件" / "项目进度简报_20261008.md"
 text = progress.read_text(encoding="utf-8").split("\n## 七、本次批量与配对测试结果")[0]
 text += f'''\n\n## 七、本次批量与配对测试结果
 
@@ -170,7 +179,7 @@ text += f'''\n\n## 七、本次批量与配对测试结果
 
 {glove_table}
 
-接触成功和稳定成功必须分开解读。本次个性化映射虽降低标定角度误差，但 WRAP 稳定帧比例从 89.52% 降至 77.62%，两个任务的物体目标点距离误差均增大，后续需要联合评估标定精度和任务表现。完整日志、逐帧数据、判据与限制见 [测试报告](test_results_v100_20261008/TEST_REPORT.md)。
+接触成功和稳定成功必须分开解读。本次个性化映射虽降低标定角度误差，但 WRAP 稳定帧比例从 89.52% 降至 77.62%，两个任务的物体目标点距离误差均增大，后续需要联合评估标定精度和任务表现。完整日志、逐帧数据、判据与限制见 [测试报告](../test/test_results_v100_20261008/TEST_REPORT.md)。
 '''
 progress.write_text(text, encoding="utf-8")
 print(json.dumps(verified, ensure_ascii=False, indent=2))

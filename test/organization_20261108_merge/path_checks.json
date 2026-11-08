@@ -1,0 +1,34 @@
+{
+  "checked_local_links": 44,
+  "missing_links": [
+    {
+      "file": "docs/design/SCHEMES/映射方法改进与创新.md",
+      "target": "数据手套数据/base_mapping(1).json"
+    },
+    {
+      "file": "docs/design/SCHEMES/映射方法改进与创新.md",
+      "target": "configs/glove.yaml"
+    },
+    {
+      "file": "docs/design/SCHEMES/映射方法改进与创新.md",
+      "target": "src/glove/adapter.py"
+    },
+    {
+      "file": "docs/design/SCHEMES/映射方法改进与创新.md",
+      "target": "src/retargeting/optimizer.py"
+    },
+    {
+      "file": "docs/design/SCHEMES/映射方法改进与创新.md",
+      "target": "src/main.py"
+    },
+    {
+      "file": "docs/design/SCHEMES/映射方法改进与创新.md",
+      "target": "configs/robot_hand.yaml"
+    },
+    {
+      "file": "docs/guides/README_阶段B_安装与运行.md",
+      "target": "experiments/实验01_StageB七方法消融/"
+    }
+  ],
+  "note": "Includes historical/pre-existing broken links; historical prose and records are preserved."
+}

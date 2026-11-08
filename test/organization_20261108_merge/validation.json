@@ -1,0 +1,22 @@
+{
+  "inventory_survivors_verified": 142,
+  "duplicates_deleted": 25,
+  "pyc_deleted": 80,
+  "files_moved": 136,
+  "remaining_duplicate_groups": [],
+  "tests_directory_removed": true,
+  "archive_roots_verified": true,
+  "current_test_files": 36,
+  "collected_test_cases": 136,
+  "pytest_status": "passed",
+  "existing_broken_local_links": 7,
+  "pytest_exit_code": 0,
+  "pytest": {
+    "tests": 136,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "pytest_elapsed_seconds": 172.6,
+  "pytest_command": ".venv/Scripts/python.exe -m pytest -p no:cacheprovider -rA --junitxml=test/organization_20261108_merge/pytest.xml"
+}
