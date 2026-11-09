@@ -1,0 +1,5 @@
+# All files in this repository require owner review
+* @czx-not-456
+
+# Protect the CODEOWNERS file itself
+/.github/CODEOWNERS @czx-not-456
