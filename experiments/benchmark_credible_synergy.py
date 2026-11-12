@@ -8,6 +8,6 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 if __name__ == '__main__':
     import runpy
-    runpy.run_module('实验07_可信度协同方案对比.benchmark_credible_synergy', run_name='__main__')
+    runpy.run_module('experiments.实验07_可信度协同方案对比.benchmark_credible_synergy', run_name='__main__')
 else:
-    from 实验07_可信度协同方案对比.benchmark_credible_synergy import *
+    from experiments.实验07_可信度协同方案对比.benchmark_credible_synergy import *

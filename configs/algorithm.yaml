@@ -48,3 +48,13 @@ task_space_servo:
     vertical_margin_m: 0.008
     stop_on_contact: any
     command_blend: 0.90
+    # Four-way WRAP controller ablation. All parameters below are ignored by
+    # the original policy; compare using --wrap-servo-policy.
+    wrap_control_ablation:
+      low_gain: 0.40
+      recovery_gain: 0.22
+      recovery_max_joint_step_deg: 0.8
+      recovery_max_frames: 18
+      target_follow_step_m: 0.00035
+      target_follow_total_m: 0.003
+      other_finger_step_deg: 0.2

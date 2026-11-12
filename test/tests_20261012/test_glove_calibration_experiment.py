@@ -1,5 +1,5 @@
 from src.common import ROOT
-from experiments.实验03_手套标定映射对比.compare_glove_calibration import compare_calibrations
+from archive.低证据实验审计.实验03_手套标定映射对比.compare_glove_calibration import compare_calibrations
 
 
 def test_personalized_mapping_experiment_uses_manifest_validation_split():

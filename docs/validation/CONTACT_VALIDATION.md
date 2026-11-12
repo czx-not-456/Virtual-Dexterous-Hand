@@ -97,3 +97,12 @@ python experiments/analyze_contacts.py outputs\run_YYYYMMDD_HHMMSS.csv
 ```
 
 除 contact_proxy 外，v0.3.4 会输出 servo_mean_error 与 servo_max_error。若接触率仍低，可据误差判断是目标不可达、伺服增益不足，还是发生了错误部位接触。
+
+## 接触判定增强（本次改进，尚未完成物理验证）
+
+- `contact_count` 现在只统计 MuJoCo 已进入约束求解器、具有正法向力的手-物接触；另输出 `inactive_contact_candidates`。
+- `*_tip_contact` 与 `*_contact` 是**供控制器使用**的力-时序迟滞状态；`pinch_contact_proxy`、`wrap_contact_proxy`、`task_contact_proxy` 和 `hold_stable_proxy` 仍只用**本帧有力接触**判断成功，不能靠时序滤波虚增成功率。
+- `raw_thumb_tip_contact`、`raw_index_tip_contact`、`hand_normal_force_n`、`thumb_tip_normal_force_n`、`index_tip_normal_force_n`、`max_contact_penetration_m` 用于诊断。
+- `configs/simulation.yaml` 的 `contact_detection` 提供法向力阈值和进出帧数，初值尚未经真实接触/负例标定；过大阈值会漏检弱触碰。
+- 注意：MuJoCo 法向力不是指套真实触觉传感器读数；真实手套/硬件须另做标定，禁止把仿真接触代理当作真实抓握成功。
+- 运行 `python experiments/benchmark_contact_detection.py` 获取**合成信号**消融；此分数不代表仿真抓握率。

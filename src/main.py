@@ -38,6 +38,16 @@ from src.retargeting.task_space_servo import ObjectAwareTaskServo, ServoDiagnost
 
 CONTACT_COLUMNS = [
     "contact_count",
+    "inactive_contact_candidates",
+    "hand_normal_force_n",
+    "thumb_tip_normal_force_n",
+    "index_tip_normal_force_n",
+    "max_contact_penetration_m",
+    "raw_thumb_tip_contact",
+    "raw_index_tip_contact",
+    "raw_pinch_contact_proxy",
+    "raw_wrap_contact_proxy",
+    "filtered_task_contact_proxy",
     "environment_contact_count",
     "contact_sections",
     "thumb_contact",
@@ -61,6 +71,13 @@ CONTACT_COLUMNS = [
     "task_contact_proxy",
     "stable_contact_proxy",
     "object_displacement_m",
+    "object_pos_x_m", "object_pos_y_m", "object_pos_z_m",
+    "object_reset_this_step",
+    "raw_thumb_contact", "raw_index_contact", "raw_middle_contact",
+    "raw_ring_contact", "raw_little_contact",
+    "thumb_normal_force_n", "index_normal_force_n", "middle_normal_force_n",
+    "ring_normal_force_n", "little_normal_force_n",
+    *[f"{finger}_force_on_object_{axis}_n" for finger in ("thumb", "index", "middle", "ring", "little") for axis in "xyz"],
     "hold_stable_proxy",
     "hold_object_free",
     "hold_pose_available",
@@ -77,6 +94,8 @@ SERVO_COLUMNS = [
     "servo_mean_error_m",
     "servo_max_error_m",
     "servo_corrected_digits",
+    "servo_thumb_recovery_active", "servo_wrap_coordination_active",
+    "servo_thumb_loss_event",
 ]
 
 ADAPTIVE_COLUMNS = [
@@ -88,6 +107,13 @@ ADAPTIVE_COLUMNS = [
     "spectrum_modes", "spectrum_omission_m", "spectrum_risk_m", "spectrum_energy",
     "spectrum_regret_m", "spectrum_post_guard", "spectrum_post_tip_m", "spectrum_post_baseline_m", "spectrum_speed_valid",
     "spectrum_guard_reason", "spectrum_object_error_m", "spectrum_object_baseline_m",
+    "spectrum_selected_k", "spectrum_accepted_k", "spectrum_output_rank",
+    "spectrum_fallback", "spectrum_fallback_reason", "spectrum_selected_indices",
+    "spectrum_final_guard_enabled", "spectrum_final_guard_regret_m",
+    "spectrum_candidate_attempts", "spectrum_reject_spectral_count",
+    "spectrum_reject_fidelity_count", "spectrum_reject_nonlinear_count",
+    "spectrum_candidate_min_fk_error_m", "spectrum_candidate_min_regret_m",
+    "spectrum_candidate_max_fidelity_excess_deg", "spectrum_selection_status",
 ]
 
 TRACE_JOINTS = (
@@ -135,6 +161,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Virtual dexterous hand v0.4 - synthetic dataset + benchmarkable MuJoCo pipeline")
     p.add_argument("--sim", choices=["auto", "none", "mujoco"], default="auto")
     p.add_argument("--render", action="store_true")
+    p.add_argument("--contact-detector",
+                   choices=["geometry_only", "force_only", "temporal_only", "force_and_temporal"],
+                   default=None,
+                   help="MuJoCo接触检测器消融：几何/力/纯时序/组合；只改变控制反馈，物理成功代理统一采用力证据")
     p.add_argument(
         "--steps",
         type=int,
@@ -194,6 +224,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seed", type=int, default=7, help="procedural mock 模式随机种子")
     p.add_argument("--output-dir", type=Path, default=ROOT / "outputs")
     p.add_argument("--run-name", default=None, help="固定输出文件名前缀，便于批量实验")
+    p.add_argument("--no-auto-reset-object", action="store_true",
+                   help="Disable only workspace-triggered task object reset; retain reproducible task-onset reset")
+    p.add_argument("--no-inactive-object-reset", action="store_true",
+                   help="Do not teleport the object home during inactive frames; task-onset reset remains")
+    p.add_argument("--wrap-servo-policy",
+                   choices=list(ObjectAwareTaskServo.WRAP_POLICIES), default="original",
+                   help="WRAP-only four-way ablation: original, low_gain, "
+                        "thumb_recovery, coordinated; requires legacy/uncoupled servo")
     p.add_argument("--coupled-servo-ablation", choices=["original", "prior", "hold", "both"],
                    default="original", help="诊断用：仅改变TEQS六维耦合伺服；其余路径不变")
     p.add_argument("--servo-trace", action="store_true",
@@ -222,6 +260,16 @@ def build_parser() -> argparse.ArgumentParser:
 def _empty_contact_metrics() -> dict[str, float | int | bool]:
     return {
         "contact_count": 0,
+        "inactive_contact_candidates": 0,
+        "hand_normal_force_n": 0.0,
+        "thumb_tip_normal_force_n": 0.0,
+        "index_tip_normal_force_n": 0.0,
+        "max_contact_penetration_m": 0.0,
+        "raw_thumb_tip_contact": False,
+        "raw_index_tip_contact": False,
+        "raw_pinch_contact_proxy": False,
+        "raw_wrap_contact_proxy": False,
+        "filtered_task_contact_proxy": False,
         "environment_contact_count": 0,
         "contact_sections": 0,
         "thumb_contact": False,
@@ -245,6 +293,13 @@ def _empty_contact_metrics() -> dict[str, float | int | bool]:
         "task_contact_proxy": False,
         "stable_contact_proxy": False,
         "object_displacement_m": 0.0,
+        "object_pos_x_m": float("nan"),
+        "object_pos_y_m": float("nan"),
+        "object_pos_z_m": float("nan"),
+        "object_reset_this_step": False,
+        **{f"raw_{f}_contact": False for f in ("thumb", "index", "middle", "ring", "little")},
+        **{f"{f}_normal_force_n": 0.0 for f in ("thumb", "index", "middle", "ring", "little")},
+        **{f"{f}_force_on_object_{axis}_n": 0.0 for f in ("thumb", "index", "middle", "ring", "little") for axis in "xyz"},
         "hold_stable_proxy": False,
         "hold_object_free": False,
         "hold_pose_available": False,
@@ -415,9 +470,17 @@ def main() -> None:
         human, robot, algo_cfg["optimizer"], latent_mapper=latent_mapper,
         adaptive_mapper=adaptive_mapper, adaptive_source=args.latent_source)
     contact_assist = TaskContactAssist(robot, algo_cfg.get("contact_assist", {}), dt)
+    if args.wrap_servo_policy != "original":
+        if task_mode != "wrap":
+            raise SystemExit("--wrap-servo-policy 非 original 仅适用于 --task wrap")
+        if (args.sim != "mujoco" or not bool(algo_cfg.get("task_space_servo", {}).get("enabled", False))):
+            raise SystemExit("WRAP 控制消融需要启用 MuJoCo 任务伺服")
+        if isinstance(adaptive_mapper, TaskEffectSpectrumMapper) or online_mapper is not None:
+            raise SystemExit("WRAP 控制消融尚不支持六维耦合伺服：请使用 --mapping-method legacy")
     task_servo = ObjectAwareTaskServo(
         robot, algo_cfg.get("task_space_servo", {}),
-        coupled_ablation=args.coupled_servo_ablation)
+        coupled_ablation=args.coupled_servo_ablation,
+        wrap_policy=args.wrap_servo_policy)
     if args.coupled_servo_ablation != "original" and not (args.task_effect_spectrum or online_mapper is not None):
         raise SystemExit("--coupled-servo-ablation 仅适用于 --task-effect-spectrum")
     if args.task_effect_spectrum or online_mapper is not None:
@@ -450,7 +513,7 @@ def main() -> None:
             task_object_body=str(sim_cfg["task_object_body"]),
             task_name=task_name,
             task_spec=task_spec,
-            auto_reset_object=bool(sim_cfg["auto_reset_object"]),
+            auto_reset_object=bool(sim_cfg["auto_reset_object"]) and not args.no_auto_reset_object,
             object_workspace_radius_m=float(sim_cfg["object_workspace_radius_m"]),
             object_min_z_m=float(sim_cfg["object_min_z_m"]),
             stability_orientation_deg=float(sim_cfg.get("stability_orientation_deg", 3.0)),
@@ -459,6 +522,8 @@ def main() -> None:
             hold_max_rotation_deg=float(sim_cfg.get("evaluation", {}).get("hold_max_rotation_deg", 1.0)),
             camera_presets=dict(sim_cfg.get("camera_presets", {})),
             scene_config=sim_cfg,
+            contact_detection={**sim_cfg.get("contact_detection", {}),
+                               **({"mode": args.contact_detector} if args.contact_detector else {})},
             control_dt_s=dt,
         )
         if args.render:
@@ -528,7 +593,8 @@ def main() -> None:
             if simulator is not None:
                 rising = simulator.set_task_active(
                     task_active,
-                    hold_when_inactive=bool(sim_cfg.get("hold_task_object_when_inactive", True)),
+                    hold_when_inactive=(bool(sim_cfg.get("hold_task_object_when_inactive", True))
+                                        and not args.no_inactive_object_reset),
                 )
                 if rising:
                     if isinstance(online_mapper, TQHGv2OnlineMapper):
@@ -629,8 +695,9 @@ def main() -> None:
                             vertical_margin_m=margin)
                         for finger in fingers
                     }
-                    adaptive_mapper.set_object_task_goal(
-                        simulator.fingertip_positions_for_target, targets)
+                    # Do not use an unavailable MuJoCo FK callback or silently
+                    # mix world-frame goals with local-hand kinematics.
+                    adaptive_mapper.set_object_task_goal(None, targets)
                 else:
                     adaptive_mapper.set_object_task_goal(None, None)
 
@@ -661,6 +728,22 @@ def main() -> None:
                             'spectrum_guard_reason': float(final_diag.final_guard_reason),
                             'spectrum_object_error_m': final_diag.final_object_task_error_m,
                             'spectrum_object_baseline_m': final_diag.final_object_baseline_m,
+                            'spectrum_selected_k': float(final_diag.requested_mode_count),
+                            'spectrum_accepted_k': float(final_diag.accepted_mode_count),
+                            'spectrum_output_rank': float(final_diag.output_control_rank),
+                            'spectrum_fallback': float(final_diag.fallback_full_reference),
+                            'spectrum_fallback_reason': final_diag.fallback_reason,
+                            'spectrum_selected_indices': ','.join(map(str, final_diag.selected_mode_indices)),
+                            'spectrum_final_guard_enabled': float(final_diag.final_guard_enabled),
+                            'spectrum_final_guard_regret_m': final_diag.final_guard_regret_m,
+                            'spectrum_candidate_attempts': float(final_diag.candidate_attempts),
+                            'spectrum_reject_spectral_count': float(final_diag.reject_spectral_count),
+                            'spectrum_reject_fidelity_count': float(final_diag.reject_fidelity_count),
+                            'spectrum_reject_nonlinear_count': float(final_diag.reject_nonlinear_count),
+                            'spectrum_candidate_min_fk_error_m': final_diag.candidate_min_fk_error_m,
+                            'spectrum_candidate_min_regret_m': final_diag.candidate_min_regret_m,
+                            'spectrum_candidate_max_fidelity_excess_deg': final_diag.candidate_max_fidelity_excess_deg,
+                            'spectrum_selection_status': final_diag.selection_status,
                         })
             elif latent_mapper is None:
                 q_out = rate_limit(q_filtered, q_prev_out, vmax, dt)
@@ -805,6 +888,15 @@ def main() -> None:
                 "active_intent": active_intent,
                 "required_success_metric": required_success_metric,
                 "coupled_servo_ablation": args.coupled_servo_ablation,
+                "wrap_servo_policy": args.wrap_servo_policy,
+                "auto_reset_object_effective": bool(sim_cfg["auto_reset_object"]) and not args.no_auto_reset_object,
+                "inactive_object_reset_effective": (bool(sim_cfg.get("hold_task_object_when_inactive", True))
+                                                     and not args.no_inactive_object_reset),
+                "requested_steps": int(args.steps),
+                "actual_processed_frames": int(frame),
+                "wrap_servo_policy_config": (task_servo._wrap_params(
+                    task_servo._task_cfg(task_name, task_mode) or {})
+                    if args.wrap_servo_policy != "original" else None),
                 "mapping_method": args.mapping_method,
                 "tqhg_calibration": str(args.tqhg_calibration) if online_mapper is not None and args.mapping_method not in ("tqhg-v2", *STAGEC_METHODS) else None,
                 "tqhg_v2_calibration": str(args.tqhg_v2_calibration) if args.mapping_method in ("tqhg-v2", *STAGEC_METHODS) else None,
@@ -822,7 +914,11 @@ def main() -> None:
                 "stability_window_s": float(eval_cfg.get("hold_window_s", 1.0)),
                 "stability_max_translation_m": float(eval_cfg.get("hold_max_translation_m", 0.001)),
                 "stability_max_rotation_deg": float(eval_cfg.get("hold_max_rotation_deg", 1.0)),
-                "stability_uses_contact_force_or_lift": False,
+                "contact_detector": (simulator._contact_filter.cfg.mode if simulator is not None else None),
+                "contact_detector_config": (vars(simulator._contact_filter.cfg) if simulator is not None else None),
+                "stability_uses_contact_force": bool(simulator is not None),
+                "stability_uses_lift": False,
+                "stability_uses_contact_force_or_lift": bool(simulator is not None),
                 "servo_trace_enabled": bool(args.servo_trace),
                 "task_metric_pass": task_metric_pass,
                 "log_csv": str(log_path),
