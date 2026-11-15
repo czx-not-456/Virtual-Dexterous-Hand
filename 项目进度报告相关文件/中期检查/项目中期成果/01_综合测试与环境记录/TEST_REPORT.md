@@ -15,12 +15,12 @@ Windows；Python 3.11.9；NumPy 2.4.6；SciPy 1.17.1；PyYAML 6.0.3；MuJoCo 3.1
 | 01_pip_check | 0 | 4.444 | [01_pip_check.log](01_pip_check.log) |
 | 02_pytest | 0 | 183.458 | [02_pytest.log](02_pytest.log) |
 | 03_mapping | 0 | 14.157 | [03_mapping.log](03_mapping.log) |
-| 04_glove_calibration | 0 | 0.55 | [04_glove_calibration.log](04_glove_calibration.log) |
+| 04_glove_calibration | 0 | 0.55 | 04_glove_calibration.log（历史工程路径：`04_glove_calibration.log`） |
 | 05_dataset_pipeline | 0 | 50.514 | [05_dataset_pipeline.log](05_dataset_pipeline.log) |
 | 06_mock_pipeline | 0 | 38.476 | [06_mock_pipeline.log](06_mock_pipeline.log) |
-| 07_glove_pipeline | 0 | 1.805 | [07_glove_pipeline.log](07_glove_pipeline.log) |
+| 07_glove_pipeline | 0 | 1.805 | 07_glove_pipeline.log（历史工程路径：`07_glove_pipeline.log`） |
 | 08_synthetic_benchmark | 0 | 429.284 | [08_synthetic_benchmark.log](08_synthetic_benchmark.log) |
-| 09_glove_tasks | 0 | 28.322 | [09_glove_tasks.log](09_glove_tasks.log) |
+| 09_glove_tasks | 0 | 28.322 | 09_glove_tasks.log（历史工程路径：`09_glove_tasks.log`） |
 
 自动化测试：**52 passed / 0 failed或error / 0 skipped**。覆盖标定、数据加载、特征与意图、映射限位、模型构建、物理时钟、任务伺服、评估语义、benchmark 错误处理及三类任务的 800 帧 MuJoCo 集成流程。JUnit 见 [pytest_results.xml](pytest_results.xml)。
 
@@ -38,7 +38,7 @@ neutral 只要求流程完成，其接触／稳定率为零是预期结果。PIN
 
 本次各运行 P95 管线延迟范围为 **109.91–132.80 ms**，60 Hz 单帧预算为 16.67 ms。因此本次结果不支持严格 60 Hz 实时执行；物理时钟同步和实际计算吞吐应分别评价。
 
-详细结果： [benchmark_runs.csv](benchmark/benchmark_runs.csv)、[benchmark_summary.csv](benchmark/benchmark_summary.csv)、[BENCHMARK_REPORT.md](benchmark/BENCHMARK_REPORT.md)、[HTML 看板](benchmark/benchmark_dashboard.html)。每次运行的 CSV 和 summary JSON 在同目录。
+详细结果： benchmark_runs.csv（历史工程路径：`benchmark/benchmark_runs.csv`）、benchmark_summary.csv（历史工程路径：`benchmark/benchmark_summary.csv`）、BENCHMARK_REPORT.md（历史工程路径：`benchmark/BENCHMARK_REPORT.md`）、HTML 看板（历史工程路径：`benchmark/benchmark_dashboard.html`）。每次运行的 CSV 和 summary JSON 在同目录。
 
 ## 4. 静态／动态动作映射
 
@@ -48,7 +48,7 @@ Mock 对照脚本每种姿态计算 80 次。PINCH 位置 MSE：0.02339360 → 0
 
 交付数据为 24 帧、6 种姿态，每姿态第 4 帧留出；本次复算 6 个样本 × 6 个输出。base RMSE **16.2204°**；personalized manifest 预测 RMSE **0.1606°**；降低 **99.01%**。
 
-本次读取交付预测，未重新训练或加载个性化模型。样本少且来自固定标定姿态，不能推断跨用户或连续动作泛化。结果见 [JSON](../../experiments/实验03_手套标定映射对比/results/mapping_comparison.json) 和 [逐姿态 CSV](../../experiments/实验03_手套标定映射对比/results/mapping_comparison_by_pose.csv)。
+本次读取交付预测，未重新训练或加载个性化模型。样本少且来自固定标定姿态，不能推断跨用户或连续动作泛化。结果见 JSON（历史工程路径：`../../experiments/实验03_手套标定映射对比/results/mapping_comparison.json`） 和 逐姿态 CSV（历史工程路径：`../../experiments/实验03_手套标定映射对比/results/mapping_comparison_by_pose.csv`）。
 
 ## 6. 实采姿态 MuJoCo 配对实验
 
@@ -63,11 +63,11 @@ Mock 对照脚本每种姿态计算 80 次。PINCH 位置 MSE：0.02339360 → 0
 
 误差列是物体目标点到机器人指尖的平均距离，和标定角度 RMSE 是不同指标。个性化预测的角度误差改善不保证任务接触／稳定指标同步改善。本次 WRAP 的个性化映射稳定帧比例由基础映射的 89.52% 降至 77.62%；两个任务的物体目标点距离误差也均增大。重复帧不构成独立受试样本；PINCH 接触可包含接近夹具帧；这些结果不代表真实抓起、搬运或放置。
 
-结果见 [summary.csv](../../experiments/实验04_手套抓握任务对比/results/summary.csv)、[summary.json](../../experiments/实验04_手套抓握任务对比/results/summary.json)、[frames.csv](../../experiments/实验04_手套抓握任务对比/results/frames.csv)。
+结果见 summary.csv（历史工程路径：`../../experiments/实验04_手套抓握任务对比/results/summary.csv`）、summary.json（历史工程路径：`../../experiments/实验04_手套抓握任务对比/results/summary.json`）、frames.csv（历史工程路径：`../../experiments/实验04_手套抓握任务对比/results/frames.csv`）。
 
 ## 7. 三种输入链路与结果完整性
 
-dataset 800 帧、Mock 800 帧、实采 glove 24 帧的主程序无物理后端运行均完成，逐帧 CSV 和 summary JSON 位于 [input_checks](input_checks/)。此处验证输入／算法／日志链路，不以接触任务指标为验收条件。无物理后端时 contact/stable 为零，glove 的 24 帧顺序也不保证激活 PINCH。
+dataset 800 帧、Mock 800 帧、实采 glove 24 帧的主程序无物理后端运行均完成，逐帧 CSV 和 summary JSON 位于 input_checks（历史工程路径：`input_checks/`）。此处验证输入／算法／日志链路，不以接触任务指标为验收条件。无物理后端时 contact/stable 为零，glove 的 24 帧顺序也不保证激活 PINCH。
 
 另行核对了 9 组 benchmark 的逐帧数量与 JSON、一致的 11 DoF／11 actuator、非零任务活动帧、960 行配对回放结果、无物理后端的零接触以及汇总数值的有限性。已审查的源码、配置、原始模型及输入数据哈希均保持一致。完整性检查：**通过**，见 [artifact_verification.json](artifact_verification.json)。
 

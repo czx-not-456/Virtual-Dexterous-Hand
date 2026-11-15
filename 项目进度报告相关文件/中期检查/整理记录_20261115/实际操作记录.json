@@ -1,0 +1,603 @@
+[
+  {
+    "action": "move",
+    "from": "06_任务演示视频/现成参考资料/CAMERA_CONTROLS.md",
+    "to": "07_系统流程图/CAMERA_CONTROLS.md"
+  },
+  {
+    "action": "move",
+    "from": "12_附件目录与复现说明/现成参考资料/映射对比实验导航.md",
+    "to": "12_附件目录与复现说明/历史项目导航/映射对比实验导航.md"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/07_系统流程.png",
+    "to": "07_系统流程图/07_系统流程.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/configs/robot_hand.yaml",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/configs/robot_hand.yaml"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/configs/simulation.yaml",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/configs/simulation.yaml"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/pyproject.toml",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/pyproject.toml"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/README.md",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/README.md"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/evaluation/logger.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/evaluation/logger.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/evaluation/relative_grasp_stability.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/evaluation/relative_grasp_stability.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/evaluation/task_evaluator.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/evaluation/task_evaluator.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/features/feature_extractor.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/features/feature_extractor.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/features/intent_recognition.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/features/intent_recognition.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/glove/adapter.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/glove/adapter.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/glove/dataset_driver.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/glove/dataset_driver.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/main.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/main.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/processing/filters.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/processing/filters.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/processing/normalization.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/processing/normalization.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/retargeting/optimizer.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/retargeting/optimizer.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/retargeting/topology_mapping.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/retargeting/topology_mapping.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/关键代码快照/src/simulation/mujoco_env.py",
+    "to": "01_综合测试与环境记录/补充运行_20261115/关键代码快照/src/simulation/mujoco_env.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/原复现脚本/project_paths.py",
+    "to": "12_附件目录与复现说明/复现参考脚本/project_paths.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/原复现脚本/requirements-v2.txt",
+    "to": "12_附件目录与复现说明/复现参考脚本/requirements-v2.txt"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/原复现脚本/复现实验.py",
+    "to": "12_附件目录与复现说明/复现参考脚本/复现实验.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/原复现脚本/验证成果.py",
+    "to": "12_附件目录与复现说明/复现参考脚本/验证成果.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/测试与校验/11_完整复现实验控制台日志.txt",
+    "to": "01_综合测试与环境记录/补充运行_20261115/测试与校验/11_完整复现实验控制台日志.txt"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/测试与校验/11_本次执行完整日志.txt",
+    "to": "01_综合测试与环境记录/补充运行_20261115/测试与校验/11_本次执行完整日志.txt"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/测试与校验/11_本次执行环境.json",
+    "to": "01_综合测试与环境记录/补充运行_20261115/测试与校验/11_本次执行环境.json"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/测试与校验/11_测试记录.csv",
+    "to": "01_综合测试与环境记录/补充运行_20261115/测试与校验/11_测试记录.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/测试与校验/V2_原始来源清单.csv",
+    "to": "01_综合测试与环境记录/补充运行_20261115/测试与校验/V2_原始来源清单.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/01_系统与测试/测试与校验/数据来源与校验.csv",
+    "to": "01_综合测试与环境记录/补充运行_20261115/测试与校验/数据来源与校验.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/01_初始全景.png",
+    "to": "05_MuJoCo任务截图组/PINCH/01_初始全景.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/02_初始近景.png",
+    "to": "05_MuJoCo任务截图组/PINCH/02_初始近景.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/03_任务开始.png",
+    "to": "05_MuJoCo任务截图组/PINCH/03_任务开始.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/04_首次任务接触代理.png",
+    "to": "05_MuJoCo任务截图组/PINCH/04_首次任务接触代理.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/任务演示_慢放.mp4",
+    "to": "06_任务演示视频/PINCH/任务演示_慢放.mp4"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/实时帧记录.csv",
+    "to": "02_MuJoCo三任务批量实验/补充运行_20261115/PINCH/实时帧记录.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/当前物理运行.csv",
+    "to": "02_MuJoCo三任务批量实验/补充运行_20261115/PINCH/当前物理运行.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/当前物理运行_summary.json",
+    "to": "02_MuJoCo三任务批量实验/补充运行_20261115/PINCH/当前物理运行_summary.json"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/录制说明.json",
+    "to": "06_任务演示视频/PINCH/录制说明.json"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/截图索引.csv",
+    "to": "05_MuJoCo任务截图组/PINCH/截图索引.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/控制台日志.txt",
+    "to": "02_MuJoCo三任务批量实验/补充运行_20261115/PINCH/控制台日志.txt"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/01_初始全景.png",
+    "to": "05_MuJoCo任务截图组/WRAP/01_初始全景.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/02_初始近景.png",
+    "to": "05_MuJoCo任务截图组/WRAP/02_初始近景.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/03_任务开始.png",
+    "to": "05_MuJoCo任务截图组/WRAP/03_任务开始.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/04_首次任务接触代理.png",
+    "to": "05_MuJoCo任务截图组/WRAP/04_首次任务接触代理.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/05_有效区间接触数最大帧.png",
+    "to": "05_MuJoCo任务截图组/WRAP/05_有效区间接触数最大帧.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/任务演示_慢放.mp4",
+    "to": "06_任务演示视频/WRAP/任务演示_慢放.mp4"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/实时帧记录.csv",
+    "to": "02_MuJoCo三任务批量实验/补充运行_20261115/WRAP/实时帧记录.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/当前物理运行.csv",
+    "to": "02_MuJoCo三任务批量实验/补充运行_20261115/WRAP/当前物理运行.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/当前物理运行_summary.json",
+    "to": "02_MuJoCo三任务批量实验/补充运行_20261115/WRAP/当前物理运行_summary.json"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/录制说明.json",
+    "to": "06_任务演示视频/WRAP/录制说明.json"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/截图索引.csv",
+    "to": "05_MuJoCo任务截图组/WRAP/截图索引.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/WRAP/控制台日志.txt",
+    "to": "02_MuJoCo三任务批量实验/补充运行_20261115/WRAP/控制台日志.txt"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/原录制脚本/实时演示.ps1",
+    "to": "12_附件目录与复现说明/复现参考脚本/实时演示.ps1"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/02_MuJoCo实测/原录制脚本/录制真实仿真.py",
+    "to": "12_附件目录与复现说明/复现参考脚本/录制真实仿真.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/04-06_历史任务与消融/StageB消融/原代码/evaluate_stageB_ablation.py",
+    "to": "03_StageB七方法消融/原代码/evaluate_stageB_ablation.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/04-06_历史任务与消融/StageB消融/原代码/README.md",
+    "to": "03_StageB七方法消融/原代码/README.md"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/04-06_历史任务与消融/StageB消融/原代码/stageB_common.py",
+    "to": "03_StageB七方法消融/原代码/stageB_common.py"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/04-06_历史任务与消融/重分析结果/08_pinch_任务时序.png",
+    "to": "08_任务时序曲线/08_pinch_任务时序.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/04-06_历史任务与消融/重分析结果/08_wrap_任务时序.png",
+    "to": "08_任务时序曲线/08_wrap_任务时序.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/04-06_历史任务与消融/重分析结果/09_三任务统计.csv",
+    "to": "09_Benchmark汇总展示页/09_三任务统计.csv"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/04-06_历史任务与消融/重分析结果/09_九次试验汇总.png",
+    "to": "09_Benchmark汇总展示页/09_九次试验汇总.png"
+  },
+  {
+    "action": "move",
+    "from": "图册配套依据/04-06_历史任务与消融/重分析结果/10_StageB七方法对比.png",
+    "to": "10_StageB消融展示页/10_StageB七方法对比.png"
+  },
+  {
+    "action": "delete",
+    "from": "12_附件目录与复现说明/现成参考资料/environment.json",
+    "reason": "重复，保留 01_综合测试与环境记录/environment.json"
+  },
+  {
+    "action": "delete",
+    "from": "12_附件目录与复现说明/现成参考资料/execution_summary.json",
+    "reason": "重复，保留 01_综合测试与环境记录/execution_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_neutral_trial00.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_neutral_trial00.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_neutral_trial00_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_neutral_trial00_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_neutral_trial01.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_neutral_trial01.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_neutral_trial01_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_neutral_trial01_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_neutral_trial02.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_neutral_trial02.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_neutral_trial02_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_neutral_trial02_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_pinch_trial00.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_pinch_trial00.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_pinch_trial00_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_pinch_trial00_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_pinch_trial01.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_pinch_trial01.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_pinch_trial01_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_pinch_trial01_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_pinch_trial02.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_pinch_trial02.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_pinch_trial02_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_pinch_trial02_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_wrap_trial00.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_wrap_trial00.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_wrap_trial00_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_wrap_trial00_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_wrap_trial01.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_wrap_trial01.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_wrap_trial01_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_wrap_trial01_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_wrap_trial02.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_wrap_trial02.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/bench_wrap_trial02_summary.json",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/bench_wrap_trial02_summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "09_Benchmark汇总展示页/现成参考资料/benchmark_dashboard.html",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/benchmark_dashboard.html"
+  },
+  {
+    "action": "delete",
+    "from": "09_Benchmark汇总展示页/现成参考资料/BENCHMARK_REPORT.md",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/BENCHMARK_REPORT.md"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/BENCHMARK_REPORT.md",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/BENCHMARK_REPORT.md"
+  },
+  {
+    "action": "delete",
+    "from": "09_Benchmark汇总展示页/现成参考资料/benchmark_runs.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/benchmark_runs.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/benchmark_runs.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/benchmark_runs.csv"
+  },
+  {
+    "action": "delete",
+    "from": "09_Benchmark汇总展示页/现成参考资料/benchmark_summary.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/benchmark_summary.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/历史Benchmark/benchmark_summary.csv",
+    "reason": "重复，保留 02_MuJoCo三任务批量实验/benchmark_summary.csv"
+  },
+  {
+    "action": "delete",
+    "from": "10_StageB消融展示页/现成参考资料/mae_by_condition.png",
+    "reason": "重复，保留 03_StageB七方法消融/mae_by_condition.png"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/StageB消融/paired_cases.csv",
+    "reason": "重复，保留 03_StageB七方法消融/paired_cases.csv"
+  },
+  {
+    "action": "delete",
+    "from": "10_StageB消融展示页/现成参考资料/pose_error_distribution.png",
+    "reason": "重复，保留 03_StageB七方法消融/pose_error_distribution.png"
+  },
+  {
+    "action": "delete",
+    "from": "10_StageB消融展示页/现成参考资料/REPORT.md",
+    "reason": "重复，保留 03_StageB七方法消融/REPORT.md"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/StageB消融/REPORT.md",
+    "reason": "重复，保留 03_StageB七方法消融/REPORT.md"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/StageB消融/summary.json",
+    "reason": "重复，保留 03_StageB七方法消融/summary.json"
+  },
+  {
+    "action": "delete",
+    "from": "10_StageB消融展示页/现成参考资料/summary_by_condition.csv",
+    "reason": "重复，保留 03_StageB七方法消融/summary_by_condition.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/StageB消融/summary_by_condition.csv",
+    "reason": "重复，保留 03_StageB七方法消融/summary_by_condition.csv"
+  },
+  {
+    "action": "delete",
+    "from": "10_StageB消融展示页/现成参考资料/summary_by_pose.csv",
+    "reason": "重复，保留 03_StageB七方法消融/summary_by_pose.csv"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/04-06_历史任务与消融/StageB消融/summary_by_pose.csv",
+    "reason": "重复，保留 03_StageB七方法消融/summary_by_pose.csv"
+  },
+  {
+    "action": "delete",
+    "from": "06_任务演示视频/现成参考资料/README.md",
+    "reason": "重复，保留 图册配套依据/01_系统与测试/关键代码快照/README.md"
+  },
+  {
+    "action": "delete",
+    "from": "07_系统流程图/现成参考资料/README.md",
+    "reason": "重复，保留 图册配套依据/01_系统与测试/关键代码快照/README.md"
+  },
+  {
+    "action": "delete",
+    "from": "12_附件目录与复现说明/现成参考资料/README.md",
+    "reason": "重复，保留 图册配套依据/01_系统与测试/关键代码快照/README.md"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/02_MuJoCo实测/原录制脚本/project_paths.py",
+    "reason": "重复，保留 图册配套依据/01_系统与测试/原复现脚本/project_paths.py"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/02_MuJoCo实测/PINCH/05_有效区间接触数最大帧.png",
+    "reason": "重复，保留 图册配套依据/02_MuJoCo实测/PINCH/04_首次任务接触代理.png"
+  },
+  {
+    "action": "delete",
+    "from": "05_MuJoCo任务截图组/01_模型全景.png",
+    "reason": "展示图缺少可靠运行溯源，改用已核验、带索引的现有材料"
+  },
+  {
+    "action": "delete",
+    "from": "05_MuJoCo任务截图组/02_初始姿态.png",
+    "reason": "展示图缺少可靠运行溯源，改用已核验、带索引的现有材料"
+  },
+  {
+    "action": "delete",
+    "from": "05_MuJoCo任务截图组/03_PINCH接近.png",
+    "reason": "展示图缺少可靠运行溯源，改用已核验、带索引的现有材料"
+  },
+  {
+    "action": "delete",
+    "from": "05_MuJoCo任务截图组/04_PINCH接触.png",
+    "reason": "展示图缺少可靠运行溯源，改用已核验、带索引的现有材料"
+  },
+  {
+    "action": "delete",
+    "from": "05_MuJoCo任务截图组/05_WRAP包络.png",
+    "reason": "展示图缺少可靠运行溯源，改用已核验、带索引的现有材料"
+  },
+  {
+    "action": "delete",
+    "from": "08_任务时序曲线/PINCH_任务时序曲线.png",
+    "reason": "展示图缺少可靠运行溯源，改用已核验、带索引的现有材料"
+  },
+  {
+    "action": "delete",
+    "from": "08_任务时序曲线/WRAP_任务时序曲线.png",
+    "reason": "展示图缺少可靠运行溯源，改用已核验、带索引的现有材料"
+  },
+  {
+    "action": "delete",
+    "from": "待制作展示材料说明.md",
+    "reason": "过时或重复入口，内容由新说明、统一来源清单及展示页替代"
+  },
+  {
+    "action": "delete",
+    "from": "待制作材料_参考资料来源清单.csv",
+    "reason": "过时或重复入口，内容由新说明、统一来源清单及展示页替代"
+  },
+  {
+    "action": "delete",
+    "from": "文件来源与校验清单.csv",
+    "reason": "过时或重复入口，内容由新说明、统一来源清单及展示页替代"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/00_成果依据索引.docx",
+    "reason": "过时或重复入口，内容由新说明、统一来源清单及展示页替代"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/原件来源及哈希.json",
+    "reason": "过时或重复入口，内容由新说明、统一来源清单及展示页替代"
+  },
+  {
+    "action": "delete",
+    "from": "图册配套依据/本次独立数值核验记录.txt",
+    "reason": "过时或重复入口，内容由新说明、统一来源清单及展示页替代"
+  },
+  {
+    "action": "delete",
+    "from": "02_MuJoCo三任务批量实验/benchmark_dashboard.html",
+    "reason": "过时或重复入口，内容由新说明、统一来源清单及展示页替代"
+  },
+  {
+    "action": "move_and_edit",
+    "from": "图册配套依据/核验图册数据.py",
+    "to": "12_附件目录与复现说明/核验成果.py",
+    "reason": "唯一核验入口归入12；完整保留数值断言并增加去重后的证据追踪"
+  }
+]

@@ -1,0 +1,6 @@
+frame,simulation_time_s,active,task_contact_proxy,stable_contact_proxy,contact_count,fixture_held,filename,camera
+0,0.016,False,False,False,0,False,01_初始全景.png,overview
+0,0.016,False,False,False,0,False,02_初始近景.png,closeup
+171,2.865999999999906,True,False,False,2,True,03_任务开始.png,closeup
+173,2.899999999999902,True,True,False,3,True,04_首次任务接触代理.png,closeup
+173,2.899999999999902,True,True,False,3,True,04_首次任务接触代理.png,closeup

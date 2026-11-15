@@ -1,0 +1,155 @@
+{
+  "05_MuJoCo任务截图组/PINCH/截图索引.csv": [
+    {
+      "start": 403,
+      "before": "05_有效区间接触数最大帧.png",
+      "after": "04_首次任务接触代理.png"
+    }
+  ],
+  "01_综合测试与环境记录/TEST_REPORT.md": [
+    {
+      "start": 4044,
+      "before": "[input_checks](input_checks/)",
+      "after": "input_checks（历史工程路径：`input_checks/`）"
+    },
+    {
+      "start": 3879,
+      "before": "[frames.csv](../../experiments/实验04_手套抓握任务对比/results/frames.csv)",
+      "after": "frames.csv（历史工程路径：`../../experiments/实验04_手套抓握任务对比/results/frames.csv`）"
+    },
+    {
+      "start": 3810,
+      "before": "[summary.json](../../experiments/实验04_手套抓握任务对比/results/summary.json)",
+      "after": "summary.json（历史工程路径：`../../experiments/实验04_手套抓握任务对比/results/summary.json`）"
+    },
+    {
+      "start": 3743,
+      "before": "[summary.csv](../../experiments/实验04_手套抓握任务对比/results/summary.csv)",
+      "after": "summary.csv（历史工程路径：`../../experiments/实验04_手套抓握任务对比/results/summary.csv`）"
+    },
+    {
+      "start": 2959,
+      "before": "[逐姿态 CSV](../../experiments/实验03_手套标定映射对比/results/mapping_comparison_by_pose.csv)",
+      "after": "逐姿态 CSV（历史工程路径：`../../experiments/实验03_手套标定映射对比/results/mapping_comparison_by_pose.csv`）"
+    },
+    {
+      "start": 2885,
+      "before": "[JSON](../../experiments/实验03_手套标定映射对比/results/mapping_comparison.json)",
+      "after": "JSON（历史工程路径：`../../experiments/实验03_手套标定映射对比/results/mapping_comparison.json`）"
+    },
+    {
+      "start": 2330,
+      "before": "[HTML 看板](benchmark/benchmark_dashboard.html)",
+      "after": "HTML 看板（历史工程路径：`benchmark/benchmark_dashboard.html`）"
+    },
+    {
+      "start": 2277,
+      "before": "[BENCHMARK_REPORT.md](benchmark/BENCHMARK_REPORT.md)",
+      "after": "BENCHMARK_REPORT.md（历史工程路径：`benchmark/BENCHMARK_REPORT.md`）"
+    },
+    {
+      "start": 2220,
+      "before": "[benchmark_summary.csv](benchmark/benchmark_summary.csv)",
+      "after": "benchmark_summary.csv（历史工程路径：`benchmark/benchmark_summary.csv`）"
+    },
+    {
+      "start": 2169,
+      "before": "[benchmark_runs.csv](benchmark/benchmark_runs.csv)",
+      "after": "benchmark_runs.csv（历史工程路径：`benchmark/benchmark_runs.csv`）"
+    },
+    {
+      "start": 1181,
+      "before": "[09_glove_tasks.log](09_glove_tasks.log)",
+      "after": "09_glove_tasks.log（历史工程路径：`09_glove_tasks.log`）"
+    },
+    {
+      "start": 1000,
+      "before": "[07_glove_pipeline.log](07_glove_pipeline.log)",
+      "after": "07_glove_pipeline.log（历史工程路径：`07_glove_pipeline.log`）"
+    },
+    {
+      "start": 740,
+      "before": "[04_glove_calibration.log](04_glove_calibration.log)",
+      "after": "04_glove_calibration.log（历史工程路径：`04_glove_calibration.log`）"
+    }
+  ],
+  "01_综合测试与环境记录/补充运行_20261115/关键代码快照/README.md": [
+    {
+      "start": 9843,
+      "before": "[整理记录](docs/organization/README.md)",
+      "after": "整理记录（历史工程路径：`docs/organization/README.md`）"
+    },
+    {
+      "start": 9762,
+      "before": "[实验导航](experiments/映射对比实验导航.md)",
+      "after": "实验导航（历史工程路径：`experiments/映射对比实验导航.md`）"
+    },
+    {
+      "start": 352,
+      "before": "[`SCHEME_B_ADAPTIVE_GUIDE.md`](docs/design/SCHEMES/SCHEME_B_ADAPTIVE_GUIDE.md)",
+      "after": "`SCHEME_B_ADAPTIVE_GUIDE.md`（历史工程路径：`docs/design/SCHEMES/SCHEME_B_ADAPTIVE_GUIDE.md`）"
+    },
+    {
+      "start": 77,
+      "before": "[00_映射对比实验_从这里开始.md](experiments/映射对比实验导航.md)",
+      "after": "00_映射对比实验_从这里开始.md（历史工程路径：`experiments/映射对比实验导航.md`）"
+    }
+  ],
+  "12_附件目录与复现说明/历史项目导航/映射对比实验导航.md": [
+    {
+      "start": 1844,
+      "before": "[`对比实验_文件迁移清单.csv`](整理记录/对比实验_文件迁移清单.csv)",
+      "after": "`对比实验_文件迁移清单.csv`（历史工程路径：`整理记录/对比实验_文件迁移清单.csv`）"
+    },
+    {
+      "start": 1527,
+      "before": "[experiments/实验10_StageC稳定性对比/](实验10_StageC稳定性对比/README.md)",
+      "after": "experiments/实验10_StageC稳定性对比/（历史工程路径：`实验10_StageC稳定性对比/README.md`）"
+    },
+    {
+      "start": 1358,
+      "before": "[experiments/实验09_StageC五方法MuJoCo对比/](实验09_StageC五方法MuJoCo对比/README.md)",
+      "after": "experiments/实验09_StageC五方法MuJoCo对比/（历史工程路径：`实验09_StageC五方法MuJoCo对比/README.md`）"
+    },
+    {
+      "start": 1218,
+      "before": "[experiments/实验08_任务效应谱方案对比/](实验08_任务效应谱方案对比/README.md)",
+      "after": "experiments/实验08_任务效应谱方案对比/（历史工程路径：`实验08_任务效应谱方案对比/README.md`）"
+    },
+    {
+      "start": 1082,
+      "before": "[experiments/实验07_可信度协同方案对比/](实验07_可信度协同方案对比/README.md)",
+      "after": "experiments/实验07_可信度协同方案对比/（历史工程路径：`实验07_可信度协同方案对比/README.md`）"
+    },
+    {
+      "start": 918,
+      "before": "[experiments/实验06_PCA与可达性协同对比/](实验06_PCA与可达性协同对比/README.md)",
+      "after": "experiments/实验06_PCA与可达性协同对比/（历史工程路径：`实验06_PCA与可达性协同对比/README.md`）"
+    },
+    {
+      "start": 794,
+      "before": "[experiments/实验05_PCA与自适应协同对比/](实验05_PCA与自适应协同对比/README.md)",
+      "after": "experiments/实验05_PCA与自适应协同对比/（历史工程路径：`实验05_PCA与自适应协同对比/README.md`）"
+    },
+    {
+      "start": 631,
+      "before": "[experiments/实验04_手套抓握任务对比/](实验04_手套抓握任务对比/README.md)",
+      "after": "experiments/实验04_手套抓握任务对比/（历史工程路径：`实验04_手套抓握任务对比/README.md`）"
+    },
+    {
+      "start": 481,
+      "before": "[experiments/实验03_手套标定映射对比/](实验03_手套标定映射对比/README.md)",
+      "after": "experiments/实验03_手套标定映射对比/（历史工程路径：`实验03_手套标定映射对比/README.md`）"
+    },
+    {
+      "start": 352,
+      "before": "[experiments/实验02_静态与动态映射对比/](实验02_静态与动态映射对比/README.md)",
+      "after": "experiments/实验02_静态与动态映射对比/（历史工程路径：`实验02_静态与动态映射对比/README.md`）"
+    },
+    {
+      "start": 194,
+      "before": "[experiments/实验01_StageB七方法消融/](实验01_StageB七方法消融/README.md)",
+      "after": "experiments/实验01_StageB七方法消融/（历史工程路径：`实验01_StageB七方法消融/README.md`）"
+    }
+  ]
+}
