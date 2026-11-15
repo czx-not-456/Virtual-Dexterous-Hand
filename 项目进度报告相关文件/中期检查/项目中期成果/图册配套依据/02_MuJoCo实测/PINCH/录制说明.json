@@ -1,0 +1,17 @@
+{
+  "task": "pinch",
+  "trial": 0,
+  "input": "synthetic dataset",
+  "mujoco": "3.3.7",
+  "execution_utc": "2026-11-15T07:41:12.550607+00:00",
+  "recorded_control_frames": 800,
+  "video_fps": 10,
+  "sample_every_control_frames": 2,
+  "playback_duration_s": 40.0,
+  "nominal_control_hz": 60,
+  "playback": "1/3 nominal simulation speed, offline rendering; not realtime",
+  "wall_elapsed_s": 30.93208927500018,
+  "source_main_sha256": "6e7f5c21fe828536ac4d5e980aa9e3b7dbc59c835e20f3b5d28b69434845c3a2",
+  "source_simulator_sha256": "c1b2172a31cd44c301f31050c963682bc9aeca46e04cb092fff135b09180b676",
+  "note": "Physical runtime framebuffer output, not Viewer window chrome; capture overhead invalidates latency benchmarking. Current v2 stability differs from 2026-10-08 legacy."
+}

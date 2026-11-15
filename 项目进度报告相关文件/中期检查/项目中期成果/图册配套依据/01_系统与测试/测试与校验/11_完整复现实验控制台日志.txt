@@ -1,0 +1,160 @@
+{
+  "sessions": 27,
+  "devices": 12,
+  "frames": 5100,
+  "mask_definition": "15 CSV columns, not verified physical sensors; constant-zero columns may be masked",
+  "device_column_audit": [
+    {
+      "device": "G12LB082701",
+      "frames": 190,
+      "constant_zero_csv_columns": "sensor_7 sensor_10 sensor_13",
+      "zero_column_count": 3,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G12LB091101",
+      "frames": 189,
+      "constant_zero_csv_columns": "sensor_7 sensor_10 sensor_13",
+      "zero_column_count": 3,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G12LC040704",
+      "frames": 190,
+      "constant_zero_csv_columns": "sensor_7 sensor_10 sensor_13",
+      "zero_column_count": 3,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G12LC042806",
+      "frames": 568,
+      "constant_zero_csv_columns": "sensor_7 sensor_10 sensor_13",
+      "zero_column_count": 3,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G12LC090201",
+      "frames": 188,
+      "constant_zero_csv_columns": "sensor_7 sensor_10 sensor_13",
+      "zero_column_count": 3,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G12RB091102",
+      "frames": 189,
+      "constant_zero_csv_columns": "sensor_7 sensor_10 sensor_13",
+      "zero_column_count": 3,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G12RC043002C",
+      "frames": 189,
+      "constant_zero_csv_columns": "sensor_7 sensor_10 sensor_13",
+      "zero_column_count": 3,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G12RC061002",
+      "frames": 188,
+      "constant_zero_csv_columns": "sensor_7 sensor_10 sensor_13",
+      "zero_column_count": 3,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G15LB010902",
+      "frames": 1511,
+      "constant_zero_csv_columns": "",
+      "zero_column_count": 0,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G15LB102001",
+      "frames": 377,
+      "constant_zero_csv_columns": "",
+      "zero_column_count": 0,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G15LC030302",
+      "frames": 189,
+      "constant_zero_csv_columns": "",
+      "zero_column_count": 0,
+      "hardware_semantics": "待数据提供者确认"
+    },
+    {
+      "device": "G15RB010901",
+      "frames": 1132,
+      "constant_zero_csv_columns": "",
+      "zero_column_count": 0,
+      "hardware_semantics": "待数据提供者确认"
+    }
+  ],
+  "summary": [
+    {
+      "missing": 0,
+      "method": "可用通道距离",
+      "accuracy": 0.9957721039450913,
+      "device_sd": 0.014100514298489783,
+      "macro_f1": 0.9957580206494422,
+      "devices": 12
+    },
+    {
+      "missing": 0,
+      "method": "均值填补",
+      "accuracy": 0.9957721039450913,
+      "device_sd": 0.014100514298489783,
+      "macro_f1": 0.9957580206494422,
+      "devices": 12
+    },
+    {
+      "missing": 1,
+      "method": "可用通道距离",
+      "accuracy": 0.9911399263878763,
+      "device_sd": 0.016810474449311493,
+      "macro_f1": 0.9897966609211054,
+      "devices": 12
+    },
+    {
+      "missing": 1,
+      "method": "均值填补",
+      "accuracy": 0.9879921016646415,
+      "device_sd": 0.016653832214244612,
+      "macro_f1": 0.9864397715336599,
+      "devices": 12
+    },
+    {
+      "missing": 3,
+      "method": "可用通道距离",
+      "accuracy": 0.9766975330879015,
+      "device_sd": 0.02940532031199087,
+      "macro_f1": 0.9728237811509025,
+      "devices": 12
+    },
+    {
+      "missing": 3,
+      "method": "均值填补",
+      "accuracy": 0.9602419759390436,
+      "device_sd": 0.03211317984128337,
+      "macro_f1": 0.9512449379907796,
+      "devices": 12
+    },
+    {
+      "missing": 5,
+      "method": "可用通道距离",
+      "accuracy": 0.9683623691605104,
+      "device_sd": 0.03181078381203097,
+      "macro_f1": 0.9613490737159047,
+      "devices": 12
+    },
+    {
+      "missing": 5,
+      "method": "均值填补",
+      "accuracy": 0.9227642745557679,
+      "device_sd": 0.02794440804657487,
+      "macro_f1": 0.9029633861340983,
+      "devices": 12
+    }
+  ],
+  "pooled_accuracy": 0.9852941176470589
+}
+Results: /workspace/scratch/5182c85ce347/revised/Virtual-Dexterous-Hand-main/项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果

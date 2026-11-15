@@ -1,0 +1,866 @@
+[
+  {
+    "file": "01_系统与测试/07_系统流程.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/07_系统流程.png",
+    "sha256": "caef848a5689e61144a15b2c02d8952ca8b821b48c4968b62381a43d8198fd3a",
+    "bytes": 117616
+  },
+  {
+    "file": "01_系统与测试/测试与校验/11_测试记录.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/11_测试记录.csv",
+    "sha256": "dd945a547a782f12b0b985927dd947f31de7f1744dd1e20ac9ab98014821e23d",
+    "bytes": 1259
+  },
+  {
+    "file": "01_系统与测试/测试与校验/11_本次执行环境.json",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/11_本次执行环境.json",
+    "sha256": "531c40f73fe5dbe1e55adf6d14df0a2d9eeb3bd278506e452725bdb0070cc38d",
+    "bytes": 1149
+  },
+  {
+    "file": "01_系统与测试/测试与校验/11_本次执行完整日志.txt",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/11_本次执行完整日志.txt",
+    "sha256": "0c53d82678c570da11baa3dc8c88dda201ffbdb040dbfe0c4ce51bb4e620bf72",
+    "bytes": 3440
+  },
+  {
+    "file": "01_系统与测试/测试与校验/11_完整复现实验控制台日志.txt",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/11_完整复现实验控制台日志.txt",
+    "sha256": "9815477c9b3b792f94a9046d80c7c1a2ef515a8ba5eb2698866544e4d859edd0",
+    "bytes": 4553
+  },
+  {
+    "file": "01_系统与测试/测试与校验/数据来源与校验.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/数据来源与校验.csv",
+    "sha256": "8bd21e032baf7261c9ad9e26505633fd172859330e5c319ca5ce0fb69c698a77",
+    "bytes": 13275
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/README.md",
+    "source": "README.md",
+    "sha256": "807faa0929f56aef3e745962e87a462f1a6dbf3276e014ed32feb8f6b0ab710e",
+    "bytes": 16175
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/pyproject.toml",
+    "source": "pyproject.toml",
+    "sha256": "ebb67a6eeca95d371506657de34b9def50e0c0e0680bd34d917708fbb8f260a3",
+    "bytes": 96
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/main.py",
+    "source": "src/main.py",
+    "sha256": "6e7f5c21fe828536ac4d5e980aa9e3b7dbc59c835e20f3b5d28b69434845c3a2",
+    "bytes": 43739
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/glove/adapter.py",
+    "source": "src/glove/adapter.py",
+    "sha256": "847e67039faba98c8ef540dce14269e7b3c08bb6c9bb3b9820e7788df161f48d",
+    "bytes": 8349
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/glove/dataset_driver.py",
+    "source": "src/glove/dataset_driver.py",
+    "sha256": "d4edb2a4b3dbcf3692b46678382a8e95ea27a84293a670029f10419c24217291",
+    "bytes": 4535
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/processing/normalization.py",
+    "source": "src/processing/normalization.py",
+    "sha256": "329454dee133cad63341658a335acc388ce464283c28a2b387429f2f8a801439",
+    "bytes": 222
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/processing/filters.py",
+    "source": "src/processing/filters.py",
+    "sha256": "9e03751980dea2aaaaa2d595c42bc0113181d3294a8c7e6992ef6a88e346ac5a",
+    "bytes": 1381
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/features/feature_extractor.py",
+    "source": "src/features/feature_extractor.py",
+    "sha256": "70b724a21d881ef9c00595094039a1a84e2f45f90175eacfc5c9d193f28ba2d8",
+    "bytes": 993
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/features/intent_recognition.py",
+    "source": "src/features/intent_recognition.py",
+    "sha256": "ef18dee47fb2226dfd11f4c5e659adc809ce66e7f99bba3281406dd017a3283e",
+    "bytes": 2428
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/retargeting/topology_mapping.py",
+    "source": "src/retargeting/topology_mapping.py",
+    "sha256": "29cd998d5188bbe2764a9f0f5eef62ed462882234f8b8748e78d763be3c4329a",
+    "bytes": 554
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/retargeting/optimizer.py",
+    "source": "src/retargeting/optimizer.py",
+    "sha256": "f546ae0de8bacbd1397012407a00f50fffdca0012030f51fded7ba3a7e1727c4",
+    "bytes": 11227
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/simulation/mujoco_env.py",
+    "source": "src/simulation/mujoco_env.py",
+    "sha256": "c1b2172a31cd44c301f31050c963682bc9aeca46e04cb092fff135b09180b676",
+    "bytes": 27035
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/evaluation/task_evaluator.py",
+    "source": "src/evaluation/task_evaluator.py",
+    "sha256": "fb86f2dd13d237a3c9dd0c243e2b5295c52a9afa202233271a097b695c76362b",
+    "bytes": 11225
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/evaluation/relative_grasp_stability.py",
+    "source": "src/evaluation/relative_grasp_stability.py",
+    "sha256": "6ab627d69f9acecdb05080110b11061d09fe0c8ba079a2699b3939e54686ebb9",
+    "bytes": 3816
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/src/evaluation/logger.py",
+    "source": "src/evaluation/logger.py",
+    "sha256": "c3d55286c706346ffee3f1ab8a2f517e86292e288722c0397f26434de5320968",
+    "bytes": 931
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/configs/simulation.yaml",
+    "source": "configs/simulation.yaml",
+    "sha256": "784dfeb34ebc14c82fab8a7f8aaa466e6fcb369e6c05637a4e642f1f2b02864b",
+    "bytes": 2071
+  },
+  {
+    "file": "01_系统与测试/关键代码快照/configs/robot_hand.yaml",
+    "source": "configs/robot_hand.yaml",
+    "sha256": "14bc521a963468c051a0129d517d65f52508a3462ba36e61033466f9e6de02f0",
+    "bytes": 4646
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/01_初始全景.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/01_初始全景.png",
+    "sha256": "bbcffacec177a9a6227ee8dc4902c249565789429ab95dbf860ceef88650de01",
+    "bytes": 17945
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/02_初始近景.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/02_初始近景.png",
+    "sha256": "586158d1894b9b836c696a745bc3da728ac6f1b13be48571f354dfad9674dda9",
+    "bytes": 26473
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/03_任务开始.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/03_任务开始.png",
+    "sha256": "ec74a188bf25ce5e1263eef249f8009fa0bdbc96d3dbf5f5e7cd970e9de013d8",
+    "bytes": 30349
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/04_首次任务接触代理.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/04_首次任务接触代理.png",
+    "sha256": "d5b8dff05eadc3aa51bab112d2ebf6ddbea1641bff144fc1c75e57247ab65c59",
+    "bytes": 30223
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/05_有效区间接触数最大帧.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/05_有效区间接触数最大帧.png",
+    "sha256": "d5b8dff05eadc3aa51bab112d2ebf6ddbea1641bff144fc1c75e57247ab65c59",
+    "bytes": 30223
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/任务演示_慢放.mp4",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/任务演示_慢放.mp4",
+    "sha256": "748c33b753c7ae0b9de407d3fab377cbf510124b9494748da5def09fd8022400",
+    "bytes": 229901
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/实时帧记录.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/实时帧记录.csv",
+    "sha256": "42331f82906df720a639841a8d815c2d453630f7c99d8dcfe4e27c9467116cd4",
+    "bytes": 39026
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/当前物理运行.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/当前物理运行.csv",
+    "sha256": "7f9b03d1390d699afd72067eeef2542737b05d554b93c641b3c933e778528935",
+    "bytes": 674653
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/当前物理运行_summary.json",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/当前物理运行_summary.json",
+    "sha256": "69b3fa27cac96e561dcaccb3ebf01055d65d437136528aef524094e0fc549309",
+    "bytes": 3495
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/录制说明.json",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/录制说明.json",
+    "sha256": "a48e99c629afa0a31206a2dee293eb61077d6518e356d91542327bbc80b6ca64",
+    "bytes": 778
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/截图索引.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/截图索引.csv",
+    "sha256": "05fb5b0869b2ac509c40b8757db6b4cc42a36f5311740261a772f21159644278",
+    "bytes": 498
+  },
+  {
+    "file": "02_MuJoCo实测/PINCH/控制台日志.txt",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/pinch_trial0_20261115_074041_618411/控制台日志.txt",
+    "sha256": "d8513974b5e79eac1cd551363a9b1bf3d0fdd4e75f0ee2f7deb4728e0ecca62e",
+    "bytes": 2911
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/01_初始全景.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/01_初始全景.png",
+    "sha256": "444d317990ad1dbf407acb757c0e8f2c4c25951bd34e695588048857daf75869",
+    "bytes": 19996
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/02_初始近景.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/02_初始近景.png",
+    "sha256": "9fc9b27f6830e90de4ebe54ea47dba09bac67fd548b1eadfa6b6f340dd799d85",
+    "bytes": 31029
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/03_任务开始.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/03_任务开始.png",
+    "sha256": "d62113f1a8ca4c2b66bd836c740b7ba9280db4370730165c6c8b341a44c34213",
+    "bytes": 22477
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/04_首次任务接触代理.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/04_首次任务接触代理.png",
+    "sha256": "382117f23185b450f13043d80fe916e81e241dcb753e626338720e1804ab21a2",
+    "bytes": 22522
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/05_有效区间接触数最大帧.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/05_有效区间接触数最大帧.png",
+    "sha256": "32effc45062074762841368fba63392a575d8218bf7f0315c6676007f1c80cbb",
+    "bytes": 23198
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/任务演示_慢放.mp4",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/任务演示_慢放.mp4",
+    "sha256": "cf634990e29b29a08f9ecff2dab8c358a4dc05dd5bdc5d619954bfbe8e875a93",
+    "bytes": 174077
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/实时帧记录.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/实时帧记录.csv",
+    "sha256": "56a4dd1f43e7481a096b7a4f92994f07a13bd246ffe8dea5a1433e3db5cdf4bc",
+    "bytes": 38770
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/当前物理运行.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/当前物理运行.csv",
+    "sha256": "c3c7dd097452f6620737c0877bc8692435745b64ef5a7c1ff621ef8adc0b4aa5",
+    "bytes": 679996
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/当前物理运行_summary.json",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/当前物理运行_summary.json",
+    "sha256": "2f5811f167ed028ab1b51b48e00fa448d0eabab236e006f5e3dfb4f022f1bd39",
+    "bytes": 3451
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/录制说明.json",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/录制说明.json",
+    "sha256": "5224b2bf1f9cbc80f5c4684aef82a224434217ff3738fffe5a871bd7867ba73d",
+    "bytes": 778
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/截图索引.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/截图索引.csv",
+    "sha256": "1ce555045ae1d3e013aec3e9601bf7ea8c037284cf9980f983f3a9b7afa73145",
+    "bytes": 502
+  },
+  {
+    "file": "02_MuJoCo实测/WRAP/控制台日志.txt",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/控制台日志.txt",
+    "sha256": "6328eaf6d3728a567ac485bc4a88537a9f388f3137273c6b39fd162eb80e8c8d",
+    "bytes": 2916
+  },
+  {
+    "file": "02_MuJoCo实测/原录制脚本/录制真实仿真.py",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/录制真实仿真.py",
+    "sha256": "59202ccdac9eb65da0d395bc8dda14db490f0a3278efc89ddc943e8b2aed4f0a",
+    "bytes": 6604
+  },
+  {
+    "file": "02_MuJoCo实测/原录制脚本/实时演示.ps1",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/实时演示.ps1",
+    "sha256": "0553b0682fe6377c8068ffb6a4c960b9e7b8baf612cc9bcdaaef5d958ae3d3b8",
+    "bytes": 1020
+  },
+  {
+    "file": "02_MuJoCo实测/原录制脚本/project_paths.py",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/project_paths.py",
+    "sha256": "a2386b31db40fd95b42a83befabc6dce9cc2f69f3c727077152220e1d99bccda",
+    "bytes": 445
+  },
+  {
+    "file": "03_三维姿态/05_pinch_三维姿态重建.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/05_pinch_三维姿态重建.png",
+    "sha256": "06241fcbe0b2b4b3399d705d9ef7fea5abad5a8248a3708c88323a1261623ad9",
+    "bytes": 223786
+  },
+  {
+    "file": "03_三维姿态/05_wrap_三维姿态重建.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/05_wrap_三维姿态重建.png",
+    "sha256": "d34b445e8b47e41e9b10c0f4c76ff5af04959629267fe03f30d7dca05714be7c",
+    "bytes": 222108
+  },
+  {
+    "file": "03_三维姿态/06_pinch_历史姿态回放.gif",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/06_pinch_历史姿态回放.gif",
+    "sha256": "fb3ecef5fe46b98463fe47ba7333677bbee63e0ec8aec79dbd6203c168ccb8a6",
+    "bytes": 437431
+  },
+  {
+    "file": "03_三维姿态/06_wrap_历史姿态回放.gif",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/06_wrap_历史姿态回放.gif",
+    "sha256": "6ed17fec1f668206ee1cb3477b77c185241e88141624bbd4ae7d2179a033725a",
+    "bytes": 454707
+  },
+  {
+    "file": "03_三维姿态/原始模型/CH-M6_L.xml",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/CH-M6_L.xml",
+    "sha256": "3bb97b4af7ce59834a0e4b237a29cefb25fd934578eeccc639f7a5f6cf915833",
+    "bytes": 5544
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/ff_distal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/ff_distal_link.STL",
+    "sha256": "c374fd07ef70ea6540bbaa01ce728566602f29cc98c0a495569c454b26fd0fcd",
+    "bytes": 318484
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/ff_proximal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/ff_proximal_link.STL",
+    "sha256": "5ee23ad651408ac859bbbcc609007ddfe662930293ec544ac0b0c1fd15e4468c",
+    "bytes": 117184
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/lf_distal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/lf_distal_link.STL",
+    "sha256": "ac182136e601e150a66b57f62449eb4e8654bebd81ac0137a339d168b0264a7d",
+    "bytes": 295784
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/lf_proximal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/lf_proximal_link.STL",
+    "sha256": "85068866fc1a1771ba442570377230085f246bf8869481e4e10c58555fc725f5",
+    "bytes": 117184
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/mf_distal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/mf_distal_link.STL",
+    "sha256": "3321f1e83449265af9ba4789ecacb51d521c8e1a1aa74ed6685e1b9467e31dc5",
+    "bytes": 318484
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/mf_proximal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/mf_proximal_link.STL",
+    "sha256": "4ce9ae6a07e718a32b0b6857ad6d12628155dbc138b23eb65f48ebb55b26e118",
+    "bytes": 110984
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/palm_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/palm_link.STL",
+    "sha256": "0b502d97ee200a58b60f110a590b94d0fd6d9d2522c39d8a22339c5c445e0e7e",
+    "bytes": 2974484
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/rf_distal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/rf_distal_link.STL",
+    "sha256": "e6e79e401b1127ec0dc9b93e6fbb357256779d733753ed71feca1f30c51a88a9",
+    "bytes": 318484
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/rf_proximal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/rf_proximal_link.STL",
+    "sha256": "d47ae29fe2930a4c4c07985d62999e283204e629fb1b0913b80695dff9920a0d",
+    "bytes": 117184
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/th_distal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/th_distal_link.STL",
+    "sha256": "25aea9d33f69d61659a821d3e86cac2ad22aeef5c59bd62935a6f4046b60a975",
+    "bytes": 413784
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/th_metacarpal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/th_metacarpal_link.STL",
+    "sha256": "4ef13ad2e3b7b847b8a6dd86b6351500291db8fd0960c974442fa927c83fce60",
+    "bytes": 205684
+  },
+  {
+    "file": "03_三维姿态/原始模型/meshes/th_proximal_link.STL",
+    "source": "数据手套数据/CH-M6型号_虚拟手模型/meshes/th_proximal_link.STL",
+    "sha256": "4a51eb2ded29aa2ddca35cf27e54a0e46e89117379c6c6011419084a5bf5f554",
+    "bytes": 569184
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_neutral_trial00.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_neutral_trial00.csv",
+    "sha256": "95dabc44de0d7bcb806549ff4ae4b09825df8262caf4dd3486f2c722f1a51454",
+    "bytes": 449025
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_neutral_trial01.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_neutral_trial01.csv",
+    "sha256": "a411a47af5099e8ec5c42f0adce917bc9d9277fe9c319effae06ea17ba5055c7",
+    "bytes": 449467
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_neutral_trial02.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_neutral_trial02.csv",
+    "sha256": "e039e994b271296ea7a942e03c966bf9a5288ae4149b3776be2996e31ceda0ed",
+    "bytes": 449280
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_pinch_trial00.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_pinch_trial00.csv",
+    "sha256": "f6632ea4d0d2e75e32e3f3116935fa0433fdc1ad4d0efa150db3ae08a82a2565",
+    "bytes": 468093
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_pinch_trial01.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_pinch_trial01.csv",
+    "sha256": "b1bfc89947e1d9cd2628ab619ffe84b70fafd6783ec46f14ebccf29357232ace",
+    "bytes": 468647
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_pinch_trial02.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_pinch_trial02.csv",
+    "sha256": "f0c1930316449320dbb1e564d19bdb1f858298aee18608811355a2358cab1ff8",
+    "bytes": 468459
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_wrap_trial00.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_wrap_trial00.csv",
+    "sha256": "8c3804104481dfd940fdbd1f720fc23d0d6137f3b32efc34da4e0811b7e3c840",
+    "bytes": 469466
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_wrap_trial01.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_wrap_trial01.csv",
+    "sha256": "400c8193079b650c9a434bf625b23736ed0613091fd15f61900194d28bd007bf",
+    "bytes": 469784
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_wrap_trial02.csv",
+    "source": "test/test_results_v100_20261008/benchmark/bench_wrap_trial02.csv",
+    "sha256": "85da41f3b82842f8246a119502783fdd191ef659848820a30ca640d9414356f8",
+    "bytes": 468426
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_neutral_trial00_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_neutral_trial00_summary.json",
+    "sha256": "cf503d13dc1d1695bbb38428eee0c1e3863e1f0d49242bcb186d4e6330d7b0e8",
+    "bytes": 1770
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_neutral_trial01_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_neutral_trial01_summary.json",
+    "sha256": "b1ad67da509740a86bda11d57417c04f0587a09ba365f1f8faf94deacb3011c6",
+    "bytes": 1769
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_neutral_trial02_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_neutral_trial02_summary.json",
+    "sha256": "2620ed750584aead702a6d67dd483c2bdd2b2f9094287b6c4a24a3deb7ae4862",
+    "bytes": 1772
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_pinch_trial00_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_pinch_trial00_summary.json",
+    "sha256": "0db3766e4e62ef3e307256a242eb6dc557f95e75141a6df407b74a382ba06ce0",
+    "bytes": 1879
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_pinch_trial01_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_pinch_trial01_summary.json",
+    "sha256": "d768b9917ca4a4991b8e53e97c1b6f67a62cb195715643e5f68279e73d370834",
+    "bytes": 1878
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_pinch_trial02_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_pinch_trial02_summary.json",
+    "sha256": "bb3d686e919111637e82f180598ebdade197c2fe75c7647d72b7a9660ed2d172",
+    "bytes": 1877
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_wrap_trial00_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_wrap_trial00_summary.json",
+    "sha256": "e447c77289b7fbe95f8a56c86a6ef72e8c5c1f8f0a37b67bc5548b63fae3612c",
+    "bytes": 1861
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_wrap_trial01_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_wrap_trial01_summary.json",
+    "sha256": "48ed4657bbbeba233adb76f52ca09dfeea0cc4371debc1964bde0e34a6f47ad5",
+    "bytes": 1856
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/bench_wrap_trial02_summary.json",
+    "source": "test/test_results_v100_20261008/benchmark/bench_wrap_trial02_summary.json",
+    "sha256": "af2fe964a95060f7c3d71fdc047924d5444a47659ddd5e9eaeacfd3abc7107eb",
+    "bytes": 1856
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/benchmark_runs.csv",
+    "source": "test/test_results_v100_20261008/benchmark/benchmark_runs.csv",
+    "sha256": "d3233b39ea45b8317f0d8604373074a331e10d7e0cf93ae1d63226df708cd99e",
+    "bytes": 2930
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/benchmark_summary.csv",
+    "source": "test/test_results_v100_20261008/benchmark/benchmark_summary.csv",
+    "sha256": "bf50f688c08f42ee60606701b9ad945c1474ddc9f8d68b178149a9b9b1b9cad4",
+    "bytes": 530
+  },
+  {
+    "file": "04-06_历史任务与消融/历史Benchmark/BENCHMARK_REPORT.md",
+    "source": "test/test_results_v100_20261008/benchmark/BENCHMARK_REPORT.md",
+    "sha256": "ed1991d4a46d385b50d572b104a2ea87ce8da3dee01729497f5601ff58e8b169",
+    "bytes": 890
+  },
+  {
+    "file": "04-06_历史任务与消融/重分析结果/08_pinch_任务时序.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/08_pinch_任务时序.png",
+    "sha256": "c96d36034f41f3112c68c53550000251ce7198907601278ba8e773412664cfe4",
+    "bytes": 247428
+  },
+  {
+    "file": "04-06_历史任务与消融/重分析结果/08_wrap_任务时序.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/08_wrap_任务时序.png",
+    "sha256": "861aa850fcf2ece3b8a28980e9c87f288540f138c30cce2474b7bb374acab423",
+    "bytes": 273113
+  },
+  {
+    "file": "04-06_历史任务与消融/重分析结果/09_九次试验汇总.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/09_九次试验汇总.png",
+    "sha256": "6575c3fca6b17386017bae1ac2466669bd3831cc5ca911a7509a3757e91645fa",
+    "bytes": 109553
+  },
+  {
+    "file": "04-06_历史任务与消融/重分析结果/09_三任务统计.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/09_三任务统计.csv",
+    "sha256": "25eee2dae27b78574c1af71e5747706d9ec497d0074746c7a25295e9b3442b4d",
+    "bytes": 296
+  },
+  {
+    "file": "04-06_历史任务与消融/重分析结果/10_StageB七方法对比.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/10_StageB七方法对比.png",
+    "sha256": "2c3aefe6e13cd239f8391bd1e4da89dc3b3f2ddc5dfe7a8e59b4682e0b6c4007",
+    "bytes": 218510
+  },
+  {
+    "file": "04-06_历史任务与消融/StageB消融/summary_by_condition.csv",
+    "source": "experiments/实验01_StageB七方法消融/results/published_example/summary_by_condition.csv",
+    "sha256": "3690429c12fb4120fbae99948350f909ab6ade0bd02a368eafd6b41118f572fb",
+    "bytes": 1104
+  },
+  {
+    "file": "04-06_历史任务与消融/StageB消融/paired_cases.csv",
+    "source": "experiments/实验01_StageB七方法消融/results/published_example/paired_cases.csv",
+    "sha256": "d0b8ca842bb166d050f220484b2b4d8a73641af0437b26b6e00cf5411b533ea2",
+    "bytes": 386053
+  },
+  {
+    "file": "04-06_历史任务与消融/StageB消融/summary_by_pose.csv",
+    "source": "experiments/实验01_StageB七方法消融/results/published_example/summary_by_pose.csv",
+    "sha256": "8ccda7c8636a09d41d834f71d96989e1fbf876812a502eb51983095be76c963c",
+    "bytes": 3994
+  },
+  {
+    "file": "04-06_历史任务与消融/StageB消融/summary.json",
+    "source": "experiments/实验01_StageB七方法消融/results/published_example/summary.json",
+    "sha256": "5a148042298e2ccc68261183b43c2c7c92b3c8e2549ede18a52181a5344748a2",
+    "bytes": 14500
+  },
+  {
+    "file": "04-06_历史任务与消融/StageB消融/REPORT.md",
+    "source": "experiments/实验01_StageB七方法消融/results/published_example/REPORT.md",
+    "sha256": "e49ca7d9d2bd1affb9bcf7599f60078b672b7493d0e8326faebf0d9c412cdcfd",
+    "bytes": 1942
+  },
+  {
+    "file": "04-06_历史任务与消融/StageB消融/原代码/README.md",
+    "source": "experiments/实验01_StageB七方法消融/README.md",
+    "sha256": "96ee62af7b55728b61ebe52c36c955d5b5a136ccc9a5927574a67c564ed04429",
+    "bytes": 1067
+  },
+  {
+    "file": "04-06_历史任务与消融/StageB消融/原代码/evaluate_stageB_ablation.py",
+    "source": "experiments/实验01_StageB七方法消融/evaluate_stageB_ablation.py",
+    "sha256": "93b7fec40813323b3d936ae4077b3bc34eaceb7733ab44f5e851bdc509d96374",
+    "bytes": 14034
+  },
+  {
+    "file": "04-06_历史任务与消融/StageB消融/原代码/stageB_common.py",
+    "source": "experiments/实验01_StageB七方法消融/stageB_common.py",
+    "sha256": "d9e4cf5bfc75a54ad28d4954f50848f6a2d371290551d1db1db7b51af8947184",
+    "bytes": 4476
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260904_113022_G15RB010901_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260904_113022_G15RB010901_right/captured_samples.csv",
+    "sha256": "f31bc4ea0934287cd5016f8905e94584ac10e1a448652c2fe3a1e9f8d6002a10",
+    "bytes": 25760
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260904_140001_G15RB010901_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260904_140001_G15RB010901_right/captured_samples.csv",
+    "sha256": "3ad4832932a947b5339f883a15a6ea3bf486b44879f357fd09c0d39305e3c730",
+    "bytes": 26182
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260904_142848_G15RB010901_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260904_142848_G15RB010901_right/captured_samples.csv",
+    "sha256": "830213667790d6514f3fdf43e6b0be1be359afda405dba1e329f48a33690cc19",
+    "bytes": 26033
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260904_145537_G15RB010901_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260904_145537_G15RB010901_right/captured_samples.csv",
+    "sha256": "987102a48da2b2ac58c7acb83c4d513f16574193ba9e33e24e66f0c819bbaa62",
+    "bytes": 25541
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260907_151504_G15LB010902_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260907_151504_G15LB010902_left/captured_samples.csv",
+    "sha256": "d43cf34923ea15c3885f940bce5742312412d93b2705bc2d65cc4591802beab5",
+    "bytes": 28162
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260907_151957_G15LB010902_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260907_151957_G15LB010902_left/captured_samples.csv",
+    "sha256": "d50deef8a32652250ed7bc445bead2fcf25945cb1f22f61bb5b7c2e28ee4e417",
+    "bytes": 27942
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260907_153317_G15LB010902_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260907_153317_G15LB010902_left/captured_samples.csv",
+    "sha256": "75488694b9d6d6ecbc187e77981569b483fb641785d8951a92bbd2f3ce289fd8",
+    "bytes": 27705
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260907_154558_G15LB010902_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260907_154558_G15LB010902_left/captured_samples.csv",
+    "sha256": "a0a485103e0d54424afdfc8a59725da5d78f24756055875b997e8d495d83ff86",
+    "bytes": 36963
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260907_154807_G15LB010902_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260907_154807_G15LB010902_left/captured_samples.csv",
+    "sha256": "e372e91196a31f1b7bc85ca33c06d8b90b05914e0afc007e31283019712dbf60",
+    "bytes": 36927
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260907_155344_G15LB010902_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260907_155344_G15LB010902_left/captured_samples.csv",
+    "sha256": "d91520c7477e64ea338b12360c1bdbdd7dcdbdaf8f8826926325d1122b2c5da2",
+    "bytes": 36040
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260907_155431_G15LB010902_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260907_155431_G15LB010902_left/captured_samples.csv",
+    "sha256": "caf3073801f56de840edc775c64627cc011e43d54a06795c05044a8df71d9482",
+    "bytes": 36427
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260907_160109_G15LB010902_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260907_160109_G15LB010902_left/captured_samples.csv",
+    "sha256": "d9efc4c478f3bbd21d79da2651a84b41ee83e7fc8093e6ffef06e049535dfe94",
+    "bytes": 27593
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260908_161120_G15RB010901_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260908_161120_G15RB010901_right/captured_samples.csv",
+    "sha256": "8f49b1c36cd45f5d665e7ce979c96eb35128d315f49d6430e58f23f0d2cd2b89",
+    "bytes": 27344
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_102405_G15RB010901_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_102405_G15RB010901_right/captured_samples.csv",
+    "sha256": "d2a8a78badf58ae2a2912565f4e3fb77bbbb0ceb58b5a670f7245f97b37bbb1b",
+    "bytes": 28220
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_102742_G12LC040704_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_102742_G12LC040704_left/captured_samples.csv",
+    "sha256": "ae22eb609b1e53038e36c0daca57876fa4317ec1f60859734013aa3407099df3",
+    "bytes": 27408
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_103458_G12RC061002_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_103458_G12RC061002_right/captured_samples.csv",
+    "sha256": "89d83f5aef3ffd64b9435a23de2885636d4eff8fa1e5c15d16970962cd25c5de",
+    "bytes": 27112
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_163003_G12RC043002C_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_163003_G12RC043002C_right/captured_samples.csv",
+    "sha256": "a891f20da348f621d3c22a7b81890a7ad624103675562ef4622722a73b4574a7",
+    "bytes": 27388
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_163205_G12LB091101_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_163205_G12LB091101_left/captured_samples.csv",
+    "sha256": "85666c1df49fa115ac923773ee3bd58db0d7840795b8ee3a462f4bbf86faeb17",
+    "bytes": 27578
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_163430_G12RB091102_right/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_163430_G12RB091102_right/captured_samples.csv",
+    "sha256": "e1c62c4eb344fb99b52385b13084b27ad7c81291b9e2b75d814f1f8e527bcccb",
+    "bytes": 27419
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_163642_G12LB082701_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_163642_G12LB082701_left/captured_samples.csv",
+    "sha256": "35d2c28022d5cdfedcc77ab5c632c96974a250790491d29a4303ce994b561af8",
+    "bytes": 27735
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_164058_G12LC042806_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_164058_G12LC042806_left/captured_samples.csv",
+    "sha256": "0d4def498ff94ddce70091c324970b498fa80fa31428802bbd085da94939ba2b",
+    "bytes": 27683
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_164156_G12LC042806_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_164156_G12LC042806_left/captured_samples.csv",
+    "sha256": "2a91dbbc123e59d10e2f1a574ecb46d3c4ea657c03fe32ddf96a6e02e1299492",
+    "bytes": 27780
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_164258_G12LC042806_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_164258_G12LC042806_left/captured_samples.csv",
+    "sha256": "09b695ef8368e9e0b323f3fba216798c4b8b8811ae9cc804651cff220cee9814",
+    "bytes": 27037
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260917_164456_G12LC090201_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260917_164456_G12LC090201_left/captured_samples.csv",
+    "sha256": "74a06301390b7f8b21f2d7f034303dc723d836c29a0a8a28bea4d3c9af9abfc6",
+    "bytes": 27001
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260918_103057_G15LB102001_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260918_103057_G15LB102001_left/captured_samples.csv",
+    "sha256": "627ef8553f93f55c744681cd45285450d92266b9fcb4eba6b0c62cc730ee8c0f",
+    "bytes": 27880
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260918_103345_G15LC030302_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260918_103345_G15LC030302_left/captured_samples.csv",
+    "sha256": "004b593fae6f11d80db2d750aea1a46c772b482943a2131e477e16915bf46e41",
+    "bytes": 28221
+  },
+  {
+    "file": "07-08_识别与鲁棒性/原始采集数据/20260918_103603_G15LB102001_left/captured_samples.csv",
+    "source": "数据手套数据/records/chm6_calibrations/20260918_103603_G15LB102001_left/captured_samples.csv",
+    "sha256": "4ee675d0e2dc0d2da61f63a4eedf740ee38de7a9b9bc6842819e1b74b39e3fb9",
+    "bytes": 28068
+  },
+  {
+    "file": "07-08_识别与鲁棒性/计算结果/13_传感器缺失鲁棒性.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/13_传感器缺失鲁棒性.png",
+    "sha256": "15ffcff74582182ed0fcb545f62ea90c4d0197a20831b7535f83bae381aaf4e7",
+    "bytes": 114410
+  },
+  {
+    "file": "07-08_识别与鲁棒性/计算结果/13_六类手势混淆矩阵.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/13_六类手势混淆矩阵.png",
+    "sha256": "babf3fe28408ac6c3ed1201ccce196d84e524b4306a5b7549b8c1cb53f44357c",
+    "bytes": 117229
+  },
+  {
+    "file": "07-08_识别与鲁棒性/计算结果/13_无缺失逐帧预测.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/13_无缺失逐帧预测.csv",
+    "sha256": "12b3a110a68cf3c2a155b8f66192a977a8d4a2276bfae333bb8f7a8d4a3df5b8",
+    "bytes": 335775
+  },
+  {
+    "file": "07-08_识别与鲁棒性/计算结果/13_设备数据列核查.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/13_设备数据列核查.csv",
+    "sha256": "418e7f09bd06971f9c4a1cfc4257a15954a6ffab353496defc2962459884f4c4",
+    "bytes": 835
+  },
+  {
+    "file": "07-08_识别与鲁棒性/计算结果/13_设备泛化差异.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/13_设备泛化差异.png",
+    "sha256": "4369c70f9fd2b08c5ed5678ee41a2d17fe501371fa627eea16bbdfb10a0a97c4",
+    "bytes": 90956
+  },
+  {
+    "file": "07-08_识别与鲁棒性/计算结果/13_设备留出与缺失实验明细.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/13_设备留出与缺失实验明细.csv",
+    "sha256": "1917ab81cdefc0f765664650eaca7117518704c11c03779eb0db7e092ba96552",
+    "bytes": 45214
+  },
+  {
+    "file": "07-08_识别与鲁棒性/计算结果/13_设备等权指标汇总.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/13_设备等权指标汇总.csv",
+    "sha256": "7148b9993ba270824d4c2936da09e1d5aef84a3015dc14b30097bb1794eb201c",
+    "bytes": 690
+  },
+  {
+    "file": "09_滤波抗噪/原始输入/synthetic_glove_v1.csv",
+    "source": "datasets/synthetic_glove_v1.csv",
+    "sha256": "3ee075c4ebe4898a7ef2c91c12a55e948e91b09a966f773751ce0b083c7f2838",
+    "bytes": 2332229
+  },
+  {
+    "file": "09_滤波抗噪/计算结果/14_滤波压力实验明细.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/14_滤波压力实验明细.csv",
+    "sha256": "2463c4dde67322a7d53d9c6214afd180fcb5a52e1507d3120d8789e276c95d6f",
+    "bytes": 1505
+  },
+  {
+    "file": "09_滤波抗噪/计算结果/14_滤波平滑与偏差.png",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/14_滤波平滑与偏差.png",
+    "sha256": "bbf6c0f4fcb52dab3394d5fd8caba751bb64382fa3fe7735225d9362f3c4a86b",
+    "bytes": 242128
+  },
+  {
+    "file": "09_滤波抗噪/计算结果/14_滤波指标汇总.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/结果/14_滤波指标汇总.csv",
+    "sha256": "4436611cbbdd2ca9ad92d24f0c533877fbded21e96572904756df0a94d755549",
+    "bytes": 208
+  },
+  {
+    "file": "01_系统与测试/原复现脚本/复现实验.py",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/复现实验.py",
+    "sha256": "26c6dc8b051d676734a75095faeacf6c36f3fd69f46d845e7cabb43e6cb73bd2",
+    "bytes": 19928
+  },
+  {
+    "file": "01_系统与测试/原复现脚本/验证成果.py",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/验证成果.py",
+    "sha256": "a0a4f25bbef519ab51f1d2eb68cecbe91a9a7c4520b5fd69d719669b4bde5048",
+    "bytes": 5525
+  },
+  {
+    "file": "01_系统与测试/原复现脚本/requirements-v2.txt",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/requirements-v2.txt",
+    "sha256": "aaf93e247e7ac75730196b15498fe072977af2511d4b51bf902a62cf49e020a8",
+    "bytes": 108
+  },
+  {
+    "file": "01_系统与测试/原复现脚本/project_paths.py",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/project_paths.py",
+    "sha256": "a2386b31db40fd95b42a83befabc6dce9cc2f69f3c727077152220e1d99bccda",
+    "bytes": 445
+  },
+  {
+    "file": "01_系统与测试/测试与校验/V2_原始来源清单.csv",
+    "source": "项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/历史记录/V2_原始来源清单.csv",
+    "sha256": "3b09088ef7c42e8cc3385ca75b2da85f6e28617c25bbfc9ff7f98f41975f4b0e",
+    "bytes": 6885
+  }
+]

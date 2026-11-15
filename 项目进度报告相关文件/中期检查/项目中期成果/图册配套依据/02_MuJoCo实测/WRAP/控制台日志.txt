@@ -1,0 +1,20 @@
+[INFO] 输入=synthetic dataset: /workspace/scratch/5182c85ce347/revised/Virtual-Dexterous-Hand-main/datasets/synthetic_glove_v1.csv trial=0 available=[0, 1, 2, 3, 4, 5, 6, 7]
+[INFO] Physics sync: control_dt=16.67ms; mujoco_dt=2.00ms; avg_substeps=8.33
+[INFO] Robot architecture: nominal DoF=11, effective actuators=11
+frame=0000 intent=NEUTRAL pinch=0.1001m wrap=0.012 opt=28.50ms contacts=0 sections=0 tip_ratio=0.00 Ttip=0 Itip=0 Terr=0.0mm Ierr=0.0mm
+frame=0171 intent=PINCH   pinch=0.0582m wrap=0.183 opt=80.38ms contacts=0 sections=0 tip_ratio=0.00 Ttip=0 Itip=0 Terr=0.0mm Ierr=0.0mm
+frame=0408 intent=NEUTRAL pinch=0.0894m wrap=0.183 opt=33.07ms contacts=2 sections=1 tip_ratio=0.20 Ttip=1 Itip=0 Terr=0.0mm Ierr=0.0mm
+frame=0489 intent=WRAP    pinch=0.0268m wrap=0.988 opt=23.21ms contacts=3 sections=1 tip_ratio=0.20 Ttip=0 Itip=0 Terr=25.3mm Ierr=7.9mm
+frame=0510 intent=WRAP    pinch=0.0267m wrap=0.988 opt=22.32ms contacts=4 sections=2 tip_ratio=0.00 Ttip=0 Itip=0 Terr=6.4mm Ierr=1.6mm
+frame=0540 intent=WRAP    pinch=0.0270m wrap=0.990 opt=21.56ms contacts=5 sections=2 tip_ratio=0.40 Ttip=0 Itip=1 Terr=8.7mm Ierr=1.3mm
+frame=0570 intent=WRAP    pinch=0.0267m wrap=0.989 opt=15.67ms contacts=6 sections=2 tip_ratio=0.80 Ttip=0 Itip=1 Terr=11.3mm Ierr=1.3mm
+frame=0600 intent=WRAP    pinch=0.0272m wrap=0.989 opt=22.26ms contacts=5 sections=2 tip_ratio=0.80 Ttip=0 Itip=1 Terr=14.3mm Ierr=1.2mm
+frame=0630 intent=WRAP    pinch=0.0268m wrap=0.988 opt=9.18ms contacts=5 sections=2 tip_ratio=0.80 Ttip=0 Itip=1 Terr=17.5mm Ierr=1.3mm
+frame=0660 intent=WRAP    pinch=0.0266m wrap=0.989 opt=22.93ms contacts=5 sections=2 tip_ratio=0.80 Ttip=0 Itip=1 Terr=19.9mm Ierr=1.3mm
+frame=0690 intent=WRAP    pinch=0.0264m wrap=0.988 opt=15.37ms contacts=5 sections=2 tip_ratio=0.80 Ttip=0 Itip=1 Terr=22.9mm Ierr=1.3mm
+frame=0720 intent=WRAP    pinch=0.0215m wrap=0.793 opt=38.52ms contacts=4 sections=2 tip_ratio=0.60 Ttip=0 Itip=0 Terr=26.0mm Ierr=1.6mm
+frame=0728 intent=NEUTRAL pinch=0.0999m wrap=0.011 opt=9.34ms contacts=8 sections=1 tip_ratio=0.80 Ttip=0 Itip=1 Terr=0.0mm Ierr=0.0mm
+[DONE] CSV:     /workspace/scratch/5182c85ce347/revised/Virtual-Dexterous-Hand-main/项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/当前物理运行.csv
+[DONE] Summary: /workspace/scratch/5182c85ce347/revised/Virtual-Dexterous-Hand-main/项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969/当前物理运行_summary.json
+[RESULT] task=wrap contact_success=True stable_success=False contact_ratio=93.3% stable_ratio=0.0% p95_latency=60.56ms
+/workspace/scratch/5182c85ce347/revised/Virtual-Dexterous-Hand-main/项目进度报告相关文件/中期检查/项目中期成果/中期增强成果V2/真实仿真录制/wrap_trial0_20261115_074045_549969

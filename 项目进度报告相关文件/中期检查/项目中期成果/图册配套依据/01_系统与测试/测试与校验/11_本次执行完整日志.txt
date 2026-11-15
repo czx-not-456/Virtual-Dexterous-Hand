@@ -1,0 +1,50 @@
+                                                                                     name status details
+                                                                               逐帧预测数量与唯一性   PASS        
+                                                                               缺失掩码配对与一致性   PASS        
+                                                                            九次Benchmark指标   PASS        
+                                                                                  滤波实验完整性   PASS        
+                                                                                 图像及动画可读性   PASS        
+                                                                               原始数据SHA256   PASS        
+                                 test_features_intent.test_intent_hysteresis_reaches_wrap   PASS        
+                      test_features_intent.test_temporal_window_rejects_single_wrap_spike   PASS        
+                                    test_features_intent.test_wrap_score_is_high_for_wrap   PASS        
+                           test_calibration.test_mock_calibration_maps_into_unit_interval   PASS        
+                           test_mapping.test_dynamic_pinch_is_finite_and_native_dimension   PASS        
+                                test_mapping.test_retargeting_respects_ch_m6_joint_limits   PASS        
+                       test_mapping.test_unconfirmed_hardware_synergy_penalty_is_disabled   PASS        
+                               test_robot_architecture.test_ch_m6_fk_moves_all_fingertips   PASS        
+             test_robot_architecture.test_joint_targets_map_one_to_one_to_ch_m6_actuators   PASS        
+           test_robot_architecture.test_robot_exposes_ch_m6_11dof_11actuator_architecture   PASS        
+             test_robot_architecture.test_standard_human_pose_maps_to_ch_m6_native_joints   PASS        
+                        test_glove_adapter.test_delivered_base_mapping_expression_is_used   PASS        
+  test_glove_adapter.test_glove_adapter_produces_human_frame_and_native_ch_m6_base_target   PASS        
+test_glove_adapter.test_teacher_captured_xlsx_is_loaded_without_optional_excel_dependency   PASS        
+{
+  "timestamp_utc": "2026-11-15T07:45:32.237777+00:00",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "dependencies": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "matplotlib": "3.10.8",
+    "scipy": "1.17.0",
+    "scikit-learn": "1.8.0",
+    "Pillow": "13.0.0",
+    "PyYAML": "6.0.3",
+    "mujoco": "3.3.7",
+    "pytest": "not installed"
+  },
+  "script_sha256": {
+    "录制真实仿真.py": "59202ccdac9eb65da0d395bc8dda14db490f0a3278efc89ddc943e8b2aed4f0a",
+    "复现实验.py": "26c6dc8b051d676734a75095faeacf6c36f3fd69f46d845e7cabb43e6cb73bd2",
+    "project_paths.py": "a2386b31db40fd95b42a83befabc6dce9cc2f69f3c727077152220e1d99bccda",
+    "生成图册.py": "2ea06ec25e9f204e126997bf3c8208414042d5fc7d827b9a56a4c1f6192f4e87",
+    "验证成果.py": "a0a4f25bbef519ab51f1d2eb68cecbe91a9a7c4520b5fd69d719669b4bde5048"
+  },
+  "integrity_checks": 6,
+  "selected_fixture_free_tests": 14,
+  "passed": 20,
+  "full_pytest_executed": false,
+  "mujoco_physics_included_in_these_checks": false,
+  "scope": "current execution, not the recipient's Windows checkout"
+}
