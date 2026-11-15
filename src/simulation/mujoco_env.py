@@ -9,6 +9,7 @@ from src.common import ROOT
 from src.hand_model.robot_hand import RobotHandModel
 from src.simulation.ch_m6_adapter import build_ch_m6_scene
 from src.evaluation.relative_grasp_stability import RelativeGraspHold
+from src.simulation.contact_detection import ContactDetectionConfig, ForceContactDebouncer
 
 
 class MujocoSimulator:
@@ -40,6 +41,7 @@ class MujocoSimulator:
         camera_presets: dict | None = None,
         scene_config: dict | None = None,
         control_dt_s: float | None = None,
+        contact_detection: dict | None = None,
     ) -> None:
         try:
             import mujoco
@@ -61,6 +63,7 @@ class MujocoSimulator:
         self.stability_orientation_deg = float(stability_orientation_deg)
         self.camera_presets = dict(camera_presets or {})
         self._contact_streak_frames = 0
+        self._contact_filter = ForceContactDebouncer(ContactDetectionConfig(**(contact_detection or {})))
         self._object_held_by_fixture = False
         self._object_reset_this_step = False
         self._hold_tracker = RelativeGraspHold(
@@ -231,6 +234,7 @@ class MujocoSimulator:
             dadr = self._object_dof_adr
             self.data.qvel[dadr : dadr + 6] = 0.0
         self._contact_streak_frames = 0
+        self._contact_filter.reset()
         self._hold_tracker.reset()
         self._object_reset_this_step = True
         self.mujoco.mj_forward(self.model, self.data)
@@ -331,74 +335,111 @@ class MujocoSimulator:
         return None
 
     def contact_metrics(self) -> dict[str, float | int | bool]:
-        """返回手-物接触与稳定性指标。
+        """Force-confirmed hand/object contact vs temporally filtered control state.
 
-        v0.3.2 修正：contact_count 只统计“手-任务物体”接触，
-        物体与桌面/地面的接触单独记录为 environment_contact_count。
-        同时增加每根手指和五个 fingertip pad 的独立接触状态。
+        MuJoCo can expose *inactive* geometric contacts in data.contact. Only
+        active constraints with positive normal force are physical evidence.
+        Raw force-backed contact is used for task success and free-body hold;
+        debounced flags are for contact-assist and task-space servo only.
         """
-        sections: set[str] = set()
-        digit_contacts: set[str] = set()
-        pad_contacts: set[str] = set()
+        fingers = ("thumb", "index", "middle", "ring", "little")
+        tip_names = {f: self.robot.tip_geom_name(f) for f in fingers}
+        forces = {f: 0.0 for f in fingers}
+        forces.update({f"{f}_tip": 0.0 for f in fingers})
+        forces['palm'] = 0.0
+        # Sum actual world-frame contact forces *on the object* by the hand digit.
+        # Contact frame rows are world-frame axes (MuJoCo convention).
+        force_on_object = {f: np.zeros(3, dtype=float) for f in fingers}
+        geometry_hits = {key: False for key in forces}
         hand_contact_count = 0
         environment_contact_count = 0
-
+        candidate_count = 0
+        total_hand_normal_force_n = 0.0
+        max_contact_penetration_m = 0.0
         for i in range(int(self.data.ncon)):
             c = self.data.contact[i]
             other = self._other_contact_geom(c)
             if other is None:
                 continue
-
+            # Classify *geometric candidates* before force gating so the
+            # ablation can reproduce the original optimistic ncon baseline.
             gname = self.mujoco.mj_id2name(
-                self.model, self.mujoco.mjtObj.mjOBJ_GEOM, other
-            ) or ""
+                self.model, self.mujoco.mjtObj.mjOBJ_GEOM, other) or ""
             bid = int(self.model.geom_bodyid[other])
             bname = self.mujoco.mj_id2name(
-                self.model, self.mujoco.mjtObj.mjOBJ_BODY, bid
-            ) or ""
-
+                self.model, self.mujoco.mjtObj.mjOBJ_BODY, bid) or ""
             digit = self.robot.finger_for_body(bname)
-
-            is_thenar = False
             is_palm = bname == str(self.robot.simulation_names["palm_body"])
-
-            if digit is not None or is_thenar or is_palm:
-                hand_contact_count += 1
-            else:
+            if digit in fingers:
+                geometry_hits[digit] = True
+                if gname == tip_names[digit]:
+                    geometry_hits[f'{digit}_tip'] = True
+            elif is_palm:
+                geometry_hits['palm'] = True
+            # A gap-zone contact may appear in ncon without entering the
+            # physics solver. It must not be reported as tactile contact.
+            if int(c.efc_address) < 0:
+                candidate_count += 1
+                continue
+            spatial_force = np.zeros(6, dtype=float)
+            self.mujoco.mj_contactForce(self.model, self.data, i, spatial_force)
+            normal_force_n = float(spatial_force[0])
+            if not np.isfinite(normal_force_n) or normal_force_n <= 0.0:
+                candidate_count += 1
+                continue
+            if digit is None and not is_palm:
                 environment_contact_count += 1
                 continue
-
-            if digit == "thumb" or is_thenar:
-                sections.add("thumb")
-                digit_contacts.add("thumb")
-            elif digit in {"index", "middle", "ring", "little"}:
-                sections.add("fingers")
-                digit_contacts.add(digit)
+            hand_contact_count += 1
+            total_hand_normal_force_n += normal_force_n
+            max_contact_penetration_m = max(max_contact_penetration_m, max(0.0, -float(c.dist)))
+            if digit in fingers:
+                forces[digit] += normal_force_n
+                if hasattr(c, 'frame'):
+                    # mj_contactForce is expressed in frame axes. Its world
+                    # vector acts on geom2; the equal/opposite acts on geom1.
+                    axes = np.asarray(c.frame, dtype=float).reshape(3, 3)
+                    world_on_geom2 = axes.T @ spatial_force[:3]
+                    sign = +1.0 if int(c.geom2) in self._object_geom_ids else -1.0
+                    force_on_object[digit] += sign * world_on_geom2
+                if gname == tip_names[digit]:
+                    forces[f'{digit}_tip'] += normal_force_n
             elif is_palm:
-                sections.add("palm")
+                forces['palm'] += normal_force_n
 
-            if gname in set(self.robot.simulation_names["fingertip_geoms"].values()):
-                pad_contacts.add(gname)
-
-        if hand_contact_count > 0:
+        raw_flags = {name: value >= self._contact_filter.cfg.enter_force_n
+                     for name, value in forces.items()}
+        mode = self._contact_filter.cfg.mode
+        if mode == 'geometry_only':
+            filtered = dict(geometry_hits)
+        elif mode == 'force_only':
+            filtered = dict(raw_flags)
+        elif mode == 'temporal_only':
+            # Hysteresis in time, no contact force criterion: this includes
+            # inactive gap contacts, precisely what this ablation tests.
+            filtered = self._contact_filter.update({
+                key: self._contact_filter.cfg.enter_force_n if hit else 0.0
+                for key, hit in geometry_hits.items()})
+        else:
+            filtered = self._contact_filter.update(forces)
+        raw_tips = {f: raw_flags[f'{f}_tip'] for f in fingers}
+        tip_flags = {f: filtered[f'{f}_tip'] for f in fingers}
+        raw_pinch = raw_tips['thumb'] and raw_tips['index']
+        raw_wrap = raw_flags['thumb'] and any(raw_flags[f] for f in fingers[1:])
+        pinch_control = tip_flags['thumb'] and tip_flags['index']
+        wrap_control = filtered['thumb'] and any(filtered[f] for f in fingers[1:])
+        raw_task_proxy = bool(raw_pinch if self.task_mode == 'pinch' else raw_wrap)
+        filtered_task_proxy = bool(pinch_control if self.task_mode == 'pinch' else wrap_control)
+        if raw_task_proxy:
             self._contact_streak_frames += 1
         else:
             self._contact_streak_frames = 0
 
         orient_deg = self.object_orientation_drift_deg()
         stable_orientation = orient_deg <= self.stability_orientation_deg
-
-        tip_flags = {
-            finger: self.robot.tip_geom_name(finger) in pad_contacts
-            for finger in ("thumb", "index", "middle", "ring", "little")
-        }
-        pinch_proxy = bool(tip_flags["thumb"] and tip_flags["index"])
-        wrap_proxy = bool(
-            "thumb" in digit_contacts
-            and any(f in digit_contacts for f in ("index", "middle", "ring", "little"))
-        )
-        task_proxy = pinch_proxy if self.task_mode == "pinch" else wrap_proxy
-        stable_contact_proxy = bool(task_proxy and stable_orientation and not self._object_held_by_fixture)
+        # In particular, do not use the debounced estimate for 'success': it
+        # may remain True for a short time *after* force goes to zero.
+        stable_contact_proxy = bool(raw_task_proxy and stable_orientation and not self._object_held_by_fixture)
         free_object = bool(self._task_active and self._object_qpos_adr is not None
                            and not self._object_held_by_fixture and not self._object_reset_this_step)
         if self._object_body_id is not None:
@@ -406,37 +447,47 @@ class MujocoSimulator:
         else:
             object_pos = object_rot = None
         hold_info = self._hold_tracker.update(
-            contact=bool(task_proxy), free_object=free_object,
+            contact=raw_task_proxy, free_object=free_object,
             palm_pos=np.asarray(self.data.xpos[self._palm_body_id], dtype=float).copy(),
             palm_rot=np.asarray(self.data.xmat[self._palm_body_id], dtype=float).reshape(3, 3).copy(),
             object_pos=object_pos, object_rot=object_rot,
         )
-
+        sections = (int(filtered['thumb']) + int(any(filtered[f] for f in fingers[1:]))
+                    + int(filtered['palm']))
         return {
-            "contact_count": int(hand_contact_count),
-            "environment_contact_count": int(environment_contact_count),
-            "contact_sections": int(len(sections)),
-            "thumb_contact": bool("thumb" in digit_contacts),
-            "index_contact": bool("index" in digit_contacts),
-            "middle_contact": bool("middle" in digit_contacts),
-            "ring_contact": bool("ring" in digit_contacts),
-            "little_contact": bool("little" in digit_contacts),
-            "finger_contact": bool(any(f in digit_contacts for f in ("index", "middle", "ring", "little"))),
-            "palm_contact": bool("palm" in sections),
-            "thumb_tip_contact": bool(tip_flags["thumb"]),
-            "index_tip_contact": bool(tip_flags["index"]),
-            "middle_tip_contact": bool(tip_flags["middle"]),
-            "ring_tip_contact": bool(tip_flags["ring"]),
-            "little_tip_contact": bool(tip_flags["little"]),
-            "tip_contact_ratio": float(len(pad_contacts) / 5.0),
-            "contact_streak_frames": int(self._contact_streak_frames),
-            "orientation_drift_deg": float(orient_deg),
-            "stable_orientation": bool(stable_orientation),
-            "pinch_contact_proxy": pinch_proxy,
-            "wrap_contact_proxy": wrap_proxy,
-            "task_contact_proxy": bool(task_proxy),
-            "stable_contact_proxy": stable_contact_proxy,
-            "object_displacement_m": float(self.object_displacement_m()),
+            'contact_count': int(hand_contact_count),
+            'environment_contact_count': int(environment_contact_count),
+            'inactive_contact_candidates': int(candidate_count),
+            'contact_sections': int(sections),
+            **{f'raw_{f}_contact': bool(raw_flags[f]) for f in fingers},
+            **{f'{f}_normal_force_n': float(forces[f]) for f in fingers},
+            **{f'{f}_force_on_object_{axis}_n': float(force_on_object[f][i])
+               for f in fingers for i, axis in enumerate('xyz')},
+            **{f'{f}_contact': bool(filtered[f]) for f in fingers},
+            'finger_contact': bool(any(filtered[f] for f in fingers[1:])),
+            'palm_contact': bool(filtered['palm']),
+            **{f'{f}_tip_contact': bool(tip_flags[f]) for f in fingers},
+            **{f'raw_{f}_tip_contact': bool(raw_tips[f]) for f in fingers},
+            'raw_pinch_contact_proxy': bool(raw_pinch),
+            'raw_wrap_contact_proxy': bool(raw_wrap),
+            'filtered_task_contact_proxy': filtered_task_proxy,
+            'hand_normal_force_n': float(total_hand_normal_force_n),
+            'thumb_tip_normal_force_n': float(forces['thumb_tip']),
+            'index_tip_normal_force_n': float(forces['index_tip']),
+            'max_contact_penetration_m': float(max_contact_penetration_m),
+            'tip_contact_ratio': float(sum(tip_flags.values())/len(fingers)),
+            'contact_streak_frames': int(self._contact_streak_frames),
+            'orientation_drift_deg': float(orient_deg),
+            'stable_orientation': bool(stable_orientation),
+            'pinch_contact_proxy': bool(raw_pinch),
+            'wrap_contact_proxy': bool(raw_wrap),
+            'task_contact_proxy': raw_task_proxy,
+            'stable_contact_proxy': stable_contact_proxy,
+            'object_displacement_m': float(self.object_displacement_m()),
+            'object_pos_x_m': float(object_pos[0]) if object_pos is not None else float('nan'),
+            'object_pos_y_m': float(object_pos[1]) if object_pos is not None else float('nan'),
+            'object_pos_z_m': float(object_pos[2]) if object_pos is not None else float('nan'),
+            'object_reset_this_step': bool(self._object_reset_this_step),
             **hold_info,
         }
 

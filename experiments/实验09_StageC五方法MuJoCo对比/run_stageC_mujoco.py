@@ -72,7 +72,7 @@ def summarize(outdir, names, fault_start=120, fault_stop=240):
     return out
 
 
-def build_command(executable,glove,outdir,condition,method,steps,start,stop,task="pinch"):
+def build_command(executable,glove,outdir,condition,method,steps,start,stop,task="pinch",contact_detector=None):
     return [str(executable),'-m','src.main',
        '--input','glove','--glove-samples',str(glove),
        '--sim','mujoco','--task',task,'--steps',str(steps),
@@ -83,7 +83,7 @@ def build_command(executable,glove,outdir,condition,method,steps,start,stop,task
        '--tqhg-v2-calibration','configs/tqhg_online_v2.json',
        '--coupled-servo-ablation','hold','--servo-trace',
        '--stagec-fault-channels',CONDITIONS[condition],
-       '--stagec-fault-start',str(start),'--stagec-fault-stop',str(stop)]
+       '--stagec-fault-start',str(start),'--stagec-fault-stop',str(stop)] + (['--contact-detector',contact_detector] if contact_detector else [])
 
 
 def main(argv=None):
@@ -96,6 +96,7 @@ def main(argv=None):
     ap.add_argument('--task',choices=('pinch','wrap','sphere'),default='pinch')
     ap.add_argument('--fault-start',type=int,default=120)
     ap.add_argument('--fault-stop',type=int,default=240)
+    ap.add_argument('--contact-detector',choices=('geometry_only','force_only','temporal_only','force_and_temporal'),default=None,help='Paired contact-controller ablation; use separate outdir for each detector')
     ap.add_argument('--dry-run',action='store_true',help='Show commands without requiring MuJoCo')
     a=ap.parse_args(argv)
     conditions=[s.strip() for s in a.conditions.split(',')]
@@ -109,7 +110,7 @@ def main(argv=None):
     for condition in conditions:
         for method in methods:
             name=f'stageC_{a.task}_{condition}_{method}'
-            cmd=build_command(sys.executable,a.glove,outdir,condition,method,a.steps,a.fault_start,a.fault_stop,a.task)
+            cmd=build_command(sys.executable,a.glove,outdir,condition,method,a.steps,a.fault_start,a.fault_stop,a.task,a.contact_detector)
             names.append((name,condition,method))
             print('[RUN]',' '.join('"'+x+'"' if ' ' in x else x for x in cmd),flush=True)
             if not a.dry_run:

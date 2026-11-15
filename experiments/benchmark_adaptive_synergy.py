@@ -8,6 +8,6 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 if __name__ == '__main__':
     import runpy
-    runpy.run_module('实验05_PCA与自适应协同对比.benchmark_adaptive_synergy', run_name='__main__')
+    runpy.run_module('experiments.实验05_PCA与自适应协同对比.benchmark_adaptive_synergy', run_name='__main__')
 else:
-    from 实验05_PCA与自适应协同对比.benchmark_adaptive_synergy import *
+    from experiments.实验05_PCA与自适应协同对比.benchmark_adaptive_synergy import *

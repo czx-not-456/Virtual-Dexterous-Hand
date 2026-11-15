@@ -1,0 +1,74 @@
+{
+  "schema": "synthetic_contact_detector_ablation_v1",
+  "warning": "Engineered synthetic force/noise; no MuJoCo physics or tactile ground truth; repeated episodes share simulation model.",
+  "seed": 20261108,
+  "episodes": 40,
+  "frames_per_episode": 240,
+  "config": {
+    "enter_force_n": 0.01,
+    "exit_force_n": 0.003,
+    "enter_frames": 2,
+    "exit_frames": 3
+  },
+  "summary": {
+    "geometry_only": {
+      "precision": 0.7896850438538928,
+      "recall": 0.8671295254254717,
+      "f1": 0.825844930192905,
+      "fpr": 0.2977831484771355,
+      "fnr": 0.13287047457452833,
+      "state_switches": 75.85,
+      "onset_delay_frames": 0.05
+    },
+    "force_only": {
+      "precision": 0.9741091581962351,
+      "recall": 0.8669121341211239,
+      "f1": 0.9170320595791118,
+      "fpr": 0.02962951819035885,
+      "fnr": 0.13308786587887617,
+      "state_switches": 39.0,
+      "onset_delay_frames": 0.05
+    },
+    "temporal_only": {
+      "precision": 0.876895047943744,
+      "recall": 0.9896692964529799,
+      "f1": 0.928902363803289,
+      "fpr": 0.18399771371457757,
+      "fnr": 0.010330703547020297,
+      "state_switches": 8.075,
+      "onset_delay_frames": 1.05
+    },
+    "force_and_temporal": {
+      "precision": 0.9840509270793643,
+      "recall": 0.9853289283392265,
+      "f1": 0.9846531105587772,
+      "fpr": 0.020746964905045778,
+      "fnr": 0.014671071660773461,
+      "state_switches": 2.45,
+      "onset_delay_frames": 1.625
+    }
+  },
+  "paired_episode_bootstrap_f1_delta_vs_proposed": {
+    "geometry_only": {
+      "mean_paired_f1_delta": 0.15880818036587224,
+      "bootstrap_95ci": [
+        0.15071648475999855,
+        0.16745854978639216
+      ]
+    },
+    "force_only": {
+      "mean_paired_f1_delta": 0.06762105097966561,
+      "bootstrap_95ci": [
+        0.06245756977262228,
+        0.07308045607563926
+      ]
+    },
+    "temporal_only": {
+      "mean_paired_f1_delta": 0.05575074675548819,
+      "bootstrap_95ci": [
+        0.046961771606277,
+        0.06514340242876383
+      ]
+    }
+  }
+}

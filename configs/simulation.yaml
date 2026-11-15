@@ -15,6 +15,14 @@ mujoco:
   object_workspace_radius_m: 0.30
   object_min_z_m: 0.040
   stability_orientation_deg: 5.0
+  # Research defaults. Calibrate against force traces and independent labelled
+  # contacts before making real-grasp success claims.
+  contact_detection:
+    mode: force_and_temporal
+    enter_force_n: 0.01
+    exit_force_n: 0.003
+    enter_frames: 2
+    exit_frames: 3
   evaluation:
     min_success_streak_frames: 12  # LEGACY 0.2s absolute-orientation proxy
     # NEW: uninterrupted contact AFTER approach fixture release; relative object/palm

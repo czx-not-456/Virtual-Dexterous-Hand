@@ -144,3 +144,72 @@ def test_within_ellipsoid_perturbation_respects_spectral_risk():
         z=z/np.linalg.norm(z)*m.ellipsoid_radius
         eta=np.diag(np.sqrt(np.diag(sigma)))@z
         assert np.linalg.norm(A@P@eta)<=bound+1e-12
+
+
+def test_fixed_spectral_dimension_is_a_true_fixed_k_ablation():
+    m=make_mapper()
+    m.fixed_spectral_modes=4
+    ref=np.array([.42,.56,.44,.61,.32,.18])
+    prev=m.decode_controls(np.array([.30,.40,.35,.49,.25,.16]))
+    speed=np.ones(11)*np.deg2rad(360)
+    m.set_command_anchor(prev,speed,1/60)
+    target=m.robot.fingertips(m.decode_controls(ref))
+    _,_,diag=m.optimize(lambda q: float(q@q),prev,Intent.PINCH,ref,
+        task_targets_m={f:target[f] for f in m.FINGERS[Intent.PINCH]})
+    assert diag.requested_mode_count == 4
+    assert diag.output_control_rank in (4,6)
+    assert diag.accepted_mode_count in (0,4)
+
+
+def test_fixed_spectral_dimension_rejects_invalid_values():
+    m=make_mapper()
+    m.fixed_spectral_modes=7
+    with pytest.raises(ValueError,match='fixed_spectral_modes'):
+        # Reinitialization validates the public config path.
+        import yaml
+        model=LatentSynergyMapper(RobotHandModel(), ROOT/'configs/latent_chm6_adaptive.json')
+        cfg=yaml.safe_load((ROOT/'configs/task_effect_spectrum.yaml').read_text(encoding='utf-8'))
+        cfg['fixed_spectral_modes']=7
+        TaskEffectSpectrumMapper(model,cfg)
+
+
+def test_final_nonlinear_guard_can_be_disabled_as_an_explicit_ablation():
+    m=make_mapper()
+    m.final_nonlinear_guard_enabled=False
+    ref=np.array([.42,.56,.44,.61,.32,.18])
+    prev=m.decode_controls(np.array([.30,.40,.35,.49,.25,.16]))
+    speed=np.ones(11)*np.deg2rad(360)
+    m.set_command_anchor(prev,speed,1/60)
+    target=m.robot.fingertips(m.decode_controls(ref))
+    q,_,_=m.optimize(lambda q: float(q@q),prev,Intent.PINCH,ref,
+        task_targets_m={f:target[f] for f in m.FINGERS[Intent.PINCH]})
+    out=m.project_and_rate_limit(q,prev,speed,1/60)
+    assert m.last_diag.final_guard_enabled is False
+    assert m.last_diag.rate_box_valid
+    assert np.allclose(out,m.C@m.encode_joints(out),atol=1e-9)
+
+
+def test_improving_candidate_that_breaks_spectral_budget_is_not_accepted(monkeypatch):
+    """Better-than-baseline FK alone is not enough to certify a lower-k output."""
+    m = make_mapper()
+    m.fixed_spectral_modes = 4
+    m.projection_abs_m = 0.0
+    m.projection_relative = 0.0
+    ref = np.array([.42, .56, .44, .61, .32, .18])
+    prev = m.decode_controls(np.array([.30, .40, .35, .49, .25, .16]))
+    speed = np.ones(11) * np.deg2rad(360)
+    m.set_command_anchor(prev, speed, 1 / 60)
+    target = m.robot.fingertips(m.decode_controls(ref))
+    errors = iter([1.0, 0.5])  # feasible reference, then improving but uncertified k=4 candidate
+    monkeypatch.setattr(m, "_nonlinear_tip_error", lambda *a, **k: next(errors))
+    monkeypatch.setattr(m, "_fidelity_ok", lambda *a, **k: True)
+
+    _, _, diag = m.optimize(lambda q: float(q @ q), prev, Intent.PINCH, ref,
+        task_targets_m={f: target[f] for f in m.FINGERS[Intent.PINCH]})
+
+    assert diag.accepted_mode_count == 0
+    assert diag.output_control_rank == 6
+    assert diag.fallback_full_reference is True
+    assert diag.reject_spectral_count == 1
+    assert diag.selection_status == "fallback_reference"
+    assert diag.fallback_reason == "no_candidate_passed:spectral_budget"

@@ -1,8 +1,32 @@
-# Virtual-Dexterous-Hand · 项目导航
+# 映射方法核心消融（精简候选版）
 
-**映射对比实验按“一组实验一个文件夹”集中放在 `experiments/`**，见 [00_映射对比实验_从这里开始.md](experiments/映射对比实验导航.md)。Stage B、静态/动态、手套标定、手套抓握、方案 B/C/D/E、Stage C 仿真与稳定性已分成 **10 个独立文件夹**，每个都有脚本、结果位置和说明。
+已将重复/低证据的实验从主清单移出；主线为 **Stage B 鲁棒性、B/C/D 模块消融、方案 E 效率/维度消融，Stage C 待验证**。移出的 02、03、04、10 均在 `archive/低证据实验审计/` 保留可审计历史，不以删数据制造更好结果。
 
-> **注意**：本次只整理文件结构、保留兼容命令，并删除仓库内原有的补丁 ZIP（未安装该补丁）；没有重新采集数据或生成新实验结论。原始数据、共享算法、模型和测试仍在原位置。
+- [核心实验导航](experiments/映射对比实验导航.md)
+- [一键运行与证据报告](experiments/run_core_mapping_suite.py)
+- [筛选说明与局限](docs/validation/MAPPING_CORE_SELECTION.md)
+
+```powershell
+python experiments/run_core_mapping_suite.py --dry-run
+python experiments/run_core_mapping_suite.py --groups stageb,modules,spectrum --steps 24 --out outputs/mapping_core
+```
+
+## 方案 E（任务效应谱）重点研究
+
+本项目将方案 E 作为重点研究方向之一，明确区分动态选维、固定维度、快速求解器和最终非线性守卫的贡献。研究说明与当前结果见 [方案 E 研究深化计划与当前结论](experiments/实验08_任务效应谱方案对比/方案E研究深化计划与当前结论.md)。当前 24 帧/6 姿态探索性重跑证据见 [方案 E 深化消融结果](experiments/实验08_任务效应谱方案对比/results/generated/方案E深化消融_24帧_2次重复/report.md)。
+
+推荐运行：
+
+```powershell
+python experiments/benchmark_scheme_e_research.py --dry-run
+python experiments/benchmark_scheme_e_research.py --steps 24 --repeats 3 --out outputs/scheme_e_research
+```
+
+v1.3.6 候选版已完成 E1–E5 的代码与评估流程推进：E1 增加候选拒绝原因并修正多条件接受证书；E2 将谱预算、编码器保真、非线性 FK/regret、速度/关节可行性联合纳入选维；E3 增加同一 E 求解链路下的动态 k 与固定 k=4/5/6 对照；E4 完成 27 份跨采集记录的 E_dynamic vs E_fixed6 回放（12 个手套序列号/左右手组合）；E5 增加 MuJoCo PINCH/WRAP 及 Pipeline P95/P99、deadline miss、任务空间误差评估入口。
+
+跨记录结果显示 E_dynamic 的实际低秩输出比例为 95.66%、fallback 为 0%，MAE 与固定 k=6 基本持平（记录级均值差约 +0.011°），但 Pipeline P95 平均慢约 0.52 ms。因此当前证据支持“降低输出秩且基本保持离线标签误差”，不支持“精度更高”或“计算更快”。E4 使用预设姿态标签且无独立受试者 ID，不能称为独立受试者泛化。E5 的代码与 dry-run 已验证，实际 MuJoCo 物理运行需在安装 MuJoCo 的环境执行。
+
+详细结果见 [方案 E E1–E5 完整推进报告](docs/research/方案E_E1-E5完整推进报告_v1.3.6.md) 和 [Windows 运行说明](方案E_E1-E5运行说明_v1.3.6.md)。可用 `experiments/run_scheme_e_e1_e5.ps1` 一次运行 E1–E4 并检查 E5 命令；在有 MuJoCo 的机器上追加 `-RunMujoco` 执行 E5，追加 `-Render` 可打开实时可视化。
 
 ---
 
@@ -330,3 +354,9 @@ neutral 要求流程无错误；PINCH 要求 contact；WRAP 要求 stable。接�
 - 研究对比与消融：[实验导航](experiments/映射对比实验导航.md)。
 - 通用文档：`docs/`；项目材料：`项目进度报告相关文件/`。
 - 迁移、去重与保留说明：[整理记录](docs/organization/README.md)。
+
+## WRAP 接触后协调控制四方法消融（候选 v1.3.4）
+
+> 新增研究候选策略尚未获得 MuJoCo 性能验证；原始方案保持默认。
+
+在项目根目录运行 `python experiments/benchmark_wrap_servo_policy.py --trials 0`，即可用相同数据、相同场景和相同物理判据执行 `original`、`low_gain`、`thumb_recovery`、`coordinated` 四组 WRAP 对照。批量运行和严格评估说明见 [`docs/validation/WRAP_SERVO_ABLATION_V134.md`](docs/validation/WRAP_SERVO_ABLATION_V134.md)。

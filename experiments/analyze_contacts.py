@@ -9,6 +9,12 @@ def as_bool(v: str) -> bool:
     return str(v).strip().lower() in {"1", "true", "yes"}
 
 
+def transitions(rows: list[dict], key: str) -> int:
+    """Count boolean contact-state changes within one task episode."""
+    values = [as_bool(r.get(key, "false")) for r in rows]
+    return sum(a != b for a, b in zip(values, values[1:]))
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description="Summarize PINCH/WRAP hand-object contact episodes")
     p.add_argument("csv", type=Path)
@@ -34,10 +40,21 @@ def main() -> None:
             servo_text = f", servo_mean_error={mean_servo_err:.4f}m, servo_max_error={max_servo_err:.4f}m"
         else:
             servo_text = ""
+        detail = ""
+        if 'filtered_task_contact_proxy' in subset[0]:
+            raw_switches = transitions(subset, 'task_contact_proxy')
+            filt_switches = transitions(subset, 'filtered_task_contact_proxy')
+            candidate_mean = sum(float(r.get('inactive_contact_candidates',0) or 0)
+                                 for r in subset)/len(subset)
+            force_mean = sum(float(r.get('hand_normal_force_n',0) or 0)
+                             for r in subset)/len(subset)
+            detail = (f", raw_switches={raw_switches}, control_switches={filt_switches}, "
+                      f"inactive_candidates_per_frame={candidate_mean:.2f}, "
+                      f"mean_hand_normal_force_N={force_mean:.3f}")
         print(
             f"{intent}: frames={len(subset)}, contact_proxy={success/len(subset):.1%}, "
             f"stable_proxy={stable/len(subset):.1%}, mean_hand_contacts={mean_contacts:.2f}, "
-            f"mean_tip_ratio={mean_tip:.2f}{servo_text}"
+            f"mean_tip_ratio={mean_tip:.2f}{servo_text}{detail}"
         )
 
 

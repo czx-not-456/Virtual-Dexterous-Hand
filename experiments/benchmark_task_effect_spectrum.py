@@ -8,6 +8,6 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 if __name__ == '__main__':
     import runpy
-    runpy.run_module('实验08_任务效应谱方案对比.benchmark_task_effect_spectrum', run_name='__main__')
+    runpy.run_module('experiments.实验08_任务效应谱方案对比.benchmark_task_effect_spectrum', run_name='__main__')
 else:
-    from 实验08_任务效应谱方案对比.benchmark_task_effect_spectrum import *
+    from experiments.实验08_任务效应谱方案对比.benchmark_task_effect_spectrum import *

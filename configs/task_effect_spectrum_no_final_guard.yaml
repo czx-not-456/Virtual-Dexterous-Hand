@@ -1,0 +1,38 @@
+# Scheme E research ablation; same base settings, one controlled factor changed.
+k_min: 1
+k_max: 6
+spectral_k_min: 1
+spectral_k_max: 6
+projection_abs_m: 0.002
+projection_relative: 0.08
+jacobian_step: 0.0001
+command_scale_m:
+  NEUTRAL: 0.01
+  PINCH: 0.003
+  WRAP: 0.006
+task_command_weight_m: 0.005
+metric_prior: 0.12
+metric_floor: 0.05
+metric_noise: 0.0
+max_reference_regret_m: 0.0001
+encoder_fidelity_slack_deg: 1.5
+linear_ref_weight_m: 0.012
+refine_mode_qp: false
+uncertainty_file: configs/chm6_uncertainty_proxy.json
+control_sigma_deg: 2.0
+uncertainty_enabled: true
+contact_feedback_enabled: true
+nonlinear_guard_enabled: true
+risk_policy: diagnostic
+risk_alpha: 0.1
+risk_budget_m: 0.025
+risk_contact_budget_m: 0.02
+ellipsoid_radius: 2.0
+noise_independently_calibrated: false
+require_calibrated_risk: true
+contact_dwell_frames: 2
+contact_loss_frames: 2
+contact_rescue_frames: 4
+maxiter: 30
+apply_lowpass: false
+final_nonlinear_guard_enabled: false

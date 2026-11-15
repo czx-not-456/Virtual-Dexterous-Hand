@@ -191,7 +191,18 @@ class IntentDrivenRetargeter:
                 })
             if isinstance(diag, TaskEffectDiagnostics):
                 comp.update({
+                    # `spectrum_modes` remains as a backwards-compatible alias
+                    # for emitted command rank. New reporting must use the
+                    # explicit selected/accepted fields below.
                     'spectrum_modes': float(diag.command_subspace_rank),
+                    'spectrum_selected_k': float(diag.requested_mode_count),
+                    'spectrum_accepted_k': float(diag.accepted_mode_count),
+                    'spectrum_output_rank': float(diag.output_control_rank),
+                    'spectrum_fallback': float(diag.fallback_full_reference),
+                    'spectrum_fallback_reason': diag.fallback_reason,
+                    'spectrum_selected_indices': ','.join(map(str, diag.selected_mode_indices)),
+                    'spectrum_final_guard_enabled': float(diag.final_guard_enabled),
+                    'spectrum_final_guard_regret_m': diag.final_guard_regret_m,
                     'spectrum_omission_m': diag.spectral_omission_m,
                     'spectrum_risk_m': diag.spectral_ellipsoid_risk_m,
                     'spectrum_energy': diag.selected_energy_fraction,
